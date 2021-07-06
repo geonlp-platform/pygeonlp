@@ -1,0 +1,6 @@
+include *.md
+include *.txt
+include LICENSE setup.py 
+recursive-include base_data *.csv *.json
+recursive-include libgeonlp *.h *.hpp *.c *.cpp
+recursive-include pygeonlp *.py

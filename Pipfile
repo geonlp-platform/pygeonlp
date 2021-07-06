@@ -1,0 +1,28 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+autopep8 = "*"
+flake8 = "*"
+epc = "*"
+jedi = "*"
+flask-jsonrpc = "*"
+gdal = "~=2.4.2"
+jageocoder = "~=0.1.9"
+pytest = "*"
+twine = "*"
+
+[packages]
+pipenv = "~=2021.5.29"
+python-dateutil = "~=2.8.1"
+requests = "*"
+pygeonlp = {editable = true, path = "."}
+
+[requires]
+python_version = "3.6.8"
+
+[scripts]
+format = "autopep8 -ivr ."
+lint = "flake8 --show-source ."

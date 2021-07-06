@@ -1,0 +1,46 @@
+{
+  "@context": "https://schema.org/",
+  "@type": "Dataset",
+  "name": "日本の鉄道駅（2019年）",
+  "keywords": [
+    "GeoNLP",
+    "地名辞書",
+    "鉄道", "駅"
+  ],
+  "alternateName": "",
+  "description": "国土数値情報「鉄道データ（令和元年度）N02-19」（https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N02-v2_3.html）から作成した、日本の鉄道駅（地下鉄を含む）の辞書です。hypernymには運営者名と路線名を記載しています。「都営」ではなく「東京都」のようになっていますので注意してください。自由フィールドとして、railway_typeに「鉄道区分」、institution_typeに「事業者種別」を含みます。",
+  "url": "https://www.info-proto.com/static/ksj-station-N02-2019.html",
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "contentUrl": "https://www.info-proto.com/static/ksj-station-N02-2019.csv",
+      "encodingFormat": "text/csv"
+    }
+  ],
+  "identifier": [
+    "geonlp:ksj-station-N02-2019"
+  ],
+  "dateModified": "2019-12-31T00:00:00+09:00",
+  "license": "https://nlftp.mlit.go.jp/ksj/other/agreement.html",
+  "size": "10311",
+  "temporalCoverage": "../..",
+  "creator": [
+    {
+      "name": "株式会社情報試作室",
+      "@type": "Organization",
+      "sameAs": "https://www.info-proto.com/"
+    }
+  ],
+  "isBasedOn": {
+    "@type": "CreativeWork",
+    "name": "鉄道データ（令和元年度）N02-19",
+    "url": "https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N02-v2_3.html"
+  },
+  "spatialCoverage": {
+    "@type": "Place",
+    "geo": {
+      "@type": "GeoShape",
+      "box": "26.193265 127.652285 45.4161633333333 145.59723"
+    }
+  }
+}

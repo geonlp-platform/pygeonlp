@@ -1,0 +1,27 @@
+*~
+*.log
+log
+nohup.out
+*.tgz
+*.tar.gz
+*.gz
+*.pyc
+*.egg-info/
+*.eggs
+*.so
+__pycache__/
+
+/dist/
+/samples/
+
+/libgeonlp/.deps
+/libgeonlp/.libs
+/build
+
+# Dicitonaries
+*.drt
+*.dic
+*.sq3
+.geonlp-dic-util/
+
+!.gitkeep
