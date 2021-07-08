@@ -31,7 +31,7 @@ class ScoringClass(object):
             パスのスコアリングやノード間のスコアを計算するときに
             利用するパラメータです。
 
-            geoparse() の `scoring_options` で指定した値が入ります。
+            geoparse() の ``scoring_options`` で指定した値が入ります。
             デフォルト実装では int の値をとり、
             地名語間の関係や距離を計算する際に、いくつ先の形態素まで
             照合するかを指定します。デフォルトは5です。
@@ -95,7 +95,7 @@ class ScoringClass(object):
 
         # 住所による得点を計算
         for address in addresses:
-            score += 10 * len(address.prop['fullname'])  # 住所階層数 * 10
+            score += 10 * len(address.morphemes)  # 住所階層数 * 10
 
         # 同じ固有名クラスが複数含まれていると得点
         ne_classes = {}
@@ -114,10 +114,20 @@ class ScoringClass(object):
 
         # ノード間の距離を計算
         # nlookup ノード先まで確認する
-        for i0 in range(len(geowords)):
-            g0 = geowords[i0]
-            for i1 in range(i0 + 1, min(i0 + nlookup, len(geowords))):
-                score += self.node_relation_score(g0, geowords[i1])
+        for i0 in range(len(path)):
+            n0 = path[i0]
+            if n0.node_type == Node.NORMAL:
+                continue
+
+            for i1 in range(i0 + 1, len(path)):
+                n1 = path[i1]
+                if n1.node_type == Node.NORMAL:
+                    continue
+
+                score += self.node_relation_score(n0, n1)
+                nlookup -= 1
+                if nlookup <= 0:
+                    break
 
         return score
 
@@ -180,14 +190,15 @@ class ScoringClass(object):
             score += 5
 
         # 相互距離
-        p1 = node0.get_point_object()
-        p2 = node1.get_point_object()
-        if p1 and p2:
-            dist = p1.Distance(p2)
-            if dist < 0.2:
+        try:
+            dist = node0.distance(node1)
+            if dist < 10000.0:  # 10km 以下
                 score += 5
             else:
-                score += int(1.0 / dist)
+                # 50km までは 1 点追加
+                score += int(50000.0 / dist)
+        except RuntimeError:
+            pass
 
         logger.debug("{} と {} のスコア => {}".format(
             node0.simple(), node1.simple(), score))

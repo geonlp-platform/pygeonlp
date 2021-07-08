@@ -53,13 +53,13 @@ class Parser(object):
             省略した場合、ジオコーディング機能は使用しません。
         address_regex : str, optional
             住所表記の開始とみなす地名語の固有名クラスを表す正規表現。
-            省略した場合、`r'^(都道府県|市区町村|行政地域|居住地名)(/.+|)'`
+            省略した場合、``r'^(都道府県|市区町村|行政地域|居住地名)(/.+|)'``
             を利用します。
         scoring_class : class, optional
             パスのスコアとノード間のスコアを計算する関数を持つ
             スコアリングクラス。
-            指定しない場合、`pygeonlp.api.scoring` モジュール内の
-            `ScoringClass` が利用されます。
+            指定しない場合、``pygeonlp.api.scoring`` モジュール内の
+            ``ScoringClass`` が利用されます。
         scoring_options : any, optional
             スコアリングクラスの初期化に渡すオプションパラメータ。
 
@@ -354,46 +354,59 @@ class Parser(object):
         Examples
         --------
         >>> import pygeonlp.api as api
+        >>> from pygeonlp.api.devtool import pp_lattice
         >>> import jageocoder
         >>> api.init()
-        >>> dbdir = api.get_jageocoder_dir()
+        >>> dbdir = api.get_jageocoder_db_dir()
         >>> jageocoder.init(f'sqlite:///{dbdir}/address.db', f'{dbdir}/address.trie')
         >>> parser = api.parser.Parser(jageocoder=jageocoder)
-        >>> lattice = parser.analyze_sentence('NIIは千代田区一ツ橋2-1-2にあります。')
+        >>> lattice = parser.analyze_sentence('アメリカ大使館：港区赤坂1-10-5')
         >>> lattice_address = parser.add_address_candidates(lattice, True)
-        >>> for nodes in lattice_address:
-        ...     [x.simple() for x in nodes]
-        ...
-        ['NII(NORMAL)']
-        ['は(NORMAL)']
-        ["千代田区(GEOWORD:['東京都'])", '千代田区一ツ橋2-1-(ADDRESS:東京都/千代田区/一ツ橋/二丁目/1番)[6]']
-        ['一ツ橋(NORMAL)']
-        ['2(NORMAL)']
-        ['-(NORMAL)']
-        ['1(NORMAL)']
-        ['-(NORMAL)']
-        ['2(NORMAL)']
-        ['に(NORMAL)']
-        ['あり(NORMAL)']
-        ['ます(NORMAL)']
-        ['。(NORMAL)']
+        >>> pp_lattice(lattice_address)
+        #0:'アメリカ大使館'
+          アメリカ大使館(NORMAL)
+        #1:'：'
+          ：(NORMAL)
+        #2:'港区'
+          港区(GEOWORD:['東京都'])
+          港区(GEOWORD:['愛知県', '名古屋市'])
+          港区(GEOWORD:['大阪府', '大阪市'])
+          港区赤坂1-10-(ADDRESS:東京都/港区/赤坂/一丁目/10番)[6]
+        #3:'赤坂'
+          赤坂(GEOWORD:['上毛電気鉄道', '上毛線'])
+          赤坂(GEOWORD:['東京地下鉄', '9号線千代田線'])
+          赤坂(GEOWORD:['富士急行', '大月線'])
+          赤坂(GEOWORD:['福岡市', '1号線(空港線)'])
+        #4:'1'
+          1(NORMAL)
+        #5:'-'
+          -(NORMAL)
+        #6:'10'
+          10(NORMAL)
+        #7:'-'
+          -(NORMAL)
+        #8:'5'
+          5(NORMAL)
         >>> lattice_address = parser.add_address_candidates(lattice)
-        >>> for nodes in lattice_address:
-        ...     [x.simple() for x in nodes]
-        ...
-        ['NII(NORMAL)']
-        ['は(NORMAL)']
-        ['千代田区一ツ橋2-1-(ADDRESS:東京都/千代田区/一ツ橋/二丁目/1番)[6]']
-        ['2(NORMAL)']
-        ['に(NORMAL)']
-        ['あり(NORMAL)']
-        ['ます(NORMAL)']
-        ['。(NORMAL)']
+        >>> pp_lattice(lattice_address)
+        #0:'アメリカ大使館'
+          アメリカ大使館(NORMAL)
+        #1:'：'
+          ：(NORMAL)
+        #2:'港区赤坂1-10-'
+          港区赤坂1-10-(ADDRESS:東京都/港区/赤坂/一丁目/10番)[6]
+        #3:'5'
+          5(NORMAL)
+        >>> node = lattice_address[2][0]
+        >>> len(node.morphemes)
+        6
+        >>> '東京都' in node.morphemes[0]['prop']['hypernym']
+        True
+        >>> node.morphemes[1]['node_type'] == 'NORMAL'
+        True
         """
         if not self.jageocoder_tree:
             return lattice
-
-        address_end_pos = 0
 
         i = 0  # 処理中のノードインデックス
         while i < len(lattice):
@@ -405,6 +418,8 @@ class Parser(object):
                    self.address_regex.match(node.prop.get('ne_class', '')):
                     can_be_address = True
                     break
+                """
+                ToDo: 地域・一般も住所ジオコーディングする
                 elif node.node_type == Node.NORMAL and \
                     self._check_word(node.morphemes, {
                         'pos': '名詞',
@@ -413,34 +428,19 @@ class Parser(object):
                         'subclass3': '一般'}):
                     can_be_address = True
                     break
+                """
 
             if can_be_address:
                 res = self.get_addresses(lattice, i)
                 if res['address']:
-                    morphemes = []
-                    parent = None
-                    for ns in lattice[i:res['pos']]:
-                        if parent is None or len(ns) == 1:
-                            cand = ns[0]
-                        else:
-                            # 親住所要素に最も関係する住所要素を選ぶ
-                            max_score = 0
-                            cand = None
-                            for n in ns:
-                                score = self.scorer.node_relation_score(
-                                    parent, n)
-                                if score > max_score:
-                                    cand = n
-                                    max_score = score
-
-                        n = cand.as_dict()
-                        morphemes.append(n)
-                        parent = cand
-
-                    if not keep_nodes:
-                        lattice = lattice[0:i] + [[]] + lattice[res['pos']:]
-
+                    new_nodes = []
                     for address in res['address']:
+                        morphemes = self._get_address_morphemes(
+                            address, lattice[i:res['pos']])
+                        if len(morphemes) == 0:
+                            # 一致する形態素列が見つからなかった
+                            continue
+
                         geometry = {
                             'type': 'Point',
                             'coordinates': [
@@ -454,19 +454,124 @@ class Parser(object):
                             geometry=geometry,
                             prop=address,
                         )
-                        lattice[i].append(new_node)
+                        new_nodes.append(new_node)
 
-                    if keep_nodes:
-                        i = res['pos']
-                    else:
-                        i += 1
+                    if len(new_nodes) > 0:
+                        if keep_nodes:
+                            lattice[i] += new_nodes
+                            i = res['pos']
+                        else:
+                            lattice = lattice[0:i] + \
+                                [new_nodes] + lattice[res['pos']:]
+                            i += 1
 
-                    continue
+                        continue
 
             i += 1
 
         # センテンス終了
         return lattice
+
+    def _get_address_morphemes(self, address_element, lattice_part):
+        """
+        住所ジオコーダが返した住所候補に対応する
+        形態素 Node のリストを生成して返します。
+
+        Parameters
+        ----------
+        address_element : dict
+            次のような要素を持つ住所候補。
+            - id: 3754681
+            - name: '皆瀬'
+            - x: 140.669102
+            - y: 39.005262
+            - level: 5
+            - note: None
+            - fullname: ['秋田県', '湯沢市', '皆瀬']
+        lattice_part : list of Node
+            住所候補に対応するラティス表現の部分配列。
+            形態素列を作成する際に、住所要素と一致するノードを利用します。
+
+        Returns
+        -------
+        list of Node
+            住所要素ごとに対応する形態素 Node を作成し、
+            リストを返します。
+            パラメータ例では "秋田県" に対応するノード、
+            "湯沢市" に対応するノード、 "皆瀬" に対応するノードを
+            作成します。
+        """
+        i = 0
+        morphemes = []
+        parent = Node(
+            surface="",
+            node_type=Node.ADDRESS,
+            morphemes={
+                'conjugated_form': '*',
+                'conjugation_type': '*',
+                'original_form': "",
+                'pos': '名詞',
+                'prononciation': '',
+                'subclass1': '固有名詞',
+                'subclass2': '地域',
+                'subclass3': '一般',
+                'surface': "",
+                'yomi': ''},
+            geometry={
+                'type': 'Point',
+                'coordinates': [
+                    address_element['x'], address_element['y']],
+            },
+            prop=address_element,
+        )
+
+        for nodes in lattice_part:
+            node = nodes[0]
+            if node.node_type != Node.GEOWORD:
+                # 非地名語はそのまま
+                morphemes.append(node.as_dict())
+                continue
+
+            dummy_node = Node(
+                surface=node.surface,
+                node_type=Node.NORMAL,
+                morphemes=copy.deepcopy(node.morphemes),
+                geometry=None,
+                prop=None,
+            )
+            dummy_node.morphemes.update({
+                'subclass1': '固有名詞',
+                'subclass2': '地域',
+                'subclass3': '一般',
+            })
+
+            if node.surface not in address_element['fullname']:
+                # 住所要素のどの表記とも一致しない
+                morphemes.append(dummy_node.as_dict())
+                continue
+
+            # 親ノードに最も関係スコアの高い地名語ノードを選ぶ
+            max_score = 0
+            cand = None
+
+            for node in nodes:
+                if not self.address_regex.match(node.prop.get('ne_class', '')):
+                    # 固有名クラスが住所表記のものではない
+                    score = 0
+                else:
+                    score = self.scorer.node_relation_score(parent, node)
+                    if score > max_score:
+                        cand = node
+                        max_score = score
+            if cand:
+                # 親ノードと関係のある候補が見つかった場合
+                parent = cand
+            else:
+                cand = dummy_node
+
+            morphemes.append(cand.as_dict())
+
+        return morphemes
 
     def _get_alternative_word(self, word):
         """
@@ -662,11 +767,11 @@ class Parser(object):
         while pos_from < len(lattice):
             lattice_part = lattice[pos_from:pos_to]
             if self.ranker.count_combinations(lattice_part) < MAX_COMBINATIONS:
-                logger.debug("---")
-                for nodes in lattice_part:
-                    logger.debug("'{}':{}".format(
-                        nodes[0].surface,
-                        len(nodes)))
+                logger.debug("--- pos {} - {}".format(pos_from, pos_to))
+                for i in range(pos_from, pos_to):
+                    nodes = lattice[i]
+                    logger.debug("{}:'{}' has {} nodes".format(
+                        i, nodes[0].surface, len(nodes)))
                 logger.debug("---")
                 yield lattice_part
 

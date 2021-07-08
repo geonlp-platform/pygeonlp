@@ -15,8 +15,7 @@ class LinkerError(RuntimeError):
 
 class LinkedResults(object):
     """
-    ラティス表現（形態素ごとに候補リストを格納したリスト）から
-    パス表現（候補の組み合わせをパスで接続したリスト）の候補を
+    ラティス表現からパス表現の候補を
     次々に出力するイテレータを作成します。
 
     Examples
@@ -30,11 +29,11 @@ class LinkedResults(object):
     ["国会議事堂前(GEOWORD:['東京地下鉄', '9号線千代田線'])", 'まで(NORMAL)', '歩き(NORMAL)', 'まし(NORMAL)', 'た(NORMAL)', '。(NORMAL)']
     """
 
-    def __init__(self, input):
+    def __init__(self, lattice):
         """
         Parameters
         ----------
-        input : list
+        lattice : list
             入力となるラティス表現
 
         Returns
@@ -42,7 +41,7 @@ class LinkedResults(object):
         int
             常に 0
         """
-        self.input = input
+        self.lattice = lattice
         self.reset_counter()
 
     def __iter__(self):
@@ -56,7 +55,7 @@ class LinkedResults(object):
         if output is None:
             raise StopIteration()
 
-        self.increment_counter()
+        self.increment_counter(0)
         return output
 
     def counter(self):
@@ -76,13 +75,13 @@ class LinkedResults(object):
 
         output = []
         n = 0
-        while n < len(self.input):
-            node = self.input[n][self.counters[n]]
+        while n < len(self.lattice):
+            node = self.lattice[n][self.counters[n]]
             output.append(node)
 
             # 住所ノード以外が保存されているかチェック
             has_non_address_node = False
-            for _node in self.input[n]:
+            for _node in self.lattice[n]:
                 if _node.node_type != Node.ADDRESS:
                     has_non_address_node = True
                     break
@@ -99,35 +98,20 @@ class LinkedResults(object):
         """
         カウンターを初期化します。
         """
-        self.counters = [0] * len(self.input)
+        self.counters = [0] * len(self.lattice)
         # 形態素ノードの種別を事前に計算する
         # 0: 非地名語のみ
         # 1: 地名語を含む（住所は含まない）
         # 2: 住所の先頭ノード
-        # -1: 住所に含まれる形態素ノード（解析しない）
-        self.node_types = [0] * len(self.input)
+        self.node_types = [Node.NORMAL] * len(self.lattice)
         n = 0
-        while n < len(self.input):
-            nodes = self.input[n]
-
-            has_non_address_node = False
-            for node in nodes:
-                if node.node_type != Node.ADDRESS:
-                    has_non_address_node = True
-                    break
+        while n < len(self.lattice):
+            nodes = self.lattice[n]
 
             for node in nodes:
                 if node.node_type == Node.ADDRESS:
                     self.node_types[n] = Node.ADDRESS
-
-                    if has_non_address_node:
-                        for i in range(n + 1, n + len(node.morphemes)):
-                            self.node_types[i] = Node.IGNORE
-
-                        n += len(node.morphemes) - 1
-
-                    break  # 住所が見つかったのでそれ以上調べない
-
+                    break
                 elif node.node_type == Node.GEOWORD:
                     self.node_types[n] = Node.GEOWORD
 
@@ -135,37 +119,70 @@ class LinkedResults(object):
 
         logger.debug("ノード種別リスト: {}".format(self.node_types))
 
-    def increment_counter(self):
+    def increment_counter(self, pos):
         """
         カウンターを次に進めます。
+
+        Parameters
+        ----------
+        pos : int
+            この値で指定された位置より後ろ側でインクリメントします。
+
+        Returns
+        -------
+        bool
+            インクリメントした結果、桁上がりが必要な場合は False
+            不要な場合 True を返します。
         """
-        n = 0
-        overflow = True
-        while overflow and n < len(self.input):
+        if pos == len(self.lattice):
+            return False
 
-            if self.node_types[n] in (Node.NORMAL, Node.IGNORE,):
-                n += 1
-                continue
+        i = self.counters[pos]
+        node = self.lattice[pos][i]
+        next_pos = pos + 1
+        if node.node_type == Node.ADDRESS:
+            has_non_address_node = False
+            for _node in self.lattice[pos]:
+                if _node.node_type != Node.ADDRESS:
+                    has_non_address_node = True
+                    break
 
-            if self.counters[n] < len(self.input[n]) - 1:
-                self.counters[n] += 1
-                overflow = False
+            if has_non_address_node:
+                # この形態素には住所ノード以外も存在するので
+                # 住所が終わる位置以降でインクリメント
+                next_pos = pos + len(node.morphemes)
+
+        # 次の地名語・住所ノード以降でインクリメント
+        while next_pos < len(self.lattice) and \
+                self.node_types[next_pos] == Node.NORMAL:
+            next_pos += 1
+
+        res = self.increment_counter(next_pos)
+
+        if res:
+            # 後方で桁上がりが発生しなかった場合
+            return True
+
+        # この位置でインクリメント
+        i += 1
+        if i < len(self.lattice[pos]):
+            self.counters[pos] = i
+            return True
+        else:
+            if pos == 0:
+                self.counters[pos] = -1
             else:
-                self.counters[n] = 0
-                overflow = True
-                n += 1
+                self.counters[pos] = 0
 
-        if overflow:
-            # 最後まで進んだ場合、先頭に -1 をセットする
-            self.counters[0] = -1
+        return False
 
 
 class RankedResults(object):
     """
-    ラティス表現（形態素ごとに候補リストを格納したリスト）から、
-    指定したメソッドで計算したスコアの高いものから順に並べたパス表現を作成します。
+    ラティス表現から、指定したメソッドで計算したスコアの高いものから
+    順に並べたパス表現を作成します。
 
-    スコアリングに独自のメソッドを利用する場合は `scoring_method` で指定してください。
+    スコアリングに独自のメソッドを利用する場合は ``scoring_method`` で指定してください。
 
     Examples
     --------
@@ -207,8 +224,8 @@ class RankedResults(object):
         scoring_class : class, optional
             パスのスコアとノード間のスコアを計算する関数を持つ
             スコアリングクラス。
-            指定しない場合、`pygeonlp.api.scoring` モジュール内の
-            `ScoringClass` が利用されます。
+            指定しない場合、``pygeonlp.api.scoring`` モジュール内の
+            ``ScoringClass`` が利用されます。
         scoring_options : any, optional
             スコアリングクラスの初期化に渡すオプションパラメータ。
         max_results : int, optional
@@ -231,13 +248,13 @@ class RankedResults(object):
         if self.max_combinations is None:
             self.max_combinations = MAX_COMBINATIONS
 
-    def count_combinations(self, input):
+    def count_combinations(self, lattice):
         """
         ラティス形式の入力に対し、組み合わせたパス表現の個数を計算します。
 
         Parameters
         ----------
-        input : list
+        lattice : list
             入力となるラティス表現。
 
         Return
@@ -246,20 +263,20 @@ class RankedResults(object):
             組み合わせの数。
         """
         n = 1
-        for i in input:
+        for i in lattice:
             n *= len(i)
             if n > 2147483647:
                 break
 
         return n
 
-    def get(self, input):
+    def get(self, lattice):
         """
-        ラティス形式を入力として、スコアリングと並べ替えを行ないます。
+        ラティス表現を入力として、スコアリングと並べ替えを行ないます。
 
         Parameters
         ----------
-        input : list
+        lattice : list
             入力となるラティス表現。
 
         Return
@@ -270,13 +287,13 @@ class RankedResults(object):
             スコア降順にソートされ、最大 max_results 個の要素を含みます。
         """
         results = []
-        combination = self.count_combinations(input)
+        combination = self.count_combinations(lattice)
         if combination > self.max_combinations:
             raise LinkerError(
                 "組み合わせ数 {} がしきい値 {} を超えています。".format(
                     combination, self.max_combinations))
 
-        lr = LinkedResults(input)
+        lr = LinkedResults(lattice)
         for path in lr:
             score = self.scorer.path_score(path)
             new_record = {
@@ -306,23 +323,23 @@ class RankedResults(object):
 
         return results
 
-    def as_dict(self, input):
+    def as_dict(self, lattice):
         """
-        `get()` と同じ処理を行ないますが、結果に含まれるノードの情報を
+        ``get()`` と同じ処理を行ないますが、結果に含まれるノードの情報を
         JSON に変換可能な dict に変換してから返します。
 
         Parameters
         ----------
-        input : list
+        lattice : list
             入力となるラティス表現。
 
         Return
         ------
         list
-            `get()` の出力結果を JSON 変換可能な形式に変換したリスト。
+            ``get()`` の出力結果を JSON 変換可能な形式に変換したリスト。
         """
         results = []
-        for r in self.get(input):
+        for r in self.get(lattice):
             score = r['score']
             node_list = r['result']
             dict_list = [x.as_dict() for x in node_list]
@@ -333,23 +350,23 @@ class RankedResults(object):
 
         return results
 
-    def as_geojson(self, input):
+    def as_geojson(self, lattice):
         """
-        `get()` と同じ処理を行ないますが、結果に含まれるノードの情報を
+        ``get()`` と同じ処理を行ないますが、結果に含まれるノードの情報を
         GeoJSON FeatureCollection に変換可能な dict に変換してから返します。
 
         Parameters
         ----------
-        input : list
+        lattice : list
             入力となるラティス表現。
 
         Return
         ------
         list
-            `get()` の出力結果を GeoJSON 変換可能な形式に変換したリスト。
+            ``get()`` の出力結果を GeoJSON 変換可能な形式に変換したリスト。
         """
         results = []
-        for r in self.get(input):
+        for r in self.get(lattice):
             score = r['score']
             node_list = r['result']
             features = [x.as_geojson() for x in node_list]

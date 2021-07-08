@@ -43,7 +43,7 @@ class Filter(object):
 
     def apply(self, input, **kwargs):
         """
-        入力データの各候補ノードに対して `filter_func()` を適用し、
+        入力データの各候補ノードに対して ``filter_func()`` を適用し、
         合格したノードだけを残した結果を返します。
 
         この実装では、各候補ノードに含まれる情報のみを利用してフィルタ処理を行なうため、
@@ -58,7 +58,7 @@ class Filter(object):
         Returns
         -------
         list
-            `filter_func()` を適用して要素を削除されたラティス表現。
+            ``filter_func()`` を適用して要素を削除されたラティス表現。
         """
         output = [None] * len(input)
         for i in range(len(input)):
@@ -108,7 +108,7 @@ class Filter(object):
     def _apply_filter(self, candidates, default=None, **kwargs):
         '''
         ラティス表現の1つの形態素に対する複数の候補ノードに対して
-        順番に `filter_func()` を適用し、条件に一致しないノードを
+        順番に ``filter_func()`` を適用し、条件に一致しないノードを
         削除した候補ノードのリストを返します。
 
         default で指定された地名語 ID を持つノードが条件に一致した場合、
@@ -242,8 +242,8 @@ class GreedySearchFilter(Filter):
         scoring_class : class, optional
             パスのスコアとノード間のスコアを計算する関数を持つ
             スコアリングクラス。
-            指定しない場合、`pygeonlp.api.scoring` モジュール内の
-            `ScoringClass` が利用されます。
+            指定しない場合、``pygeonlp.api.scoring`` モジュール内の
+            ``ScoringClass`` が利用されます。
         scoring_options : any, optional
             スコアリングクラスの初期化に渡すオプションパラメータ。
         """
@@ -259,7 +259,7 @@ class GreedySearchFilter(Filter):
     def apply(self, input, **kwargs):
         """
         このフィルタは前後の形態素ノードを調べて地名語間の関係を計算するため、
-        `apply()` をオーバーライドします。
+        ``apply()`` をオーバーライドします。
 
         Parameters
         ----------

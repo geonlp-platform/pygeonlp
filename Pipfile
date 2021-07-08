@@ -19,6 +19,7 @@ pipenv = "~=2021.5.29"
 python-dateutil = "~=2.8.1"
 requests = "*"
 pygeonlp = {editable = true, path = "."}
+geographiclib = "*"
 
 [requires]
 python_version = "3.6.8"

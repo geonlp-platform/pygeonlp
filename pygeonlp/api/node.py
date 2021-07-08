@@ -1,5 +1,8 @@
 import json
 from logging import getLogger
+import math
+
+from geographiclib.geodesic import Geodesic
 
 logger = getLogger(__name__)
 
@@ -52,6 +55,51 @@ class Node(object):
         self.prop = prop
         self._attr = {}  # 動的に計算する属性
 
+    def get_lonlat(self):
+        """
+        ノードの経度、緯度を返します。
+
+        Returns
+        -------
+        dict
+            以下の要素を持つ dict。
+
+            - lat : float
+                ノードの代表点の緯度。
+            - lon : float
+                ノードの代表点の経度。
+
+        Examples
+        --------
+        >>> import pygeonlp.api as api
+        >>> api.init()
+        >>> node = api.analyze('国会議事堂前')[0][0]
+        >>> node.get_lonlat()
+        {'lat': 35.674845, 'lon': 139.74534166666666}
+
+        >>> import pygeonlp.api as api
+        >>> import jageocoder
+        >>> api.init()
+        >>> dbdir = api.get_jageocoder_db_dir()
+        >>> jageocoder.init(f'sqlite:///{dbdir}/address.db', f'{dbdir}/address.trie')
+        >>> node = api.analyze('千代田区一ツ橋2-1-2', jageocoder=jageocoder)[0][0]
+        >>> node.get_lonlat()
+        {'lat': 35.692332, 'lon': 139.758148}
+        """
+        if self.node_type == self.__class__.GEOWORD:
+            return {
+                'lat': float(self.prop['latitude']),
+                'lon': float(self.prop['longitude']),
+            }
+
+        if self.node_type == self.__class__.ADDRESS:
+            return {
+                'lat': self.prop['y'],
+                'lon': self.prop['x'],
+            }
+
+        return None
+
     def __get_type_string(self):
         if self.node_type == self.__class__.NORMAL:
             return "NORMAL"
@@ -75,24 +123,28 @@ class Node(object):
         >>> api.init()
         >>> api.analyze('国会議事堂前')[0][0].simple()
         "国会議事堂前(GEOWORD:['東京地下鉄', '4号線丸ノ内線'])"
+
+        Returns
+        -------
+        str
+            シンプルな形式の文字列。
         """
+
         hypernym = None
         if self.node_type == Node.GEOWORD:
             hypernym = self.prop.get('hypernym')
 
-        if hypernym:
-            res = "{}({}:{})".format(self.surface,
-                                     self.__get_type_string(), hypernym)
-        else:
-            res = "{}({})".format(self.surface, self.__get_type_string())
-
-        if isinstance(self.morphemes, list):
-            # Address
+        if self.node_type == Node.ADDRESS:
             res = "{}({}:{})[{}]".format(
                 self.surface,
                 self.__get_type_string(),
                 "/".join(self.prop['fullname']),
                 len(self.morphemes))
+        elif hypernym:
+            res = "{}({}:{})".format(self.surface,
+                                     self.__get_type_string(), hypernym)
+        else:
+            res = "{}({})".format(self.surface, self.__get_type_string())
 
         return res
 
@@ -106,6 +158,11 @@ class Node(object):
         >>> api.init()
         >>> api.analyze('国会議事堂前')[0][0].as_dict()
         {'surface': '国会議事堂前', 'node_type': 'GEOWORD', 'morphemes': {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '国会議事堂前', 'pos': '名詞', 'prononciation': '', 'subclass1': '固有名詞', 'subclass2': '地名語', 'subclass3': 'fuquyv:国会議事堂前駅', 'surface': '国会議事堂前', 'yomi': ''}, 'geometry': {'type': 'Point', 'coordinates': [139.74534166666666, 35.674845]}, 'prop': {'body': '国会議事堂前', 'dictionary_id': 3, 'entry_id': 'e630bf128884455c4994e0ac5ca49b8d', 'geolod_id': 'fuquyv', 'hypernym': ['東京地下鉄', '4号線丸ノ内線'], 'institution_type': '民営鉄道', 'latitude': '35.674845', 'longitude': '139.74534166666666', 'ne_class': '鉄道施設/鉄道駅', 'railway_class': '普通鉄道', 'suffix': ['駅', ''], 'dictionary_identifier': 'geonlp:ksj-station-N02-2019'}}
+
+        Returns
+        -------
+        dict
+            JSON 出力可能な dict オブジェクト。
         """
         obj = {
             "surface": self.surface,
@@ -126,6 +183,11 @@ class Node(object):
         >>> api.init()
         >>> api.analyze('国会議事堂前')[0][0].as_geojson()
         {'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [139.74534166666666, 35.674845]}, 'properties': {'surface': '国会議事堂前', 'node_type': 'GEOWORD', 'morphemes': {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '国会議事堂前', 'pos': '名詞', 'prononciation': '', 'subclass1': '固有名詞', 'subclass2': '地名語', 'subclass3': 'fuquyv:国会議事堂前駅', 'surface': '国会議事堂前', 'yomi': ''}, 'geoword_properties': {'body': '国会議事堂前', 'dictionary_id': 3, 'entry_id': 'e630bf128884455c4994e0ac5ca49b8d', 'geolod_id': 'fuquyv', 'hypernym': ['東京地下鉄', '4号線丸ノ内線'], 'institution_type': '民営鉄道', 'latitude': '35.674845', 'longitude': '139.74534166666666', 'ne_class': '鉄道施設/鉄道駅', 'railway_class': '普通鉄道', 'suffix': ['駅', ''], 'dictionary_identifier': 'geonlp:ksj-station-N02-2019'}}}
+
+        Returns
+        -------
+        dict
+            GeoJSON Feature 形式に変換可能な dict オブジェクト。
         """
         feature = {
             "type": "Feature",
@@ -172,7 +234,7 @@ class Node(object):
 
         Notes
         -----
-        何度も計算しないように、計算した結果は `_attr['notations']` に保持します。
+        何度も計算しないように、計算した結果は ``_attr['notations']`` に保持します。
         """
         if 'notations' in self._attr:
             return self._attr['notations']
@@ -214,8 +276,8 @@ class Node(object):
 
         Notes
         -----
-        `gdal` がインストールされていない場合は None を返します。
-        何度も計算しないように、計算した結果は `_attr['point']` に保持します。
+        ``gdal`` がインストールされていない場合は None を返します。
+        何度も計算しないように、計算した結果は ``_attr['point']`` に保持します。
         """
         if 'point' in self._attr:
             return self._attr['point']
@@ -226,3 +288,31 @@ class Node(object):
         point = ogr.CreateGeometryFromJson(json.dumps(self.geometry))
         self._attr['point'] = point
         return point
+
+    def distance(self, node):
+        """
+        自身と他のノードの距離 (m) を計算します。
+        このメソッドは geographiclib を利用します。
+        https://pypi.org/project/geographiclib/
+
+        Examples
+        --------
+        >>> import pygeonlp.api as api
+        >>> api.init()
+        >>> lattice = api.analyze('国会議事堂前,永田町')
+        >>> n0 = lattice[0][0]
+        >>> n1 = lattice[2][0]
+        >>> round(n0.distance(n1), 6)
+        676.592019
+        """
+        p0 = self.get_lonlat()
+        p1 = node.get_lonlat()
+
+        if p0 is None or p1 is None:
+            raise RuntimeError(
+                "ジオメトリを持たないノード間の距離は計算できません。")
+
+        geod = Geodesic.WGS84
+        g = geod.Inverse(p0['lat'], p0['lon'], p1['lat'], p1['lon'])
+
+        return g['s12']

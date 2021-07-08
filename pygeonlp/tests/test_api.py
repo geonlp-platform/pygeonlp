@@ -7,10 +7,12 @@ import pygeonlp.api as api
 
 def setup(test):
     testdir = os.path.abspath(os.path.join(os.getcwd(), "apitest"))
-    os.environ['GEONLP_DIR'] = testdir
+    os.environ['GEONLP_DB_DIR'] = testdir
     os.makedirs(testdir, 0o755, exist_ok=True)
-    api.init(dict_dir=testdir)
+    api.setup_basic_database(db_dir=testdir)
+    api.init(db_dir=testdir)
 
+    """
     updated = False
     if api.getDictionary('geonlp:geoshape-city') is None:
         api.addDictionaryFromFile(
@@ -32,6 +34,7 @@ def setup(test):
 
     if updated:
         api.updateIndex()
+    """
 
 
 def load_tests(loader, tests, ignore):

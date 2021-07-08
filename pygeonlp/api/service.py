@@ -40,30 +40,38 @@ class Service(object):
 
     """
 
-    def __init__(self, dict_dir=None, geoword_rules={}, **options):
+    def __init__(self, db_dir=None, geoword_rules={}, **options):
         """
         このサービスが利用する辞書や、各種設定を初期化します。
 
         Parameters
         ----------
-        dict_dir : str, optional
-            辞書データが配置されているディレクトリのパス。
+        db_dir : str, optional
+            利用するデータベースディレクトリのパス。
+            省略した場合は ``api.get_db_dir()`` で決定します。
         geoword_rules: dict, optional
-            地名語を解析するルールセット。
+            地名語を解析するルールセットを指定します。
         options : dict, optional
-            その他の解析オプション。
+            その他の解析オプションを指定します。
 
         Notes
         -----
-        geoword_rules, options の詳細は pygeonlp.api.init() を参照してください。
+        geoword_rules, options の詳細およびデフォルト値は
+        ``pygeonlp.api.init()`` を参照してください。
         """
         self._dict_cache = {}
         self.options = options
         self.capi_ma = None
 
-        if dict_dir is None:
-            from . import get_dic_dir
-            dict_dir = get_dic_dir()
+        if db_dir is None:
+            from . import get_db_dir
+            db_dir = get_db_dir()
+
+        # データベースディレクトリの存在チェック
+        if not os.path.exists(db_dir):
+            raise RuntimeError(
+                ("データベースディレクトリ {} がありません。".format(db_dir),
+                 "setup_basic_database() で作成してください。"))
 
         # デフォルト値を設定
         if 'address_class' not in self.options:
@@ -74,7 +82,7 @@ class Service(object):
             self.options['address_class'] = '^$'
 
         # capi.ma 用のオプションを構築
-        capi_options = {'data_dir': dict_dir}
+        capi_options = {'data_dir': db_dir}
         if 'suffix' in geoword_rules:
             if isinstance(geoword_rules['suffix'], str):
                 capi_options['suffix'] = geoword_rules['suffix']
@@ -297,8 +305,8 @@ class Service(object):
         インストール済み辞書のうち、解析に利用する辞書のメタデータ一覧を返します。
         デフォルトでは全てのインストール済み辞書を利用します。
 
-        一時的に辞書を利用したくない場合、 `disactivateDictionaries()` で除外できます。
-        除外された辞書は `activateDictionaries()` で再び利用可能になります。
+        一時的に辞書を利用したくない場合、 ``disactivateDictionaries()`` で除外できます。
+        除外された辞書は ``activateDictionaries()`` で再び利用可能になります。
 
         Returns
         -------
@@ -815,7 +823,7 @@ class Service(object):
         scoring_class : class, optional
             パスのスコアとノード間のスコアを計算するメソッドをもつ
             スコアリングクラス。
-            省略した場合は `scoring.ScoringClass` を利用します。
+            省略した場合は ``scoring.ScoringClass`` を利用します。
         scoring_options : any, optional
             スコアリングクラスの初期化に渡すオプションパラメータ。
 

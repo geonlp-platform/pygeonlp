@@ -172,7 +172,7 @@ class Dictionary(object):
 
         Parameters
         ----------
-        capi_ma : `capi.MA`
+        capi_ma : ``capi.MA``
             辞書を管理する MA オブジェクト。
             init() で初期化済みである必要があります。
 

@@ -11,45 +11,48 @@ logger = getLogger(__name__)
 _default_service = None
 
 
-def get_dic_dir():
+def get_db_dir():
     """
-    GeoNLP 辞書が配置されている辞書ディレクトリを取得します。
-    辞書ディレクトリは次の優先順位に従って決定します。
+    データベースディレクトリを取得します。
+    データベースディレクトリは次の優先順位に従って決定します。
 
-    - 環境変数 `GEONLP_DIR` の値
-    - 環境変数 `HOME` が指すディレクトリの下の `geonlp/dic`
+    - 環境変数 ``GEONLP_DB_DIR`` の値
+    - 環境変数 ``HOME`` が指すディレクトリの下の ``geonlp/db/``
 
-    どちらの環境変数も指定されていない場合は `RuntimeError` を送出して終了します。
+    どちらの環境変数も指定されていない場合は ``RuntimeError`` を送出して
+    終了します。
 
     Return
     ------
     str
         ディレクトリの絶対パス。
     """
-
     # 環境変数 GEONLP_DIR をチェック
-    geonlp_dir = os.environ.get('GEONLP_DIR')
-    if geonlp_dir:
-        return os.path.abspath(geonlp_dir)
+    db_dir = os.environ.get('GEONLP_DB_DIR')
+    if db_dir:
+        db_dir = os.path.abspath(db_dir)
 
-    # 環境変数 HOME が利用できれば $HOME/geonlp/dic
+    # 環境変数 HOME が利用できれば $HOME/geonlp/db
     home = os.environ.get('HOME')
-    if home:
-        geonlp_dir = os.path.join(home, 'geonlp/dic')
-        return os.path.abspath(geonlp_dir)
+    if not db_dir and home:
+        db_dir = os.path.join(home, 'geonlp/db')
+        db_dir = os.path.abspath(db_dir)
 
-    raise RuntimeError(("辞書ディレクトリを環境変数 "
-                        "GEONLP_DIR で指定してください。"))
+    if not db_dir:
+        raise RuntimeError(("データベースディレクトリを環境変数 "
+                            "GEONLP_DB_DIR で指定してください。"))
+
+    return db_dir
 
 
-def get_jageocoder_dir():
+def get_jageocoder_db_dir():
     """
     jageocoder の辞書が配置されているディレクトリを取得します。
     次の優先順位に従って決定します。
 
-    - 環境変数 `JAGEOCODER_DIR` の値
-    - 環境変数 `HOME` が指すディレクトリの下の `jageocoder/db`
-    - どちらの環境変数も指定されていない場合は `None`
+    - 環境変数 ``JAGEOCODER_DB_DIR`` の値
+    - 環境変数 ``HOME`` が指すディレクトリの下の ``jageocoder/db``
+    - どちらの環境変数も指定されていない場合は None
 
     Return
     ------
@@ -61,35 +64,37 @@ def get_jageocoder_dir():
     except ModuleNotFoundError:
         return None
 
-    # 環境変数 JAGEOCODER_DIR をチェック
-    jageocoder_dic_dir = os.environ.get('JAGEOCODER_DIR')
-    if jageocoder_dic_dir:
-        return os.path.abspath(jageocoder_dic_dir)
+    # 環境変数 JAGEOCODER_DB_DIR をチェック
+    jageocoder_db_dir = os.environ.get('JAGEOCODER_DB_DIR')
+    if jageocoder_db_dir:
+        return os.path.abspath(jageocoder_db_dir)
 
     # 環境変数 HOME が利用できれば $HOME/jageocoder/db
     home = os.environ.get('HOME')
     if home:
-        jageocoder_dic_dir = os.path.join(home, 'jageocoder/db')
-        return os.path.abspath(jageocoder_dic_dir)
+        jageocoder_db_dir = os.path.join(home, 'jageocoder/db')
+        return os.path.abspath(jageocoder_db_dir)
 
     return None
 
 
-def init(dict_dir=None, geoword_rules={}, **options):
+def init(db_dir=None, geoword_rules={}, **options):
     """
     API を与えられたパラメータで初期化します。
 
     Parameters
     ----------
-    dict_dir : str, optional
-        辞書データが配置されているディレクトリのパス
-        省略した場合、環境変数 "GEONLP_DIR" が定義されていれば
+    db_dir : str, optional
+        利用するデータベースディレクトリのパス。
+        省略した場合、環境変数 ``GEONLP_DB_DIR`` が定義されていれば
         そのディレクトリを、定義されていない場合は
-        "$(HOME)/geonlp/dic/" を参照します。
+        ``$HOME/geonlp/db/`` を参照します。
     geoword_rules : dict, optional
         地名語抽出ルールを細かく指定します。
+        詳細は下記を参照してください。
     options : dict, optional
         その他の解析オプションを指定します。
+        詳細は下記を参照してください。
 
     Examples
     --------
@@ -134,15 +139,15 @@ def init(dict_dir=None, geoword_rules={}, **options):
         たとえば固有名クラスが「都道府県」である地名語から始まる住所表記だけを
         住所として解析したい（市区町村から始まる場合は無視したい）場合は
         r"^都道府県" を指定します。
-        デフォルト値は r"^(都道府県|市区町村|行政地域|居住地名)(\/.+|)" です。
+        デフォルト値は r"^(都道府県|市区町村|行政地域|居住地名)(/.+|)" です。
 
     system_dic_dir : str
         MeCab システム辞書のディレクトリを指定します。
         省略した場合はデフォルトのシステム辞書を利用します。
 
     実際には、この関数は初期化した Service オブジェクト
-    `_default_service` を作成して利用可能な状態にします。
-    `pygeonlp.api` の各関数は、この Service オブジェクトの
+    ``_default_service`` を作成して利用可能な状態にします。
+    ``pygeonlp.api`` の各関数は、この Service オブジェクトの
     メンバ関数を呼びだすヘルパー関数として実装されています。
 
     異なるパラメータで初期化した Service オブジェクトを複数生成し、
@@ -151,8 +156,8 @@ def init(dict_dir=None, geoword_rules={}, **options):
     global _default_service
     if _default_service:
         del _default_service
-        
-    _default_service = Service(dict_dir, geoword_rules, **options)
+
+    _default_service = Service(db_dir, geoword_rules, **options)
 
 
 def ma_parse(sentence):
@@ -320,8 +325,8 @@ def getActiveDictionaries():
     インストール済み辞書のうち、解析に利用する辞書のメタデータ一覧を返します。
     デフォルトでは全てのインストール済み辞書を利用します。
 
-    一時的に辞書を利用したくない場合、 `disactivateDictionaries()` で除外できます。
-    除外された辞書は `activateDictionaries()` で再び利用可能になります。
+    一時的に辞書を利用したくない場合、 ``disactivateDictionaries()`` で除外できます。
+    除外された辞書は ``activateDictionaries()`` で再び利用可能になります。
 
     Returns
     -------
@@ -715,7 +720,7 @@ def geoparse(sentence, jageocoder=None, filters=None,
     scoring_class : class, optional
         パスのスコアとノード間のスコアを計算するメソッドをもつ
         スコアリングクラス。
-        省略した場合は `scoring.ScoringClass` を利用します。
+        省略した場合は ``scoring.ScoringClass`` を利用します。
     scoring_options : any, optional
         スコアリングクラスの初期化に渡すオプションパラメータ。
 
@@ -759,15 +764,25 @@ def default_service():
     return _default_service
 
 
-def setup_basic_database(src_dir=None):
+def setup_basic_database(db_dir=None, src_dir=None):
     """
     基本的な地名解析辞書を登録したデータベースを作成します。
 
     Parameters
     ----------
+    db_dir : str, optional
+        データベースディレクトリを指定します。
+        ここにデータベースファイルを作成します。
+        既にデータベースが存在する場合は追記します（つまり、
+        既に登録済みの地名解析辞書のデータは失われません）。
+        省略された場合には ``get_db_dir()`` で決定します。
+
     src_dir : str, optional
         地名解析辞書ファイルが配置されているディレクトリ。
-        省略された場合には可能性のある場所を探します。
+        省略された場合には、 ``sys.prefix`` または ``site.USER_BASE`` の
+        下に ``pygeonlp_basedata`` がないか探します。
+        見つからない場合は ``RuntimeError`` を送出しますので、
+        ディレクトリを指定してください。
 
     Examples
     --------
@@ -775,17 +790,16 @@ def setup_basic_database(src_dir=None):
     >>> api.setup_basic_database()
     """
     data_dir = None
-    base_dir = os.path.abspath(os.path.join(
-        os.path.dirname(__file__), '../../'))
+    base_dir = os.getcwd()
     candidates = []
     if src_dir:
         candidates.append(src_dir)
 
     candidates += [
-        os.path.join(base_dir, 'base_data'),
-        os.path.join(base_dir, 'pygeonlp_basedata'),
         os.path.join(sys.prefix, 'pygeonlp_basedata'),
         os.path.join(site.USER_BASE, 'pygeonlp_basedata'),
+        os.path.join(base_dir, 'base_data'),
+        os.path.join(base_dir, 'pygeonlp_basedata'),
     ]
 
     for cand in candidates:
@@ -796,9 +810,9 @@ def setup_basic_database(src_dir=None):
     if not data_dir:
         raise RuntimeError("地名解析辞書がインストールされたディレクトリが見つかりません。")
 
-    dict_dir = get_dic_dir()
-    os.makedirs(dict_dir, 0o755, exist_ok=True)
-    service = Service(dict_dir=dict_dir)
+    db_dir = get_db_dir()
+    os.makedirs(db_dir, 0o755, exist_ok=True)
+    service = Service(db_dir=db_dir)
 
     updated = False
     if service.getDictionary('geonlp:geoshape-city') is None:
@@ -825,7 +839,7 @@ def setup_basic_database(src_dir=None):
 
 def _check_initialized():
     """
-    Default Service オブジェクトが `init()` で初期化されていることを確認するための
+    Default Service オブジェクトが ``init()`` で初期化されていることを確認するための
     プライベートメソッドです。
 
     この関数は API メソッド内でチェックのために呼びだすものなので、
