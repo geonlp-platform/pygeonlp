@@ -55,7 +55,7 @@ class LinkedResults(object):
         if output is None:
             raise StopIteration()
 
-        self.increment_counter(0)
+        self.increment_counter()
         return output
 
     def counter(self):
@@ -119,62 +119,53 @@ class LinkedResults(object):
 
         logger.debug("ノード種別リスト: {}".format(self.node_types))
 
-    def increment_counter(self, pos):
+    def increment_counter(self):
         """
         カウンターを次に進めます。
-
-        Parameters
-        ----------
-        pos : int
-            この値で指定された位置より後ろ側でインクリメントします。
-
-        Returns
-        -------
-        bool
-            インクリメントした結果、桁上がりが必要な場合は False
-            不要な場合 True を返します。
         """
-        if pos == len(self.lattice):
-            return False
+        positions = []
+        pos = 0
 
-        i = self.counters[pos]
-        node = self.lattice[pos][i]
-        next_pos = pos + 1
-        if node.node_type == Node.ADDRESS:
-            has_non_address_node = False
-            for _node in self.lattice[pos]:
-                if _node.node_type != Node.ADDRESS:
-                    has_non_address_node = True
-                    break
+        # ラティス上で地名語・住所ノード候補を含む位置のリストを作成
+        # 住所ノードが選択されている場合は住所に含まれる要素はスキップ
+        while pos < len(self.lattice):
+            i = self.counters[pos]
+            node = self.lattice[pos][i]
+            next_pos = pos + 1
 
-            if has_non_address_node:
-                # この形態素には住所ノード以外も存在するので
-                # 住所が終わる位置以降でインクリメント
-                next_pos = pos + len(node.morphemes)
+            if node.node_type == Node.ADDRESS:
+                positions.append(pos)
+                has_non_address_node = False
+                for _node in self.lattice[pos]:
+                    if _node.node_type != Node.ADDRESS:
+                        has_non_address_node = True
+                        break
 
-        # 次の地名語・住所ノード以降でインクリメント
-        while next_pos < len(self.lattice) and \
-                self.node_types[next_pos] == Node.NORMAL:
-            next_pos += 1
+                if has_non_address_node:
+                    # この形態素には住所ノード以外も存在するので
+                    # 住所が終わる位置までスキップ
+                    next_pos = pos + len(node.morphemes)
 
-        res = self.increment_counter(next_pos)
+            elif node.node_type == Node.GEOWORD:
+                positions.append(pos)
 
-        if res:
-            # 後方で桁上がりが発生しなかった場合
-            return True
+            pos = next_pos
 
-        # この位置でインクリメント
-        i += 1
-        if i < len(self.lattice[pos]):
-            self.counters[pos] = i
-            return True
-        else:
-            if pos == 0:
-                self.counters[pos] = -1
+        # 位置のリストの最後尾から、カウンターを 1 増やす
+        # 候補の数を超えた場合は 0 に戻し、
+        # 一つ手前の位置でインクリメントを継続する
+        while len(positions) > 0:
+            pos = positions.pop()
+            i = self.counters[pos] + 1
+            if i < len(self.lattice[pos]):
+                self.counters[pos] = i
+                return
             else:
                 self.counters[pos] = 0
 
-        return False
+        # インクリメントできなかった = 最後の候補に到達した場合
+        # カウンターの先頭を -1 にセット
+        self.counters[0] = -1
 
 
 class RankedResults(object):
