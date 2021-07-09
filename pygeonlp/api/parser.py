@@ -404,6 +404,13 @@ class Parser(object):
         True
         >>> node.morphemes[1]['node_type'] == 'NORMAL'
         True
+        >>> lattice = parser.analyze_sentence('喜多方市三島町')
+        >>> lattice_address = parser.add_address_candidates(lattice, True)
+        >>> pp_lattice(lattice_address)
+        #0:'喜多方市'
+          ...
+        #1:'三島町'
+          ...
         """
         if not self.jageocoder_tree:
             return lattice
@@ -646,8 +653,12 @@ class Parser(object):
         i = pos
         while i < len(lattice):
             surface += lattice[i][0].surface
+            if len(surface) > len(geocoding_result[0][1]):
+                # 形態素 lattice[i] は住所の区切りと一致しない
+                break
+
             i += 1
-            if len(surface) >= len(geocoding_result[0][1]):
+            if len(surface) == len(geocoding_result[0][1]):
                 break
 
         if i - pos == 1:
