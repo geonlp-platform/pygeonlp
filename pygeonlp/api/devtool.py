@@ -28,7 +28,9 @@ def pp_geojson(geojson_list, indent=2, file=sys.stdout):
     >>> import pygeonlp.api as api
     >>> from pygeonlp.api.devtool import pp_geojson
     >>> api.init()
-    >>> pp_geojson(api.geoparse('アメリカ大使館：港区赤坂1-10-5'))
+    >>> pp_geojson(api.geoparse('アメリカ大使館：港区赤坂'))
+    アメリカ大使館 ： ≪港区|市区町村['東京都']≫ ≪赤坂|鉄道施設/鉄道駅['東京地下鉄', '9号線千代田線']≫
+
     """
     def simple(geojson):
         properties = geojson['properties']
@@ -42,7 +44,7 @@ def pp_geojson(geojson_list, indent=2, file=sys.stdout):
             hypernym = properties['geoword_properties'].get('hypernym')
             ne_class = properties['geoword_properties'].get('ne_class')
             if hypernym:
-                return "≪{}|{}  {}≫".format(
+                return "≪{}|{}{}≫".format(
                     properties['surface'], ne_class, hypernym)
 
             return "≪{}|{}≫".format(properties['surface'], ne_class)
@@ -51,6 +53,8 @@ def pp_geojson(geojson_list, indent=2, file=sys.stdout):
 
     for pos, geojson in enumerate(geojson_list):
         print("{}".format(simple(geojson)), end=' ', file=file)
+
+    print("\n", file=file)
 
 
 def pp_lattice(lattice, indent=2, file=sys.stdout):
