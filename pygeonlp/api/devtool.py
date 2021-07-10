@@ -1,10 +1,5 @@
-import copy
-import json
 import logging
-import re
 import sys
-
-from .node import Node
 
 
 logger = logging.getLogger(__name__)
@@ -72,15 +67,16 @@ def pp_lattice(lattice, indent=2, file=sys.stdout):
 
     Examples
     --------
-    >> > import pygeonlp.api as api
-    >> > from pygeonlp.api.devtool import pp_lattice
-    >> > import jageocoder
-    >> > api.init()
-    >> > dbdir = api.get_jageocoder_db_dir()
-    >> > jageocoder.init(f'sqlite:///{dbdir}/address.db', f'{dbdir}/address.trie')
-    >> > parser = api.parser.Parser(jageocoder=jageocoder)
-    >> > lattice = parser.analyze_sentence('アメリカ大使館：港区赤坂1-10-5')
-    >> > pp_lattice(lattice)
+    >>> import pygeonlp.api as api
+    >>> from pygeonlp.api.devtool import pp_lattice
+    >>> import jageocoder
+    >>> api.init()
+    >>> dbdir = api.get_jageocoder_db_dir()
+    >>> jageocoder.init(f'sqlite:///{dbdir}/address.db',
+    ...   f'{dbdir}/address.trie')
+    >>> parser = api.parser.Parser(jageocoder=jageocoder)
+    >>> lattice = parser.analyze_sentence('アメリカ大使館：港区赤坂1-10-5')
+    >>> pp_lattice(lattice)
     # 0:'アメリカ大使館'
       アメリカ大使館(NORMAL)
     # 1:'：'
@@ -104,8 +100,8 @@ def pp_lattice(lattice, indent=2, file=sys.stdout):
       -(NORMAL)
     # 8:'5'
       5(NORMAL)
-    >> > lattice_address = parser.add_address_candidates(lattice, True)
-    >> > pp_lattice(lattice_address)
+    >>> lattice_address = parser.add_address_candidates(lattice, True)
+    >>> pp_lattice(lattice_address)
     # 0:'アメリカ大使館'
       アメリカ大使館(NORMAL)
     # 1:'：'
@@ -130,8 +126,8 @@ def pp_lattice(lattice, indent=2, file=sys.stdout):
       -(NORMAL)
     # 8:'5'
       5(NORMAL)
-    >> > lattice_address_compact = parser.add_address_candidates(lattice)
-    >> > pp_lattice(lattice_compact)
+    >>> lattice_address_compact = parser.add_address_candidates(lattice)
+    >>> pp_lattice(lattice_compact)
     # 0:'アメリカ大使館'
       アメリカ大使館(NORMAL)
     # 1:'：'

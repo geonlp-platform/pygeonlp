@@ -202,10 +202,12 @@ $ rm -r mydic/
 
 ## 謝辞
 
-本ソフトウェアの一部には、独立行政法人科学技術振興機構の戦略的創造研究推進事業「さきがけ」の支援を受けた。
+本ソフトウェアは、DIAS(Data Integration and Analysis System)と
+ROIS-DS CODH (Center for Open Data in the Humanities) の支援を受けています。
 
-本ソフトウェアの一部には、大学共同利用機関法人情報・システム研究機構の支援を受けた。
+また，JST（科学技術振興機構）さきがけプログラムの支援を受けました。
 
-This software is partially supported by PRESTO program of Japan Science and Technology Agency (JST).
+This software is supported by DIAS (Data Integration and Analysis System) and
+ROIS-DS CODH (Center for Open Data in the Humanities).
 
-This software is partially supported by Research Organization of Information and Systems (ROIS).
+It was also supported by JST (Japan Science and Technology Agency) PRESTO program.

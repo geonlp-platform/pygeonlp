@@ -218,6 +218,7 @@ $ rm -r mydic/
 
 ## Acknowledgements
 
-This software is partially supported by PRESTO program of Japan Science and Technology Agency (JST).
+This software is supported by DIAS (Data Integration and Analysis System) and
+ROIS-DS CODH (Center for Open Data in the Humanities).
 
-This software is partially supported by Research Organization of Information and Systems (ROIS).
+It was also supported by JST (Japan Science and Technology Agency) PRESTO program.

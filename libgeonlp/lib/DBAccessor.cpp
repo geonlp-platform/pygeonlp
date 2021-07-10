@@ -79,30 +79,43 @@ namespace geonlp
   /// DBは読み込み専用でオープンされる。
   /// @exception std::runtime_error オープンに失敗。例外オブジェクトはSqlite3のエラーメッセージを保持する。
   void DBAccessor::open() {
+    bool create_tables_needed = false;
 
 #ifdef DEBUG
     fplog = fopen("/tmp/dbaccess.log", "w");
     fprintf(fplog, "sqlite3_open('%s,%s')\n", sqlite3_fname.c_str(), wordlist_fname.c_str());
 #endif /* DEBUG */
 
+    // Check if the db file is existing
+    if (!boost::filesystem::exists(this->sqlite3_fname.c_str())
+      || !boost::filesystem::exists(this->wordlist_fname.c_str())) {
+      create_tables_needed = true;
+    }
+
     int ret;
     ret = sqlite3_open( sqlite3_fname.c_str(),   /* Database filename (UTF-8) */
 			    &sqlitep           /* OUT: SQLite db handle */
 			    );
 
-    if ( SQLITE_OK != ret){
-      throw std::runtime_error(sqlite3_errmsg(sqlitep));
+    if (SQLITE_OK != ret) {
+      std::string errmsg = std::string("sqlite3_open(") +
+      this->sqlite3_fname + std::string(") failed, ") + sqlite3_errmsg(sqlitep);
+      throw std::runtime_error(errmsg);
     }
     ret = sqlite3_open( wordlist_fname.c_str(),   /* Database filename (UTF-8) */
 			    &wordlistp           /* OUT: SQLite db handle */
 			    );
 
     if ( SQLITE_OK != ret){
-      throw std::runtime_error(sqlite3_errmsg(wordlistp));
+      std::string errmsg = std::string("sqlite3_open(") +
+      this->wordlist_fname + std::string(") failed, ") + sqlite3_errmsg(wordlistp);
+      throw std::runtime_error(errmsg);
     }
 
     // テーブルがまだ存在しない場合は作成する
-    this->createTables();
+    if (create_tables_needed) {
+      this->createTables();  // ここでロック
+    }
   }
 	
   /// @brief DBクローズ。
@@ -528,7 +541,7 @@ namespace geonlp
     if ( NULL == sqlitep) throw SqliteNotInitializedException();
 
     // テーブルの作成
-    this->createTables();
+    // this->createTables();
 
     /*
     // 既存テーブル上のデータの削除
@@ -616,7 +629,7 @@ namespace geonlp
     if ( NULL == this->sqlitep) throw SqliteNotInitializedException();
 
     // テーブルの作成
-    this->createTables();
+    // this->createTables();
 
     // トランザクションの開始
     // トランザクションがかかっていないと、とてもとても遅くなる。
@@ -691,7 +704,7 @@ namespace geonlp
     if ( NULL == wordlistp) throw SqliteNotInitializedException();
 
     // テーブルの作成
-    this->createTables();
+    // this->createTables();
 
     /*
     // 既存テーブル上のデータの削除
@@ -774,7 +787,7 @@ namespace geonlp
     char *zErrMsg;
 		
     if ( NULL == sqlitep) throw SqliteNotInitializedException();
-    this->createTables(); // テーブルが存在していなければ作成しておく
+    // this->createTables(); // テーブルが存在していなければ作成しておく
 
     // 既存テーブル上のデータの削除
     rc = sqlite3_exec(sqlitep, "DELETE FROM geoword;", NULL, NULL, &zErrMsg);
@@ -798,7 +811,7 @@ namespace geonlp
     char *zErrMsg;
 		
     if ( NULL == wordlistp) throw SqliteNotInitializedException();
-    this->createTables(); // テーブルが存在していなければ作成しておく
+    // this->createTables(); // テーブルが存在していなければ作成しておく
 
     // 既存テーブル上のデータの削除
     rc = sqlite3_exec(wordlistp, "DELETE FROM wordlist;", NULL, NULL, &zErrMsg);
@@ -840,7 +853,7 @@ namespace geonlp
     int rc;
 		
     if (NULL == sqlitep || NULL == wordlistp) throw SqliteNotInitializedException();
-    this->createTables(); // テーブルが存在していなければ作成しておく
+    // this->createTables(); // テーブルが存在していなければ作成しておく
 
     // 既存テーブル上のデータの削除
     this->clearWordlists();
@@ -1230,7 +1243,7 @@ namespace geonlp
     char *zErrMsg;
 		
     if ( NULL == sqlitep) throw SqliteNotInitializedException();
-    this->createTables(); // テーブルが存在していなければ作成しておく
+    // this->createTables(); // テーブルが存在していなければ作成しておく
 
     // 既存テーブル上のデータの削除
     rc = sqlite3_exec(sqlitep, "DELETE FROM dictionary;", NULL, NULL, &zErrMsg);
@@ -1244,6 +1257,7 @@ namespace geonlp
   /// @brief 辞書データをファイルからデータベースに追加する
   /// @return 登録した地名語の件数
   int DBAccessor::addDictionary(const std::string& jsonfile, const std::string& csvfile) const {
+    // this->createTables(); // テーブルが存在していなければ作成しておく
     FileAccessor fa(*(this));
     return fa.importDictionaryCSV(csvfile, jsonfile);
   }
@@ -1252,6 +1266,7 @@ namespace geonlp
   void DBAccessor::removeDictionary(const std::string& identifier) const {
     sqlite3_stmt* stmt;
     int rc;
+    // this->createTables(); // テーブルが存在していなければ作成しておく
     int dic_id = this->getDictionaryInternalId(identifier);
 
     // 内部 ID を取得

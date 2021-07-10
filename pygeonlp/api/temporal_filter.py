@@ -4,7 +4,6 @@
 """
 
 import datetime
-import json
 from logging import getLogger
 import re
 

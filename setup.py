@@ -32,7 +32,7 @@ def get_libgeonlp():
     import shutil
     import distutils.sysconfig
     import distutils.ccompiler
-    from distutils.errors import CompileError, LinkError
+    from distutils.errors import LinkError
 
     boost_libs = ['boost_regex', 'boost_system', 'boost_filesystem']
 
@@ -41,13 +41,13 @@ def get_libgeonlp():
     #include <iostream>
     #include <string>
     #include <boost/regex.hpp>
-    
+
     int main(int argc, char* argv[])
     {
       boost::regex r("air$");
       boost::smatch m;
       std::string pattern = "chair";
-      
+
       if (boost::regex_search(pattern, m, r)) {
         std::cout << "match." << std::endl;
       } else {
@@ -108,7 +108,7 @@ def get_libgeonlp():
         define_macros=[
             ('MAJOR_VERSION', '1'),
             ('MINOR_VERSION', '0'),
-            ('REVISION', '0')
+            ('REVISION', '1')
         ],
         include_dirs=[LIBGEONLP_INCLUDE_DIR],
         sources=LIBGEONLP_FILES + CPYGEONLP_FILES,
@@ -120,7 +120,7 @@ def get_libgeonlp():
 # Setup tools
 setup(
     name='pygeonlp',
-    version='1.0.0',
+    version='1.0.1',
     description='A Python module for geotagging Japanese texts.',
     author='GeoNLP Project Team',
     author_email='geonlp@nii.ac.jp',
@@ -129,7 +129,7 @@ setup(
     long_description_content_type='text/markdown',
     ext_modules=[get_libgeonlp()],
     packages=['pygeonlp.api', 'pygeonlp.tests'],
-    test_suite='pygeonlp.tests.test_api',
+    test_suite='pygeonlp.tests',
     python_requires='>=3.6.8',
     install_requires=['requests>=2.21.0', 'chardet>=4.0.0',
                       'lxml>=4.6.2', 'python-dateutil>=2.8.1',

@@ -18,7 +18,7 @@ from .filter import Filter, FilterError
 
 try:
     from osgeo import ogr
-except:
+except ModuleNotFoundError:
     raise FilterError((
         "SpatialFilter を利用するには 'gdal' パッケージを"
         "インストールしてください。"))
@@ -71,7 +71,8 @@ class SpatialFilter(Filter):
         Examples
         --------
         >>> from pygeonlp.api.spatial_filter import SpatialFilter
-        >>> SpatialFilter.get_geometry_from_geojson_url('https://geoshape.ex.nii.ac.jp/city/geojson/20200101/13/13101A1968.geojson').ExportToWkt()
+        >>> SpatialFilter.get_geometry_from_geojson_url(
+        ...   'https://geoshape.ex.nii.ac.jp/city/geojson/20200101/13/13101A1968.geojson').ExportToWkt()
         'MULTIPOLYGON (((139.73150362 35.68150121,139.73119903 35.68198095,...,139.73150362 35.68150121)))'
         """
         geo = None
@@ -107,7 +108,9 @@ class SpatialFilter(Filter):
         Examples
         --------
         >>> from pygeonlp.api.spatial_filter import SpatialFilter
-        >>> SpatialFilter.get_geometry_from_geojson({'type':'Point','coordinates':[139.6917337, 35.6895014]}).ExportToWkt()
+        >>> SpatialFilter.get_geometry_from_geojson(
+        ...   {'type':'Point','coordinates':[139.6917337, 35.6895014]}
+        ... ).ExportToWkt()
         'POINT (139.6917337 35.6895014)'
         """
         if isinstance(geojson, str):

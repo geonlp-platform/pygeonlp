@@ -1,7 +1,5 @@
-from collections.abc import Iterable
 from logging import getLogger
 import os
-import re
 import site
 import sys
 
@@ -61,6 +59,7 @@ def get_jageocoder_db_dir():
     """
     try:
         import jageocoder
+        jageocoder.tree  # Flake8 の F401 エラーを回避
     except ModuleNotFoundError:
         return None
 
