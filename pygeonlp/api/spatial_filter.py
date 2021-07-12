@@ -14,7 +14,7 @@ import json
 from logging import getLogger
 import urllib
 
-from .filter import Filter, FilterError
+from pygeonlp.api.filter import Filter, FilterError
 
 try:
     from osgeo import ogr

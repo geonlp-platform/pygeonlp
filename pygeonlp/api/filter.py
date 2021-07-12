@@ -2,7 +2,7 @@ import copy
 import logging
 import re
 
-from .node import Node
+from pygeonlp.api.node import Node
 
 logger = logging.getLogger(__name__)
 

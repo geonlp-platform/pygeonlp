@@ -14,10 +14,10 @@ def setup(test):
 
 
 def load_tests(loader, tests, ignore):
-    from pygeonlp.api import temporal_filter
+    from pygeonlp.api import devtool, temporal_filter
     modules = [
         api, api.service, api.metadata, api.dictionary, api.node,
-        api.parser, api.linker,
+        api.parser, api.linker, devtool,
         api.filter, temporal_filter,
     ]
 
@@ -31,6 +31,7 @@ def load_tests(loader, tests, ignore):
         pass
 
     flags = doctest.NORMALIZE_WHITESPACE | doctest.ELLIPSIS
+
     for module in modules:
         tests.addTest(
             doctest.DocTestSuite(module, setUp=setup, optionflags=flags))

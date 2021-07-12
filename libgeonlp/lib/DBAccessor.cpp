@@ -47,7 +47,6 @@ bool operator>(const tmp_wordlist& kv0, const tmp_wordlist& kv1) {
 
 namespace geonlp
 {
-  
   void DBAccessor::beginTransaction(sqlite3* p) const {
     int rc;
     char *zErrMsg;
@@ -81,21 +80,20 @@ namespace geonlp
   void DBAccessor::open() {
     bool create_tables_needed = false;
 
-#ifdef DEBUG
-    fplog = fopen("/tmp/dbaccess.log", "w");
-    fprintf(fplog, "sqlite3_open('%s,%s')\n", sqlite3_fname.c_str(), wordlist_fname.c_str());
-#endif /* DEBUG */
-
     // Check if the db file is existing
-    if (!boost::filesystem::exists(this->sqlite3_fname.c_str())
-      || !boost::filesystem::exists(this->wordlist_fname.c_str())) {
+#ifdef DEBUG
+    std::cerr << std::string("sqlite3_fname:") + this->sqlite3_fname << std::endl;
+    std::cerr << std::string("wordlist_fname:") + this->wordlist_fname << std::endl;
+#endif /* DEBUG */
+    if (!Util::fileExists(this->sqlite3_fname) || 
+      !Util::fileExists(this->wordlist_fname)) {
       create_tables_needed = true;
     }
 
     int ret;
     ret = sqlite3_open( sqlite3_fname.c_str(),   /* Database filename (UTF-8) */
-			    &sqlitep           /* OUT: SQLite db handle */
-			    );
+          &sqlitep           /* OUT: SQLite db handle */
+          );
 
     if (SQLITE_OK != ret) {
       std::string errmsg = std::string("sqlite3_open(") +
@@ -103,8 +101,8 @@ namespace geonlp
       throw std::runtime_error(errmsg);
     }
     ret = sqlite3_open( wordlist_fname.c_str(),   /* Database filename (UTF-8) */
-			    &wordlistp           /* OUT: SQLite db handle */
-			    );
+          &wordlistp           /* OUT: SQLite db handle */
+          );
 
     if ( SQLITE_OK != ret){
       std::string errmsg = std::string("sqlite3_open(") +
@@ -117,7 +115,7 @@ namespace geonlp
       this->createTables();  // ここでロック
     }
   }
-	
+
   /// @brief DBクローズ。
   ///
   /// @return sqlite3_close()の戻り値をそのまま返す。正常終了時は SQLITE_OK (=0)。
@@ -128,13 +126,9 @@ namespace geonlp
     sqlitep = NULL;
     ret = sqlite3_close(wordlistp);
     wordlistp = NULL;
-#ifdef DEBUG
-    fprintf(fplog, "sqlite3_close()\n");
-    fclose(fplog);
-#endif /* DEBUG */
     return ret;
   }
-	
+  
   /// @brief 引数として渡されたIDを持つ地名語エントリの全ての情報を地名語辞書システムから取得する。
   ///
   /// 一致するエントリが見つからない場合には、戻り値の地名語エントリクラスのget_geonlp_id()が空文字列となる。
@@ -150,7 +144,7 @@ namespace geonlp
     int row, column, rc;
     char *zErrMsg;
     std::ostringstream oss;
-		
+    
     if ( NULL == sqlitep) throw SqliteNotInitializedException();
 
     // キャッシュチェック
@@ -185,7 +179,7 @@ namespace geonlp
 
     return ret.isValid();
   }
-	
+  
   /// @brief 引数として渡された辞書IDとentry_idのペアを持つ地名語エントリの情報を DB から取得する
   ///
   /// 一致するエントリが見つからない場合には、戻り値の地名語エントリクラスのget_geonlp_id()が空文字列となる。
@@ -201,7 +195,7 @@ namespace geonlp
     int row, column, rc;
     char *zErrMsg;
     std::ostringstream oss;
-		
+    
     if ( NULL == sqlitep) throw SqliteNotInitializedException();
     oss << "SELECT * FROM geoword WHERE dictionary_id = " << dictionary_id << " AND entry_id = '" << entry_id << "';";
     std::string sql =  oss.str();
@@ -245,7 +239,7 @@ namespace geonlp
     ret.clear();
     return this->getGeowordListFromWordlist(wordlist, ret);
   }
-	
+  
   /// @brief 辞書一覧を DB から取得する
   /// @arg ret 辞書 identifier をキー、辞書を値とするマップ 
   /// @return 件数
@@ -288,7 +282,7 @@ namespace geonlp
     char **azResult;
     int row, column, rc;
     char *zErrMsg;
-		
+    
     if ( NULL == sqlitep) throw SqliteNotInitializedException();
     oss.str("");
     oss << "select * from dictionary where id = " << id << ";";
@@ -314,7 +308,7 @@ namespace geonlp
     
     return ret.isValid();
   }
-	
+  
   /// @brief 引数として渡された identifier を持つ辞書の情報を取得する
   ///
   /// @arg @c std::string identifier (例："geonlp:japan_pref")
@@ -343,7 +337,7 @@ namespace geonlp
     sqlite3_finalize(stm);
     return false;
   }
-	
+  
   /// @brief 引数として渡された identifier を持つ辞書の内部 ID を取得する
   ///
   /// @arg @c std::string identifier (例："geonlp:japan_pref")
@@ -367,7 +361,7 @@ namespace geonlp
     sqlite3_finalize(stm);
     return internal_id;
   }
-	
+  
   /// @brief 全ての単語IDリストを DB から取得する
   ///
   /// @return 単語IDリストクラスのリスト
@@ -380,7 +374,7 @@ namespace geonlp
     char **azResult;
     int row, column, rc;
     char *zErrMsg;
-		
+    
     if ( NULL == wordlistp) throw SqliteNotInitializedException();
     oss.str("");
     oss << "select * from wordlist";
@@ -398,9 +392,9 @@ namespace geonlp
     if ( row != 0){
       assertWordlistColumns( azResult, column);
       for (int i = 1, index = column; i <= row; i++) {
-	resultToWordlist( &azResult[index], wordlist);
-	wordlists.push_back(wordlist);
-	index += column;
+  resultToWordlist( &azResult[index], wordlist);
+  wordlists.push_back(wordlist);
+  index += column;
       }
     }
     sqlite3_free_table(azResult);
@@ -421,7 +415,7 @@ namespace geonlp
     char **azResult;
     int row, column, rc;
     char *zErrMsg;
-		
+    
     if ( NULL == wordlistp) throw SqliteNotInitializedException();
     oss.str("");
     oss << "select * from wordlist where id = " << id << ";";
@@ -460,7 +454,7 @@ namespace geonlp
     char **azResult;
     int row, column, rc;
     char *zErrMsg;
-		
+    
     if ( NULL == wordlistp) throw SqliteNotInitializedException();
 
 #ifdef HAVE_LIBDAMS
@@ -503,7 +497,7 @@ namespace geonlp
     char **azResult;
     int row, column, rc;
     char *zErrMsg;
-		
+    
     if ( NULL == wordlistp) throw SqliteNotInitializedException();
     std::string sql = "select * from wordlist where yomi = '" + yomi + "';";
     rc = sqlite3_get_table(wordlistp, sql.c_str(), &azResult, &row, &column, &zErrMsg);
@@ -537,7 +531,7 @@ namespace geonlp
   {
     std::ostringstream oss;
     int rc;
-		
+    
     if ( NULL == sqlitep) throw SqliteNotInitializedException();
 
     // テーブルの作成
@@ -568,38 +562,38 @@ namespace geonlp
 
     try {
       for (unsigned int i = 0; i < geowords.size(); i++) {
-	const Geoword* wp = &(geowords[i]);
-	std::string json = wp->toJson(); 
-	// パラメータのバインド
-	sqlite3_bind_text(stm, 1, wp->get_geonlp_id().c_str(), wp->get_geonlp_id().length(), SQLITE_TRANSIENT);
-	sqlite3_bind_int(stm, 2, wp->get_dictionary_id());
-	sqlite3_bind_text(stm, 3, wp->get_entry_id().c_str(), wp->get_entry_id().length(), SQLITE_TRANSIENT);
-	sqlite3_bind_text(stm, 4, json.c_str(), json.length(), SQLITE_TRANSIENT);
+  const Geoword* wp = &(geowords[i]);
+  std::string json = wp->toJson(); 
+  // パラメータのバインド
+  sqlite3_bind_text(stm, 1, wp->get_geonlp_id().c_str(), wp->get_geonlp_id().length(), SQLITE_TRANSIENT);
+  sqlite3_bind_int(stm, 2, wp->get_dictionary_id());
+  sqlite3_bind_text(stm, 3, wp->get_entry_id().c_str(), wp->get_entry_id().length(), SQLITE_TRANSIENT);
+  sqlite3_bind_text(stm, 4, json.c_str(), json.length(), SQLITE_TRANSIENT);
 
-	// 実行
-	rc = sqlite3_step(stm);
-	if (rc != SQLITE_DONE) {
-	  std::string errmsg = sqlite3_errmsg(sqlitep);
-	  throw SqliteErrException(rc, errmsg.c_str());
-	}
+  // 実行
+  rc = sqlite3_step(stm);
+  if (rc != SQLITE_DONE) {
+    std::string errmsg = sqlite3_errmsg(sqlitep);
+    throw SqliteErrException(rc, errmsg.c_str());
+  }
 
-	// 最後に挿入したROWIDの取得
-	// const long long rowid = sqlite3_last_insert_rowid(dp);
-	// _tprintf(_TEXT("ROWID: %I64d\n"), rowid);
+  // 最後に挿入したROWIDの取得
+  // const long long rowid = sqlite3_last_insert_rowid(dp);
+  // _tprintf(_TEXT("ROWID: %I64d\n"), rowid);
 
-	// バインドのリセット
-	rc = sqlite3_reset(stm);
-	if (rc != SQLITE_OK) {
-	  std::string errmsg = sqlite3_errmsg(sqlitep);
-	  throw SqliteErrException(rc, errmsg.c_str());
-	}
-	// リセットしてもバインド変数はリセットされないため
-	// 明示的にリセットする必要あり。
-	rc = sqlite3_clear_bindings(stm);
-	if (rc != SQLITE_OK) {
-	  std::string errmsg = sqlite3_errmsg(sqlitep);
-	  throw SqliteErrException(rc, errmsg.c_str());
-	}
+  // バインドのリセット
+  rc = sqlite3_reset(stm);
+  if (rc != SQLITE_OK) {
+    std::string errmsg = sqlite3_errmsg(sqlitep);
+    throw SqliteErrException(rc, errmsg.c_str());
+  }
+  // リセットしてもバインド変数はリセットされないため
+  // 明示的にリセットする必要あり。
+  rc = sqlite3_clear_bindings(stm);
+  if (rc != SQLITE_OK) {
+    std::string errmsg = sqlite3_errmsg(sqlitep);
+    throw SqliteErrException(rc, errmsg.c_str());
+  }
       }
     } catch (SqliteErrException e) {
       sqlite3_finalize(stm);
@@ -625,7 +619,7 @@ namespace geonlp
     Dictionary dictionary;
     int rc;
     sqlite3_stmt *stmt;
-		
+    
     if ( NULL == this->sqlitep) throw SqliteNotInitializedException();
 
     // テーブルの作成
@@ -644,38 +638,38 @@ namespace geonlp
 
     try {
       for (unsigned int i = 0; i < dictionaries.size(); i++) {
-	const Dictionary* wp = &(dictionaries[i]);
-	std::string identifier = wp->get_identifier();
-	const std::string& json = wp->toJson(); 
-	// パラメータのバインド
-	sqlite3_bind_text(stmt, 1, identifier.c_str(), identifier.length(), SQLITE_TRANSIENT);
-	sqlite3_bind_text(stmt, 2, json.c_str(), json.length(), SQLITE_TRANSIENT);
+  const Dictionary* wp = &(dictionaries[i]);
+  std::string identifier = wp->get_identifier();
+  const std::string& json = wp->toJson(); 
+  // パラメータのバインド
+  sqlite3_bind_text(stmt, 1, identifier.c_str(), identifier.length(), SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 2, json.c_str(), json.length(), SQLITE_TRANSIENT);
 
-	// 実行
-	rc = sqlite3_step(stmt);
-	if (rc != SQLITE_DONE) {
-	  std::string errmsg = sqlite3_errmsg(sqlitep);
-	  throw SqliteErrException(rc, errmsg.c_str());
-	}
+  // 実行
+  rc = sqlite3_step(stmt);
+  if (rc != SQLITE_DONE) {
+    std::string errmsg = sqlite3_errmsg(sqlitep);
+    throw SqliteErrException(rc, errmsg.c_str());
+  }
 
-	// 最後に挿入したROWIDの取得
-	// const long long rowid = sqlite3_last_insert_rowid(dp);
-	// _tprintf(_TEXT("ROWID: %I64d\n"), rowid);
+  // 最後に挿入したROWIDの取得
+  // const long long rowid = sqlite3_last_insert_rowid(dp);
+  // _tprintf(_TEXT("ROWID: %I64d\n"), rowid);
 
-	// バインドのリセット
-	rc = sqlite3_reset(stmt);
-	if (rc != SQLITE_OK) {
-	  std::string errmsg = sqlite3_errmsg(sqlitep);
-	  throw SqliteErrException(rc, errmsg.c_str());
-	}
+  // バインドのリセット
+  rc = sqlite3_reset(stmt);
+  if (rc != SQLITE_OK) {
+    std::string errmsg = sqlite3_errmsg(sqlitep);
+    throw SqliteErrException(rc, errmsg.c_str());
+  }
 
-	// リセットしてもバインド変数はリセットされないため
-	// 明示的にリセットする必要あり。
-	rc = sqlite3_clear_bindings(stmt);
-	if (rc != SQLITE_OK) {
-	  std::string errmsg = sqlite3_errmsg(sqlitep);
-	  throw SqliteErrException(rc, errmsg.c_str());
-	}
+  // リセットしてもバインド変数はリセットされないため
+  // 明示的にリセットする必要あり。
+  rc = sqlite3_clear_bindings(stmt);
+  if (rc != SQLITE_OK) {
+    std::string errmsg = sqlite3_errmsg(sqlitep);
+    throw SqliteErrException(rc, errmsg.c_str());
+  }
       }
     } catch (SqliteErrException e) {
       sqlite3_finalize(stmt);
@@ -700,7 +694,7 @@ namespace geonlp
     std::ostringstream oss;
     Wordlist wordlist;
     int rc;
-		
+    
     if ( NULL == wordlistp) throw SqliteNotInitializedException();
 
     // テーブルの作成
@@ -731,37 +725,37 @@ namespace geonlp
 
     try {
       for (unsigned int i = 0; i < wordlists.size(); i++) {
-	const Wordlist* wp = &(wordlists[i]);
-	// パラメータのバインド
-	sqlite3_bind_int(stm, 1, wp->get_id());
-	sqlite3_bind_text(stm, 2, wp->get_surface().c_str(), wp->get_surface().length(), SQLITE_TRANSIENT);
-	sqlite3_bind_text(stm, 3, wp->get_idlist().c_str(), wp->get_idlist().length(), SQLITE_TRANSIENT);
-	sqlite3_bind_text(stm, 4, wp->get_yomi().c_str(), wp->get_yomi().length(), SQLITE_TRANSIENT);
+        const Wordlist* wp = &(wordlists[i]);
+        // パラメータのバインド
+        sqlite3_bind_int(stm, 1, wp->get_id());
+        sqlite3_bind_text(stm, 2, wp->get_surface().c_str(), wp->get_surface().length(), SQLITE_TRANSIENT);
+        sqlite3_bind_text(stm, 3, wp->get_idlist().c_str(), wp->get_idlist().length(), SQLITE_TRANSIENT);
+        sqlite3_bind_text(stm, 4, wp->get_yomi().c_str(), wp->get_yomi().length(), SQLITE_TRANSIENT);
 
-	// 実行
-	rc = sqlite3_step(stm);
-	if (rc != SQLITE_DONE) {
-	  std::string errmsg = sqlite3_errmsg(wordlistp);
-	  throw SqliteErrException(rc, errmsg.c_str());
-	}
+        // 実行
+        rc = sqlite3_step(stm);
+        if (rc != SQLITE_DONE) {
+          std::string errmsg = sqlite3_errmsg(wordlistp);
+          throw SqliteErrException(rc, errmsg.c_str());
+        }
 
-	// 最後に挿入したROWIDの取得
-	// const long long rowid = sqlite3_last_insert_rowid(dp);
-	// _tprintf(_TEXT("ROWID: %I64d\n"), rowid);
+        // 最後に挿入したROWIDの取得
+        // const long long rowid = sqlite3_last_insert_rowid(dp);
+        // _tprintf(_TEXT("ROWID: %I64d\n"), rowid);
 
-	// バインドのリセット
-	rc = sqlite3_reset(stm);
-	if (rc != SQLITE_OK) {
-	  std::string errmsg = sqlite3_errmsg(wordlistp);
-	  throw SqliteErrException(rc, errmsg.c_str());
-	}
-	// リセットしてもバインド変数はリセットされないため
-	// 明示的にリセットする必要あり。
-	rc = sqlite3_clear_bindings(stm);
-	if (rc != SQLITE_OK) {
-	  std::string errmsg = sqlite3_errmsg(wordlistp);
-	  throw SqliteErrException(rc, errmsg.c_str());
-	}
+        // バインドのリセット
+        rc = sqlite3_reset(stm);
+        if (rc != SQLITE_OK) {
+          std::string errmsg = sqlite3_errmsg(wordlistp);
+          throw SqliteErrException(rc, errmsg.c_str());
+        }
+        // リセットしてもバインド変数はリセットされないため
+        // 明示的にリセットする必要あり。
+        rc = sqlite3_clear_bindings(stm);
+        if (rc != SQLITE_OK) {
+          std::string errmsg = sqlite3_errmsg(wordlistp);
+          throw SqliteErrException(rc, errmsg.c_str());
+        }
       }
     } catch (SqliteErrException e) {
       sqlite3_finalize(stm);
@@ -785,10 +779,9 @@ namespace geonlp
     std::ostringstream oss;
     int rc;
     char *zErrMsg;
-		
+
     if ( NULL == sqlitep) throw SqliteNotInitializedException();
     // this->createTables(); // テーブルが存在していなければ作成しておく
-
     // 既存テーブル上のデータの削除
     rc = sqlite3_exec(sqlitep, "DELETE FROM geoword;", NULL, NULL, &zErrMsg);
     if (zErrMsg || rc != SQLITE_OK) {
@@ -809,7 +802,7 @@ namespace geonlp
     std::ostringstream oss;
     int rc;
     char *zErrMsg;
-		
+
     if ( NULL == wordlistp) throw SqliteNotInitializedException();
     // this->createTables(); // テーブルが存在していなければ作成しておく
 
@@ -851,7 +844,7 @@ namespace geonlp
     sqlite3_stmt* stmt;
     Geoword geo_in;
     int rc;
-		
+
     if (NULL == sqlitep || NULL == wordlistp) throw SqliteNotInitializedException();
     // this->createTables(); // テーブルが存在していなければ作成しておく
 
@@ -886,63 +879,54 @@ namespace geonlp
       int i_prefix = 0;
       int i_suffix = 0;
       for (std::vector<std::string>::iterator it_prefix = prefixes.begin(); it_prefix != prefixes.end(); it_prefix++) {
-	for (std::vector<std::string>::iterator it_suffix = suffixes.begin(); it_suffix != suffixes.end(); it_suffix++) {
-	  std::string surface = (*it_prefix) + body + (*it_suffix);
-	  std::string yomi  = "";
-	  if (body_kana.length() > 0) {
-	    if (i_prefix < int(prefixes_kana.size())) {
-	      yomi += prefixes_kana[i_prefix];
-	    } else {
-	      yomi += "";
-	    }
-	    yomi += body_kana;
-	    if (i_suffix < int(suffixes_kana.size())) {
-	      yomi += suffixes_kana[i_suffix];
-	    } else {
-	      yomi += "";
-	    }
-	  }
-
+        for (std::vector<std::string>::iterator it_suffix = suffixes.begin(); it_suffix != suffixes.end(); it_suffix++) {
+          std::string surface = (*it_prefix) + body + (*it_suffix);
+          std::string yomi  = "";
+          if (body_kana.length() > 0) {
+            if (i_prefix < int(prefixes_kana.size())) {
+              yomi += prefixes_kana[i_prefix];
+            } else {
+              yomi += "";
+            }
+            yomi += body_kana;
+            if (i_suffix < int(suffixes_kana.size())) {
+              yomi += suffixes_kana[i_suffix];
+            } else {
+              yomi += "";
+            }
+          }
 #ifdef HAVE_LIBDAMS
-	  std::string standardized = std::string(damswrapper::get_standardized_string(surface));
+          std::string standardized = std::string(damswrapper::get_standardized_string(surface));
 #else
-	  std::string standardized = surface;
+          std::string standardized = surface;
 #endif /* HAVE_LIBDAMS */
-	  if (surface_idlist[standardized].size() == 0) {
-	    surface_idlist[standardized].push_back("");
-	    surface_idlist[standardized].push_back(surface);
-	    surface_idlist[standardized].push_back(yomi);
-	  } else {
-	    surface_idlist[standardized][0] += "/";
-	  }
-	  surface_idlist[standardized][0] += geonlp_id + ":" + typical_name;
+          if (surface_idlist[standardized].size() == 0) {
+            surface_idlist[standardized].push_back("");
+            surface_idlist[standardized].push_back(surface);
+            surface_idlist[standardized].push_back(yomi);
+          } else {
+            surface_idlist[standardized][0] += "/";
+          }
+          surface_idlist[standardized][0] += geonlp_id + ":" + typical_name;
 
-	  if (yomi.length() > 0) {
-	    if (surface_idlist[yomi].size() == 0) {
-	      surface_idlist[yomi].push_back("");
-	      surface_idlist[yomi].push_back(surface);
-	      surface_idlist[yomi].push_back(yomi);
-	    } else {
-	      surface_idlist[yomi][0] += "/";
-	    }
-	    surface_idlist[yomi][0] += geonlp_id + ":" + typical_name;
-	  }
-	  
-	  i_suffix++;
-	}
-	i_prefix++;
+          if (yomi.length() > 0) {
+            if (surface_idlist[yomi].size() == 0) {
+              surface_idlist[yomi].push_back("");
+              surface_idlist[yomi].push_back(surface);
+              surface_idlist[yomi].push_back(yomi);
+            } else {
+              surface_idlist[yomi][0] += "/";
+            }
+            surface_idlist[yomi][0] += geonlp_id + ":" + typical_name;
+          }
+          
+          i_suffix++;
+        }
+        i_prefix++;
       }
     }
     // select 終了
     sqlite3_finalize(stmt);
-
-    // デバグ用
-#ifdef DEBUG
-    for (std::map<std::string, std::vector<std::string> >::iterator it = surface_idlist.begin(); it != surface_idlist.end(); it++) {
-      const std::vector<std::string>& elem = (*it).second;
-      std::cout << "'" << (*it).first << "' => '" << elem[0] << "', '" << elem[1] << "', '" << elem[2] << "'\n";
-    }
-#endif /* DEBUG */
 
     // 文字コード昇順に並べ替え（darts は文字コード順である必要があるので）
     std::vector<tmp_wordlist> tmp_wordlists;
@@ -975,10 +959,10 @@ namespace geonlp
 
     // darts 用テーブル（オンメモリ）の削除
     for (int i = 0; i < int(keys.size()); i++) delete[] keys[i];
-    
+
     // Wordlist を DB に書き込むトランザクションの開始
     this->beginTransaction(this->wordlistp);
-    
+
     // 一時 Wordlist テーブル作成
     this->createTmpWordlistTable();
 
@@ -988,30 +972,30 @@ namespace geonlp
     if (SQLITE_OK != rc) {
       throw SqliteErrException(rc, sqlite3_errmsg(this->wordlistp));
     }
-    
+
     try {
       for (std::vector<Wordlist>::iterator it = wordlists.begin(); it != wordlists.end(); it++) {
-	sqlite3_bind_int(stmt, 1, (*it).get_id());
-	sqlite3_bind_text(stmt, 2, (*it).get_key().c_str(), (*it).get_key().length(), SQLITE_TRANSIENT);
-	sqlite3_bind_text(stmt, 3, (*it).get_surface().c_str(), (*it).get_surface().length(), SQLITE_TRANSIENT);
-	sqlite3_bind_text(stmt, 4, (*it).get_idlist().c_str(), (*it).get_idlist().length(), SQLITE_TRANSIENT);
-	sqlite3_bind_text(stmt, 5, (*it).get_yomi().c_str(), (*it).get_yomi().length(), SQLITE_TRANSIENT);
-	
-	rc = sqlite3_step(stmt);
-	if (rc != SQLITE_DONE) {
-	  std::string errmsg = sqlite3_errmsg(this->wordlistp);
-	  throw SqliteErrException(rc, errmsg.c_str());
-	}
-	rc = sqlite3_reset(stmt);
-	if (rc != SQLITE_OK) {
-	  std::string errmsg = sqlite3_errmsg(this->wordlistp);
-	  throw SqliteErrException(rc, errmsg.c_str());
-	}
-	rc = sqlite3_clear_bindings(stmt);
-	if (rc != SQLITE_OK) {
-	  std::string errmsg = sqlite3_errmsg(this->wordlistp);
-	  throw SqliteErrException(rc, errmsg.c_str());
-	}
+        sqlite3_bind_int(stmt, 1, (*it).get_id());
+        sqlite3_bind_text(stmt, 2, (*it).get_key().c_str(), (*it).get_key().length(), SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 3, (*it).get_surface().c_str(), (*it).get_surface().length(), SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 4, (*it).get_idlist().c_str(), (*it).get_idlist().length(), SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 5, (*it).get_yomi().c_str(), (*it).get_yomi().length(), SQLITE_TRANSIENT);
+
+        rc = sqlite3_step(stmt);
+        if (rc != SQLITE_DONE) {
+          std::string errmsg = sqlite3_errmsg(this->wordlistp);
+          throw SqliteErrException(rc, errmsg.c_str());
+        }
+        rc = sqlite3_reset(stmt);
+        if (rc != SQLITE_OK) {
+          std::string errmsg = sqlite3_errmsg(this->wordlistp);
+          throw SqliteErrException(rc, errmsg.c_str());
+        }
+        rc = sqlite3_clear_bindings(stmt);
+        if (rc != SQLITE_OK) {
+          std::string errmsg = sqlite3_errmsg(this->wordlistp);
+          throw SqliteErrException(rc, errmsg.c_str());
+        }
       }
     } catch (SqliteErrException e) {
       sqlite3_finalize(stmt);
@@ -1042,7 +1026,7 @@ namespace geonlp
 
     // コミット
     this->commit(this->wordlistp);
-    
+
     // 一時ファイルを正規ファイルに移動
     boost::filesystem::path tmppath(tmp_darts_fname);
     boost::filesystem::path regpath(this->darts_fname);
@@ -1094,7 +1078,7 @@ namespace geonlp
     }
     return 0;
   }
-	
+
   /// @brief geowordテーブルから得られた情報を地名語エントリクラスに変換する
   ///
   /// @arg @c azResult [in] Sqlite3から得られた情報
@@ -1241,7 +1225,7 @@ namespace geonlp
     std::ostringstream oss;
     int rc;
     char *zErrMsg;
-		
+
     if ( NULL == sqlitep) throw SqliteNotInitializedException();
     // this->createTables(); // テーブルが存在していなければ作成しておく
 

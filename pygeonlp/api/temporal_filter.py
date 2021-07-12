@@ -7,7 +7,7 @@ import datetime
 from logging import getLogger
 import re
 
-from .filter import Filter, FilterError
+from pygeonlp.api.filter import Filter, FilterError
 
 logger = getLogger(__name__)
 

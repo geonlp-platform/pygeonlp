@@ -9,14 +9,14 @@ Import `pygeonlp.api` and initialize it by specifying the directory
 where the place-name database is placed.
 
 ```python
-import pygeonlp.api as geonlp_api
-geonlp_api.init(dict_dir='mydic')
+>>> import pygeonlp.api as api
+>>> api.init(db_dir='mydic')
 ```
 
 Then, run `geoparse("text to parse")` .
 
 ```python
-result = geonlp_api.geoparse("国立情報学研究所は千代田区にあります。")
+>>> result = api.geoparse("国立情報学研究所は千代田区にあります。")
 ```
 
 The result is a list of dict objects, with POS/Spatial attributes
@@ -26,7 +26,8 @@ A [GeoJSON](https://tools.ietf.org/html/rfc7946#section-3.2)
 representation is obtained by JSON-encoding each dict object.
 
 ```python
-print(json.dumps(result, indent=2, ensure_ascii=False))
+>>> import json
+>>> print(json.dumps(result, indent=2, ensure_ascii=False))
 [
   {
     "type": "Feature",
@@ -144,6 +145,27 @@ $ pip install --upgrade pip setuptools
 $ pip install pygeonlp
 ```
 
+The database needs to be prepared the first time.
+
+**Prepare the database**
+
+Execute the command to register the basic place name word analysis dictionaries
+(`*.json`, `*.csv`) in this package into the database under `mydic/`.
+
+```
+>>> import pygeonlp.api as api
+>>> api.setup_basic_database(db_dir='mydic/')
+```
+
+This command registers three dictionaries:
+
+- "Prefectures of Japan" (`geonlp:geoshape-pref`),
+
+- "Historical Administrative Area Data Set Beta Dictionary of Place Names" (`geonlp:geoshape-city`)
+
+- "Railroad Stations in Japan (2019)" (`geonlp:ksj-station-N02-2019`)
+
+
 ### Install GDAL library (Optional)
 
 If the [GDAL](https://pypi.org/project/GDAL/) library is installed,
@@ -161,20 +183,11 @@ $ pip install gdal
 `pygeonlp` can use address-geocoding if
 the [jageocoder](https://pypi.org/project/jageocoder/) is installed.
 
-```sh
-$ pip install jageocoder
-$ mkdir db/
-$ wget https://www.info-proto.com/static/jusho.zip
-$ unzip jusho.zip -d db/
-$ python
->>> import jageocoder
->>> jageocoder.init(dsn='sqlite:///db/address.db', trie_path='db/address.trie')
->>> jageocoder.create_trie_index()
-```
+See the jageocoder documentation for installation instructions.
 
-### Run Tests (Optional)
+### Run tests (Optional)
 
-Run the API tests with `python setup.py test` command.
+Run the unit tests with `python setup.py test` command.
 
 
 ## Uninstall
@@ -185,23 +198,7 @@ Use `pip` command to uninstall.
 $ pip uninstall pygeonlp
 ```
 
-## Registering a place-name word analysis dictionary
-
-Execute the script to register the basic place name word analysis dictionaries
-(`*.json`, `*.csv`) in `base_data/` into the database under `mydic/`.
-
-```sh
-$ python scripts/setup_dictionaries.py
-```
-
-This script registers three dictionaries:
-"Prefectures of Japan" (`geonlp:geoshape-pref`),
-"Historical Administrative Area Data Set Beta Dictionary of Place Names"
-(`geonlp:geoshape-city`), and "Railroad Stations in Japan (2019)"
-(`geonlp:ksj-station-N02-2019`).
-
-
-## Delete the place-name database
+## Delete the database
 
 When you register a place-name word analysis dictionary to the database,
 it will create a sqlite3 database and some other files in the specified directory.

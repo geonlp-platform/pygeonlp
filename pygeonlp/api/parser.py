@@ -2,9 +2,9 @@ import copy
 import logging
 import re
 
-from .filter import EntityClassFilter, GreedySearchFilter
-from .linker import RankedResults, MAX_COMBINATIONS
-from .node import Node
+from pygeonlp.api.filter import EntityClassFilter, GreedySearchFilter
+from pygeonlp.api.linker import RankedResults, MAX_COMBINATIONS
+from pygeonlp.api.node import Node
 
 
 logger = logging.getLogger(__name__)

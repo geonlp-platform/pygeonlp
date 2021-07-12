@@ -9,21 +9,23 @@
 置かれているディレクトリを指定して初期化します。
 
 ```python
-import pygeonlp.api as geonlp_api
-geonlp_api.init(dict_dir='mydic')
+>>> import pygeonlp.api as api
+>>> api.init(db_dir='mydic')
 ```
 
 `geoparse("解析したい文章")` を実行します。
 
 ```python
-result = geonlp_api.geoparse("国立情報学研究所は千代田区にあります。")
+>>> result = api.geoparse("国立情報学研究所は千代田区にあります。")
 ```
 
 結果は単語ごとに品詞や空間属性を付与した dict オブジェクトのリストです。
+
 各 dict オブジェクトを JSON エンコードすると [GeoJSON Feature Object](https://tools.ietf.org/html/rfc7946#section-3.2) を得られます。
 
 ```python
-print(json.dumps(result, indent=2, ensure_ascii=False))
+>>> import json
+>>> print(json.dumps(result, indent=2, ensure_ascii=False))
 [
   {
     "type": "Feature",
@@ -124,6 +126,7 @@ print(json.dumps(result, indent=2, ensure_ascii=False))
 
 `pygeonlp` は日本語形態素解析に [MeCab](https://taku910.github.io/mecab/)
 C++ ライブラリと UTF8 の辞書を必要とします。
+
 また、 C++ 実装部分が [Boost C++](https://www.boost.org/) に依存します。
 
 ```sh
@@ -140,6 +143,27 @@ $ pip install --upgrade pip setuptools
 $ pip install pygeonlp
 ```
 
+初めてインストールした時はデータベースを準備する必要があります。
+
+**データベースの準備**
+
+次のコマンドを実行して、pygeonlp パッケージに含まれる
+基本的な地名語解析辞書（`*.json`, `*.csv`）を
+`mydic/` の下のデータベースに登録します。
+
+```
+>>> import pygeonlp.api as api
+>>> api.setup_basic_database(db_dir='mydic/')
+```
+
+このコマンドは3つの辞書を登録します。
+
+- 「日本の都道府県」 (`geonlp:geoshape-pref`)
+
+- 「歴史的行政区域データセットβ版地名辞書」 (`geonlp:geoshape-city`)
+
+- 「日本の鉄道駅（2019年）」 (`geonlp:ksj-station-N02-2019`)
+
 ##### GDAL のインストール（オプション）
 
 pygeonlp は [GDAL](https://pypi.org/project/GDAL/) がインストールされている場合、
@@ -155,16 +179,12 @@ $ pip install gdal
 
 pygeonlp は [jageocoder](https://pypi.org/project/jageocoder/) がインストールされている場合、住所ジオコーディングを利用することができます。
 
-```sh
-$ pip install jageocoder
-$ mkdir db/
-$ wget https://www.info-proto.com/static/jusho.zip
-$ unzip jusho.zip -d db/
-$ python
->>> import jageocoder
->>> jageocoder.init(dsn='sqlite:///db/address.db', trie_path='db/address.trie')
->>> jageocoder.create_trie_index()
-```
+インストール方法は jageocoder のドキュメントを参照してください。
+
+### テストの実行（オプション）
+
+`python setup.py tests` コマンドでユニットテストを実行します。
+
 
 ## pygeonlp のアンインストール
 
@@ -174,22 +194,11 @@ $ python
 $ pip uninstall pygeonlp
 ```
 
-## 地名語解析辞書の登録
-
-`base_data/` に含まれている基本的な地名語解析辞書（`*.json`, `*.csv`）を
-`mydic/` の下のデータベースに登録するスクリプトを実行します。
-
-```sh
-$ python scripts/setup_dictionaries.py
-```
-
-このスクリプトで登録される辞書は 「日本の都道府県」 (`geonlp:geoshape-pref`)、 「歴史的行政区域データセットβ版地名辞書」 (`geonlp:geoshape-city`)、
-「日本の鉄道駅（2019年）」 (`geonlp:ksj-station-N02-2019`) の3種類です。
-
 ## 地名語解析辞書の削除
 
 地名語解析辞書をデータベースに登録すると、
 指定したディレクトリに sqlite3 データベースの他いくつかのファイルを作成します。
+
 削除したい場合はディレクトリごと消去してください。
 
 ```sh

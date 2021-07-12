@@ -7,8 +7,8 @@ scoring モジュールは、一通りのジオパージング処理を行なう
 
 from logging import getLogger
 
-from .linker import RankedResults
-from .node import Node
+from pygeonlp.api.linker import RankedResults
+from pygeonlp.api.node import Node
 
 logger = getLogger(__name__)
 

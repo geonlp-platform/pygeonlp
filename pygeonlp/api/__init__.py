@@ -178,6 +178,7 @@ def ma_parse(sentence):
     >>> import pygeonlp.api as api
     >>> api.init()
     >>> print(ma_parse('今日は国会議事堂前まで歩きました。'))
+    <BLANKLINE>
     今日    名詞,副詞可能,*,*,*,*,今日,キョウ,キョー
     は      助詞,係助詞,*,*,*,*,は,ハ,ワ
     国会議事堂前    名詞,固有名詞,地名語,fuquyv:国会議事堂前駅/QUy2yP:国会議事堂前駅,*,*,国会議事堂前,,
@@ -187,7 +188,7 @@ def ma_parse(sentence):
     た      助動詞,*,*,*,特殊・タ,基本形,た,タ,タ
     。      記号,句点,*,*,*,*,。,。,。
     EOS
-
+    <BLANKLINE>
     """
     _check_initialized()
     return _default_service.ma_parse(sentence)
@@ -212,8 +213,7 @@ def ma_parseNode(sentence):
     >>> import pygeonlp.api as api
     >>> api.init()
     >>> api.ma_parseNode('今日は国会議事堂前まで歩きました。')
-    [{'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '*', 'pos': 'BOS/EOS', 'prononciation': '*', 'subclass1': '*', 'subclass2': '*', 'subclass3': '*', 'surface': '', 'yomi': '*'}, {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '今日', 'pos': '名詞', 'prononciation': 'キョー', 'subclass1': '副詞可能', 'subclass2': '*', 'subclass3': '*', 'surface': '今日', 'yomi': 'キョウ'}, {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': 'は', 'pos': '助詞', 'prononciation': 'ワ', 'subclass1': '係助詞', 'subclass2': '*', 'subclass3': '*', 'surface': 'は', 'yomi': 'ハ'}, {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '国会議事堂前', 'pos': '名詞', 'prononciation': '', 'subclass1': '固有名詞', 'subclass2': '地名語', 'subclass3': 'fuquyv:国会議事堂前駅/QUy2yP:国会議事堂前駅', 'surface': '国会議事堂前', 'yomi': ''}, {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': 'まで', 'pos': '助詞', 'prononciation': 'マデ', 'subclass1': '副助詞', 'subclass2': '*', 'subclass3': '*', 'surface': 'まで',
-        'yomi': 'マデ'}, {'conjugated_form': '五段・カ行イ音便', 'conjugation_type': '連用形', 'original_form': '歩く', 'pos': '動詞', 'prononciation': 'アルキ', 'subclass1': '自立', 'subclass2': '*', 'subclass3': '*', 'surface': '歩き', 'yomi': 'アルキ'}, {'conjugated_form': '特殊・マス', 'conjugation_type': '連用形', 'original_form': 'ます', 'pos': '助動詞', 'prononciation': 'マシ', 'subclass1': '*', 'subclass2': '*', 'subclass3': '*', 'surface': 'まし', 'yomi': 'マシ'}, {'conjugated_form': '特殊・タ', 'conjugation_type': '基本形', 'original_form': 'た', 'pos': '助動詞', 'prononciation': 'タ', 'subclass1': '*', 'subclass2': '*', 'subclass3': '*', 'surface': 'た', 'yomi': 'タ'}, {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '。', 'pos': '記号', 'prononciation': '。', 'subclass1': '句点', 'subclass2': '*', 'subclass3': '*', 'surface': '。', 'yomi': '。'}, {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '*', 'pos': 'BOS/EOS', 'prononciation': '*', 'subclass1': '*', 'subclass2': '*', 'subclass3': '*', 'surface': '', 'yomi': '*'}]
+    [{'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '*', 'pos': 'BOS/EOS', 'prononciation': '*', 'subclass1': '*', 'subclass2': '*', 'subclass3': '*', 'surface': '', 'yomi': '*'}, {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '今日', 'pos': '名詞', 'prononciation': 'キョー', 'subclass1': '副詞可能', 'subclass2': '*', 'subclass3': '*', 'surface': '今日', 'yomi': 'キョウ'}, {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': 'は', 'pos': '助詞', 'prononciation': 'ワ', 'subclass1': '係助詞', 'subclass2': '*', 'subclass3': '*', 'surface': 'は', 'yomi': 'ハ'}, {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '国会議事堂前', 'pos': '名詞', 'prononciation': '', 'subclass1': '固有名詞', 'subclass2': '地名語', 'subclass3': 'fuquyv:国会議事堂前駅/QUy2yP:国会議事堂前駅', 'surface': '国会議事堂前', 'yomi': ''}, {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': 'まで', 'pos': '助詞', 'prononciation': 'マデ', 'subclass1': '副助詞', 'subclass2': '*', 'subclass3': '*', 'surface': 'まで', 'yomi': 'マデ'}, {'conjugated_form': '五段・カ行イ音便', 'conjugation_type': '連用形', 'original_form': '歩く', 'pos': '動詞', 'prononciation': 'アルキ', 'subclass1': '自立', 'subclass2': '*', 'subclass3': '*', 'surface': '歩き', 'yomi': 'アルキ'}, {'conjugated_form': '特殊・マス', 'conjugation_type': '連用形', 'original_form': 'ます', 'pos': '助動詞', 'prononciation': 'マシ', 'subclass1': '*', 'subclass2': '*', 'subclass3': '*', 'surface': 'まし', 'yomi': 'マシ'}, {'conjugated_form': '特殊・タ', 'conjugation_type': '基本形', 'original_form': 'た', 'pos': '助動詞', 'prononciation': 'タ', 'subclass1': '*', 'subclass2': '*', 'subclass3': '*', 'surface': 'た', 'yomi': 'タ'}, {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '。', 'pos': '記号', 'prononciation': '。', 'subclass1': '句点', 'subclass2': '*', 'subclass3': '*', 'surface': '。', 'yomi': '。'}, {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '*', 'pos': 'BOS/EOS', 'prononciation': '*', 'subclass1': '*', 'subclass2': '*', 'subclass3': '*', 'surface': '', 'yomi': '*'}]
 
     """
     _check_initialized()
@@ -809,7 +809,9 @@ def setup_basic_database(db_dir=None, src_dir=None):
     if not data_dir:
         raise RuntimeError("地名解析辞書がインストールされたディレクトリが見つかりません。")
 
-    db_dir = get_db_dir()
+    if db_dir is None:
+        db_dir = get_db_dir()
+
     os.makedirs(db_dir, 0o755, exist_ok=True)
     service = Service(db_dir=db_dir)
 

@@ -5,9 +5,9 @@ import re
 
 from pygeonlp import capi
 
-from .dictionary import Dictionary
-from .metadata import Metadata
-from .parser import Parser
+from pygeonlp.api.dictionary import Dictionary
+from pygeonlp.api.metadata import Metadata
+from pygeonlp.api.parser import Parser
 
 logger = getLogger(__name__)
 
@@ -138,6 +138,7 @@ class Service(object):
         >>> from pygeonlp.api.service import Service
         >>> service = Service()
         >>> print(service.ma_parse('今日は国会議事堂前まで歩きました。'))
+        <BLANKLINE>
         今日    名詞,副詞可能,*,*,*,*,今日,キョウ,キョー
         は      助詞,係助詞,*,*,*,*,は,ハ,ワ
         国会議事堂前    名詞,固有名詞,地名語,fuquyv:国会議事堂前駅/QUy2yP:国会議事堂前駅,*,*,国会議事堂前,,
@@ -147,7 +148,7 @@ class Service(object):
         た      助動詞,*,*,*,特殊・タ,基本形,た,タ,タ
         。      記号,句点,*,*,*,*,。,。,。
         EOS
-
+        <BLANKLINE>
         """
         self._check_initialized()
         return self.capi_ma.parse(sentence)
