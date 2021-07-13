@@ -113,7 +113,9 @@ namespace geonlp {
       return ne_class;
     }
 
-    inline const std::string& get_data_dir() const {
+    inline std::string get_data_dir() const {
+      std::string data_dir = this->data_dir;
+      if (data_dir.at(data_dir.length() - 1) != '/') data_dir += "/";
       return data_dir;
     }
 
@@ -123,6 +125,8 @@ namespace geonlp {
 
     inline void set_data_dir(const std::string& data_dir) {
       this->data_dir = data_dir;
+      if (this->data_dir.at(this->data_dir.length() - 1) != '/')
+        this->data_dir += "/";
     }
 
     inline const std::string& get_log_dir() const {
@@ -130,19 +134,19 @@ namespace geonlp {
     }
 		
     inline const std::string get_sqlite3_file() const {
-      return data_dir + "/geodic.sq3";
+      return this->get_data_dir() + "geodic.sq3";
     }
 		
     inline const std::string get_darts_file() const {
-      return data_dir + "/geo_name_fullname.drt";
+      return this->get_data_dir() + "geo_name_fullname.drt";
     }
 		
     inline const std::string get_wordlist_file() const {
-      return data_dir + "/wordlist.sq3";
+      return this->get_data_dir() + "wordlist.sq3";
     }
 		
     inline const std::string get_mecab_userdic() const {
-      return data_dir + "/mecabusr.dic";
+      return this->get_data_dir() + "mecabusr.dic";
     }
 
 #ifdef HAVE_LIBDAMS

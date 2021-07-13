@@ -1,11 +1,10 @@
 import copy
-import json
 import logging
 import re
 
-from .filter import EntityClassFilter, GreedySearchFilter
-from .linker import RankedResults, MAX_COMBINATIONS
-from .node import Node
+from pygeonlp.api.filter import EntityClassFilter, GreedySearchFilter
+from pygeonlp.api.linker import RankedResults, MAX_COMBINATIONS
+from pygeonlp.api.node import Node
 
 
 logger = logging.getLogger(__name__)
@@ -24,8 +23,8 @@ class Parser(object):
 
     Attributes
     ----------
-    capi_ma : pygeonlp.capi
-        拡張形態素解析を行なう C++ で実装されたモジュール capi のインスタンス。
+    service : pygeonlp.service.Service
+        利用する Service インスタンス。
     jageocoder_tree : jageocoder.address.AddressTree
         住所ジオコーダー jageocoder の AddressTree インスタンス。
     address_regex : regex
@@ -38,16 +37,16 @@ class Parser(object):
         スコアリングを行なうクラスインスタンス。
     """
 
-    def __init__(self, capi_ma=None, jageocoder=None, address_regex=None,
+    def __init__(self, service=None, jageocoder=None, address_regex=None,
                  scoring_class=None, scoring_options=None):
         """
         パーザを初期化します。
 
         Parameters
         ----------
-        capi_ma : pygeonlp.capi, optional
-            拡張形態素解析を行う C++ モジュール capi のインスタンス。
-            省略した場合、 default_service の capi_ma を利用します。
+        service : pygeonlp.service.Service, optional
+            拡張形態素解析や地名語の検索を行うための Service インスタンス。
+            省略した場合、 ``pygeonlp.api.default_service()`` を利用します。
         jageocoder : jageocoder, optional
             住所ジオコーダー jageocoder モジュール。
             省略した場合、ジオコーディング機能は使用しません。
@@ -75,7 +74,7 @@ class Parser(object):
             scoring_options=self.scoring_options,
             max_results=1, max_combinations=MAX_COMBINATIONS)
 
-        self.capi_ma = capi_ma
+        self.service = service
 
         if self.scoring_class is None:
             from .scoring import ScoringClass
@@ -83,9 +82,9 @@ class Parser(object):
         else:
             self.scorer = scoring_class(scoring_options)
 
-        if capi_ma is None:
+        if service is None:
             from . import default_service
-            self.capi_ma = default_service().capi_ma
+            self.service = default_service()
 
         if jageocoder is None:
             self.jageocoder_tree = None
@@ -101,11 +100,11 @@ class Parser(object):
                 self.jageocoder_tree = jageocoder.tree
             else:
                 raise ParseError(
-                    'The jageocoder module must be initialized first.')
+                    '"jageocoder" モジュールが init() で初期化されていません。')
 
-        except ModuleNotFoundError as e:
+        except ModuleNotFoundError:
             raise ParseError(
-                'Install jageocoder package to use address geocoding.')
+                '"jageocoder" モジュールがインストールされていません。')
 
         if address_regex is None:
             self.address_regex = re.compile(
@@ -134,7 +133,7 @@ class Parser(object):
             return False
 
         for k, v in filter.items():
-            if not k in word:
+            if k not in word:
                 return False
 
             if word[k] != v:
@@ -179,10 +178,9 @@ class Parser(object):
         ['ます(NORMAL)']
         ['。(NORMAL)']
         """
-        from . import getWordInfo
 
         lattice = []
-        words = self.capi_ma.parseNode(sentence)
+        words = self.service.ma_parseNode(sentence)
 
         i = 0  # 処理中の単語のインデックス
         while i < len(words):
@@ -296,7 +294,6 @@ class Parser(object):
 
             # 地名語以外の可能性を追加
             if word['conjugated_form'] not in ("", "*"):
-                pos_args = word['conjugated_form'].split('-')
                 alternative = self._get_alternative_word(word)
                 node_candidates.append(
                     Node(surface, Node.NORMAL, alternative))
@@ -308,7 +305,8 @@ class Parser(object):
                 geolod_id = x.split(':')[0]
                 geolod_ids[geolod_id] = x
 
-            for geolod_id, geoword in getWordInfo(geolod_ids.keys()).items():
+            for geolod_id, geoword in self.service.getWordInfo(
+                    geolod_ids.keys()).items():
                 if geoword is None:
                     raise RuntimeError(
                         "No geoword found with id='{}', word={}".format(
@@ -404,6 +402,13 @@ class Parser(object):
         True
         >>> node.morphemes[1]['node_type'] == 'NORMAL'
         True
+        >>> lattice = parser.analyze_sentence('喜多方市三島町')
+        >>> lattice_address = parser.add_address_candidates(lattice, True)
+        >>> pp_lattice(lattice_address)
+        #0:'喜多方市'
+          ...
+        #1:'三島町'
+          ...
         """
         if not self.jageocoder_tree:
             return lattice
@@ -501,7 +506,6 @@ class Parser(object):
             "湯沢市" に対応するノード、 "皆瀬" に対応するノードを
             作成します。
         """
-        i = 0
         morphemes = []
         parent = Node(
             surface="",
@@ -646,8 +650,12 @@ class Parser(object):
         i = pos
         while i < len(lattice):
             surface += lattice[i][0].surface
+            if len(surface) > len(geocoding_result[0][1]):
+                # 形態素 lattice[i] は住所の区切りと一致しない
+                break
+
             i += 1
-            if len(surface) >= len(geocoding_result[0][1]):
+            if len(surface) == len(geocoding_result[0][1]):
                 break
 
         if i - pos == 1:

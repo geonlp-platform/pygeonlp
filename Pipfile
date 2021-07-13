@@ -25,5 +25,5 @@ geographiclib = "*"
 python_version = "3.6.8"
 
 [scripts]
-format = "autopep8 -ivr ."
-lint = "flake8 --show-source ."
+format = "autopep8 -ivr --ignore E226,E24,W50,W690,E501 ."
+lint = "flake8 --show-source --extend-ignore E501 ."

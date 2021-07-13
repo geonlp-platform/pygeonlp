@@ -5,10 +5,9 @@ import re
 
 from pygeonlp import capi
 
-from .dictionary import Dictionary
-from .metadata import Metadata
-from .parser import Parser, Statistics
-from .filter import EntityClassFilter
+from pygeonlp.api.dictionary import Dictionary
+from pygeonlp.api.metadata import Metadata
+from pygeonlp.api.parser import Parser
 
 logger = getLogger(__name__)
 
@@ -139,6 +138,7 @@ class Service(object):
         >>> from pygeonlp.api.service import Service
         >>> service = Service()
         >>> print(service.ma_parse('今日は国会議事堂前まで歩きました。'))
+        <BLANKLINE>
         今日    名詞,副詞可能,*,*,*,*,今日,キョウ,キョー
         は      助詞,係助詞,*,*,*,*,は,ハ,ワ
         国会議事堂前    名詞,固有名詞,地名語,fuquyv:国会議事堂前駅/QUy2yP:国会議事堂前駅,*,*,国会議事堂前,,
@@ -148,7 +148,7 @@ class Service(object):
         た      助動詞,*,*,*,特殊・タ,基本形,た,タ,タ
         。      記号,句点,*,*,*,*,。,。,。
         EOS
-
+        <BLANKLINE>
         """
         self._check_initialized()
         return self.capi_ma.parse(sentence)
@@ -576,7 +576,8 @@ class Service(object):
         >>> service = Service()
         >>> service.clearDatabase()
         True
-        >>> service.addDictionaryFromWeb('https://geonlp.ex.nii.ac.jp/dictionary/geoshape-city/')
+        >>> service.addDictionaryFromWeb(
+        ...   'https://geonlp.ex.nii.ac.jp/dictionary/geoshape-city/')
         True
         >>> service.updateIndex()
         True
@@ -608,7 +609,8 @@ class Service(object):
         --------
         >>> from pygeonlp.api.service import Service
         >>> service = Service()
-        >>> service.addDictionaryFromFile('base_data/geoshape-city.json', 'base_data/geoshape-city.csv')
+        >>> service.addDictionaryFromFile(
+        ...   'base_data/geoshape-city.json', 'base_data/geoshape-city.csv')
         True
         >>> service.updateIndex()
         True
@@ -641,7 +643,7 @@ class Service(object):
             常に True。登録に失敗した場合は例外が発生します。
 
         Examples
-        --------        
+        --------
         >>> from pygeonlp.api.service import Service
         >>> service = Service()
         >>> service.clearDatabase()
@@ -798,7 +800,7 @@ class Service(object):
         """
         jageocoder = kwargs.get('jageocoder', None)
         address_regex = self.options.get('address_regex', None)
-        parser = Parser(capi_ma=self.capi_ma, jageocoder=jageocoder,
+        parser = Parser(service=self, jageocoder=jageocoder,
                         address_regex=address_regex)
         varray = parser.analyze_sentence(sentence, **kwargs)
 
@@ -847,7 +849,7 @@ class Service(object):
         このメソッドは解析結果から適切なフィルタを判断し、候補の絞り込みやランキングを行ないます。
         """
         address_regex = self.options.get('address_class', None)
-        parser = Parser(capi_ma=self.capi_ma, jageocoder=jageocoder,
+        parser = Parser(service=self, jageocoder=jageocoder,
                         address_regex=address_regex,
                         scoring_class=scoring_class,
                         scoring_options=scoring_options)

@@ -149,7 +149,7 @@ class Metadata(object):
         try:
             name = obj['name']
             return name
-        except (IndexError, TypeError) as e:
+        except (IndexError, TypeError):
             raise MetadataError(
                 ("json-ld から name を見つけられません。"
                  "{}".format(self.jsonld)))
@@ -190,7 +190,7 @@ class Metadata(object):
                 if identifier.startswith('geonlp:'):
                     return identifier
 
-        except (IndexError, TypeError) as e:
+        except (IndexError, TypeError):
             raise MetadataError(
                 ("json-ld から identifier を見つけられません。"
                  "{}".format(self.jsonld)))
@@ -230,7 +230,7 @@ class Metadata(object):
                     continue
 
                 content_url = dist['contentUrl']
-        except (IndexError, TypeError) as e:
+        except (IndexError, TypeError):
             raise MetadataError(
                 ("json-ld から contentUrl を見つけられません。"
                  "{}".format(self.jsonld)))

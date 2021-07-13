@@ -1,27 +1,68 @@
-import copy
-import json
 import logging
-import re
-import sys
-
-from .node import Node
 
 
 logger = logging.getLogger(__name__)
 
 
-def pp_lattice(lattice, indent=2, file=sys.stdout):
+def pp_geojson(geojson_list, indent=2, file=None):
+    """
+    geoparse() の結果（GeoJSON互換）を pretty print します。
+
+    Parameters
+    ----------
+    geojson_list : list
+        geoparse() 結果の GeoJSON 互換 dict のリスト。
+    indent : int, optional
+        インデント幅。デフォルトは2です。
+    file : file descriptor, optional
+        出力先のファイルデスクリプタ。デフォルトは None です。
+
+    Examples
+    --------
+    >>> import pygeonlp.api as api
+    >>> from pygeonlp.api.devtool import pp_geojson
+    >>> api.init()
+    >>> pp_geojson(api.geoparse('アメリカ大使館：港区赤坂'))
+    アメリカ大使館 ： ≪港区|市区町村['東京都']≫ ≪赤坂|鉄道施設/鉄道駅['東京地下鉄', '9号線千代田線']≫ EOS
+    <BLANKLINE>
+    """
+    def simple(geojson):
+        properties = geojson['properties']
+        hypernym = ""
+
+        if properties['node_type'] == "ADDRESS":
+            return "【{}:{}】".format(
+                properties['surface'],
+                properties['address_properties']['fullname'])
+        elif properties['node_type'] == "GEOWORD":
+            hypernym = properties['geoword_properties'].get('hypernym')
+            ne_class = properties['geoword_properties'].get('ne_class')
+            if hypernym:
+                return "≪{}|{}{}≫".format(
+                    properties['surface'], ne_class, hypernym)
+
+            return "≪{}|{}≫".format(properties['surface'], ne_class)
+
+        return properties['surface']
+
+    for pos, geojson in enumerate(geojson_list):
+        print("{}".format(simple(geojson)), end=' ', file=file)
+
+    print("EOS\n", file=file)
+
+
+def pp_lattice(lattice, indent=2, file=None):
     """
     ラティス表現のデータを pretty print します。
 
     Parameters
     ----------
-    lattice : list
+    lattice: list
         解析結果のラティス表現。
-    indent : int, optional
+    indent: int, optional
         インデント幅。デフォルトは2です。
-    file : file descriptor, optional
-        出力先のファイルデスクリプタ。デフォルトは sys.stdout です。
+    file: file descriptor, optional
+        出力先のファイルデスクリプタ。デフォルトは None です。
 
     Examples
     --------
@@ -30,7 +71,8 @@ def pp_lattice(lattice, indent=2, file=sys.stdout):
     >>> import jageocoder
     >>> api.init()
     >>> dbdir = api.get_jageocoder_db_dir()
-    >>> jageocoder.init(f'sqlite:///{dbdir}/address.db', f'{dbdir}/address.trie')
+    >>> jageocoder.init(f'sqlite:///{dbdir}/address.db',
+    ...   f'{dbdir}/address.trie')
     >>> parser = api.parser.Parser(jageocoder=jageocoder)
     >>> lattice = parser.analyze_sentence('アメリカ大使館：港区赤坂1-10-5')
     >>> pp_lattice(lattice)
@@ -84,7 +126,7 @@ def pp_lattice(lattice, indent=2, file=sys.stdout):
     #8:'5'
       5(NORMAL)
     >>> lattice_address_compact = parser.add_address_candidates(lattice)
-    >>> pp_lattice(lattice_compact)
+    >>> pp_lattice(lattice_address_compact)
     #0:'アメリカ大使館'
       アメリカ大使館(NORMAL)
     #1:'：'
@@ -102,17 +144,17 @@ def pp_lattice(lattice, indent=2, file=sys.stdout):
             print(node.simple(), file=file)
 
 
-def pp_path(path, indent=2, file=sys.stdout):
+def pp_path(path, indent=2, file=None):
     """
     パス表現のデータを pretty print します。
 
     Parameters
     ----------
-    path : list
+    path: list
         解析結果のパス表現。
-    indent : int, optional
+    indent: int, optional
         インデント幅。デフォルトは2です。
-    file : file descriptor, optional
+    file: file descriptor, optional
         出力先のファイルデスクリプタ。デフォルトは sys.stdout です。
 
     Examples
@@ -139,8 +181,8 @@ def pp_path(path, indent=2, file=sys.stdout):
     [
       #0:アメリカ大使館(NORMAL)
       #1:：(NORMAL)
-      #2:港区(GEOWORD:['愛知県', '名古屋市'])
-      #3:赤坂(GEOWORD:['上毛電気鉄道', '上毛線'])
+      #2:港区(GEOWORD:['東京都'])
+      #3:赤坂(GEOWORD:['東京地下鉄', '9号線千代田線'])
       #4:1(NORMAL)
       #5:-(NORMAL)
       #6:10(NORMAL)

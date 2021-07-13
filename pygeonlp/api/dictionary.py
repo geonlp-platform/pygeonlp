@@ -2,7 +2,7 @@ import chardet
 import os
 import tempfile
 
-from .metadata import Metadata
+from pygeonlp.api.metadata import Metadata
 
 
 class DictionaryError(RuntimeError):

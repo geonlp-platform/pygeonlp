@@ -7,8 +7,8 @@ scoring モジュールは、一通りのジオパージング処理を行なう
 
 from logging import getLogger
 
-from .linker import RankedResults
-from .node import Node
+from pygeonlp.api.linker import RankedResults
+from pygeonlp.api.node import Node
 
 logger = getLogger(__name__)
 
@@ -143,7 +143,8 @@ class ScoringClass(object):
         >>> from pygeonlp.api.scoring import ScoringClass
         >>> api.init()
         >>> s = ScoringClass()
-        >>> s.node_relation_score(api.analyze('国会議事堂前')[0][0], api.analyze('永田町')[0][0])
+        >>> s.node_relation_score(api.analyze('国会議事堂前')[0][0],
+        ...   api.analyze('永田町')[0][0])
         20
 
         Notes

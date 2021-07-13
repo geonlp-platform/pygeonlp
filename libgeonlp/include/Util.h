@@ -50,6 +50,10 @@ namespace geonlp
     // 6 - param
     static bool split_url(const std::string& url, std::vector<std::string>& result);
 
+    // ファイルが存在するかどうか調べる
+    // 存在していれば true, なければ false
+    static bool fileExists(const std::string& path);
+
   };
 	
 }

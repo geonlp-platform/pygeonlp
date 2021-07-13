@@ -1,6 +1,5 @@
 import json
 from logging import getLogger
-import math
 
 from geographiclib.geodesic import Geodesic
 
@@ -9,7 +8,7 @@ logger = getLogger(__name__)
 try:
     from osgeo import ogr
     have_gdal = True
-except:
+except ModuleNotFoundError:
     logger.info(("gdal パッケージがインストールされていないため、"
                  "ノード間の地理的距離計算をスキップします。"))
     have_gdal = False
@@ -282,7 +281,7 @@ class Node(object):
         if 'point' in self._attr:
             return self._attr['point']
 
-        if have_gdal == False or self.geometry is None:
+        if have_gdal is False or self.geometry is None:
             return None
 
         point = ogr.CreateGeometryFromJson(json.dumps(self.geometry))

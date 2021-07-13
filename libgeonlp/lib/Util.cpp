@@ -8,6 +8,7 @@
 #ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
 #endif /* _USE_MATH_DEFINES */
+#include <sys/stat.h>
 #include <cmath>
 #include <sstream>
 #include "Util.h"
@@ -182,6 +183,21 @@ namespace geonlp
       result.push_back(std::string(what[i].first, what[i].second));
     }
     return true;
+  }
+
+  /// @brief ファイルの存在チェック
+  /// @arg @c path  ファイルパス（相対または絶対）
+  /// @return true if path exists
+  bool Util::fileExists(const std::string& path) {
+    static struct stat st_stat;
+    int result;
+
+    result = stat(path.c_str(), &st_stat);
+    if (result == 0) {
+      return true;
+    }
+
+    return false;
   }
 
 }
