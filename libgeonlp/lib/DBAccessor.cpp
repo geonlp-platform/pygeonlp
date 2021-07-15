@@ -1027,6 +1027,9 @@ namespace geonlp
     // コミット
     this->commit(this->wordlistp);
 
+    // キャッシュを消す
+    this->clearGeowordCache();
+
     // 一時ファイルを正規ファイルに移動
     boost::filesystem::path tmppath(tmp_darts_fname);
     boost::filesystem::path regpath(this->darts_fname);
@@ -1227,7 +1230,7 @@ namespace geonlp
     char *zErrMsg;
 
     if ( NULL == sqlitep) throw SqliteNotInitializedException();
-    // this->createTables(); // テーブルが存在していなければ作成しておく
+    this->createTables(); // テーブルが存在していなければ作成しておく
 
     // 既存テーブル上のデータの削除
     rc = sqlite3_exec(sqlitep, "DELETE FROM dictionary;", NULL, NULL, &zErrMsg);
@@ -1241,7 +1244,7 @@ namespace geonlp
   /// @brief 辞書データをファイルからデータベースに追加する
   /// @return 登録した地名語の件数
   int DBAccessor::addDictionary(const std::string& jsonfile, const std::string& csvfile) const {
-    // this->createTables(); // テーブルが存在していなければ作成しておく
+    this->createTables(); // テーブルが存在していなければ作成しておく
     FileAccessor fa(*(this));
     return fa.importDictionaryCSV(csvfile, jsonfile);
   }
@@ -1250,7 +1253,7 @@ namespace geonlp
   void DBAccessor::removeDictionary(const std::string& identifier) const {
     sqlite3_stmt* stmt;
     int rc;
-    // this->createTables(); // テーブルが存在していなければ作成しておく
+    this->createTables(); // テーブルが存在していなければ作成しておく
     int dic_id = this->getDictionaryInternalId(identifier);
 
     // 内部 ID を取得
@@ -1285,7 +1288,6 @@ namespace geonlp
     }
 
     this->commit(this->sqlitep);
-
   }
 
   /// キャッシュ関連メソッド

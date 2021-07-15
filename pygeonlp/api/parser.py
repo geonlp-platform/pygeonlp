@@ -353,6 +353,7 @@ class Parser(object):
         --------
         >>> import pygeonlp.api as api
         >>> from pygeonlp.api.devtool import pp_lattice
+        >>> from pygeonlp.api.node import Node
         >>> import jageocoder
         >>> api.init()
         >>> dbdir = api.get_jageocoder_db_dir()
@@ -398,9 +399,9 @@ class Parser(object):
         >>> node = lattice_address[2][0]
         >>> len(node.morphemes)
         6
-        >>> '東京都' in node.morphemes[0]['prop']['hypernym']
+        >>> '東京都' in node.morphemes[0].prop['hypernym']
         True
-        >>> node.morphemes[1]['node_type'] == 'NORMAL'
+        >>> node.morphemes[1].node_type == Node.NORMAL
         True
         >>> lattice = parser.analyze_sentence('喜多方市三島町')
         >>> lattice_address = parser.add_address_candidates(lattice, True)
@@ -533,7 +534,7 @@ class Parser(object):
             node = nodes[0]
             if node.node_type != Node.GEOWORD:
                 # 非地名語はそのまま
-                morphemes.append(node.as_dict())
+                morphemes.append(node)
                 continue
 
             dummy_node = Node(
@@ -551,7 +552,7 @@ class Parser(object):
 
             if node.surface not in address_element['fullname']:
                 # 住所要素のどの表記とも一致しない
-                morphemes.append(dummy_node.as_dict())
+                morphemes.append(dummy_node)
                 continue
 
             # 親ノードに最も関係スコアの高い地名語ノードを選ぶ
@@ -573,7 +574,7 @@ class Parser(object):
             else:
                 cand = dummy_node
 
-            morphemes.append(cand.as_dict())
+            morphemes.append(cand)
 
         return morphemes
 
@@ -645,17 +646,22 @@ class Parser(object):
         if len(geocoding_result) < 1:
             return {"address": None, "pos": pos}
 
+        address_string = geocoding_result[0][1]  # 変換できた住所文字列
+        check_address = re.sub(r'番$', '番地', address_string)
+
         # 一致した文字列が形態素ノード列のどの部分に当たるかチェック
         surface = ''
         i = pos
         while i < len(lattice):
-            surface += lattice[i][0].surface
-            if len(surface) > len(geocoding_result[0][1]):
-                # 形態素 lattice[i] は住所の区切りと一致しない
-                break
+            new_surface = surface + lattice[i][0].surface
+            if len(new_surface) > len(check_address):
+                # 形態素 lattice[i] は住所の区切りと一致しないので
+                # lattice[0:i] までを利用してジオコーディングをやり直す
+                return self.get_addresses(lattice[0:i], pos)
 
             i += 1
-            if len(surface) == len(geocoding_result[0][1]):
+            surface = new_surface
+            if len(surface) == len(check_address):
                 break
 
         if i - pos == 1:
@@ -663,7 +669,7 @@ class Parser(object):
             return {"surface": None, "address": None, "pos": pos}
 
         return {
-            "surface": geocoding_result[0][1],
+            "surface": surface,
             "address": [x[0].as_dict() for x in geocoding_result],
             "pos": i,
         }

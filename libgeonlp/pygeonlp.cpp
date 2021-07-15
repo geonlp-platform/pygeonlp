@@ -159,7 +159,7 @@ static PyObject * geonlp_ma_search_word(GeonlpMA *self, PyObject *args)
     std::map<std::string, geonlp::Geoword> results;
     (self->_ptrObj)->getGeowordEntries(str, results);
     for (std::map<std::string, geonlp::Geoword>::iterator it = results.begin();
-	 it != results.end(); it++) {
+      it != results.end(); it++) {
       __alter_geonlpid_fieldname((*it).second);
       json_obj.set_value((*it).first, (*it).second);
     }
@@ -180,7 +180,7 @@ static PyObject * geonlp_ma_list_dictionary(GeonlpMA *self, PyObject *args)
     std::map<int, geonlp::Dictionary> dicts;
     (self->_ptrObj)->getDictionaryList(dicts);
     for (std::map<int, geonlp::Dictionary>::iterator it = dicts.begin();
-	 it != dicts.end(); it++) {
+      it != dicts.end(); it++) {
       std::stringstream ss;
       std::string dict_id;
       ss << (*it).first;
@@ -207,13 +207,13 @@ static PyObject * geonlp_ma_get_dictionary_info(GeonlpMA *self, PyObject *args)
     if (PyLong_Check(pyobj)) {
       long int dict_id = PyLong_AsLong(pyobj);
       if ((self->_ptrObj)->getDictionaryById(dict_id, dict)) {
-	return picojson_to_pyobject(dict);
+        return picojson_to_pyobject(dict);
       }
       return Py_None;
     } else if (PyUnicode_Check(pyobj)) {
       const std::string cstr = PyBytes_AsString(PyUnicode_AsUTF8String(pyobj));
       if ((self->_ptrObj)->getDictionary(cstr, dict)) {
-	return picojson_to_pyobject(dict);
+        return picojson_to_pyobject(dict);
       }
       return Py_None;
     }

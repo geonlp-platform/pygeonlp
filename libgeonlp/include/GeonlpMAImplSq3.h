@@ -161,7 +161,7 @@ namespace geonlp
 
     void clearDatabase(void);
     int addDictionary(const std::string& jsonfile, const std::string& csvfile) const;
-    bool removeDictionary(const std::string& identifier) const;
+    bool removeDictionary(const std::string& identifier);
     void updateIndex(void);
 
   private:

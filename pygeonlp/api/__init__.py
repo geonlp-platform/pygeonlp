@@ -3,7 +3,7 @@ import os
 import site
 import sys
 
-from .service import Service, ServiceError
+from pygeonlp.api.service import Service, ServiceError
 
 logger = getLogger(__name__)
 _default_service = None
@@ -514,9 +514,6 @@ def clearDatabase():
     >>> import pygeonlp.api as api
     >>> api.init()
     >>> api.clearDatabase()
-    >>> api.addDictionaryFromWeb('https://geonlp.ex.nii.ac.jp/dictionary/geoshape-city/')
-    True
-    >>> api.updateIndex()
     """
     _check_initialized()
     _default_service.clearDatabase()
@@ -529,6 +526,9 @@ def addDictionaryFromFile(jsonfile, csvfile):
 
     既に同じ identifier を持つ辞書データがデータベースに登録されている場合、
     削除してから新しい辞書データを登録します。
+
+    登録した辞書を利用可能にするには、 ``setActivateDictionaries()``
+    または ``activateDictionaires()`` で有効化する必要があります。
 
     Parameters
     ----------
@@ -549,6 +549,9 @@ def addDictionaryFromFile(jsonfile, csvfile):
     >>> api.addDictionaryFromFile('base_data/geoshape-city.json', 'base_data/geoshape-city.csv')
     True
     >>> api.updateIndex()
+    >>> api.activateDictionaries(pattern=r'geoshape-city')
+    >>> 'lQccqK' in api.searchWord('和歌山市')
+    True
     """
     _check_initialized()
     return _default_service.addDictionaryFromFile(jsonfile, csvfile)
@@ -559,6 +562,12 @@ def addDictionaryFromWeb(url, params=None, **kwargs):
     指定した URL にあるページに含まれる辞書メタデータ（JSON-LD）を取得し、
     メタデータに記載されている URL から地名解析辞書（CSVファイル）を取得し、
     データベースに登録します。
+
+    既に同じ identifier を持つ辞書データがデータベースに登録されている場合、
+    削除してから新しい辞書データを登録します。
+
+    登録した辞書を利用可能にするには、 ``setActivateDictionaries()``
+    または ``activateDictionaires()`` で有効化する必要があります。
 
     Parameters
     ----------
@@ -578,10 +587,15 @@ def addDictionaryFromWeb(url, params=None, **kwargs):
     --------
     >>> import pygeonlp.api as api
     >>> api.init()
-    >>> api.clearDatabase()
     >>> api.addDictionaryFromWeb('https://geonlp.ex.nii.ac.jp/dictionary/geoshape-city/')
     True
     >>> api.updateIndex()
+    >>> api.activateDictionaries(pattern=r'geoshape-city')
+    >>> geowords = api.searchWord('千代田区')
+    >>> len(geowords)
+    1
+    >>> next(iter(geowords.values()))['dictionary_identifier']
+    'geonlp:geoshape-city'
     """
     _check_initialized()
     return _default_service.addDictionaryFromWeb(url, params, **kwargs)
@@ -649,9 +663,13 @@ def removeDictionary(identifier):
     --------
     >>> import pygeonlp.api as api
     >>> api.init()
+    >>> 'lQccqK' in api.searchWord('和歌山市')
+    True
     >>> api.removeDictionary('geonlp:geoshape-city')
     True
     >>> api.updateIndex()
+    >>> 'lQccqK' in api.searchWord('和歌山市')
+    False
     """
     _check_initialized()
     return _default_service.removeDictionary(identifier)
@@ -816,19 +834,22 @@ def setup_basic_database(db_dir=None, src_dir=None):
     service = Service(db_dir=db_dir)
 
     updated = False
-    if service.getDictionary('geonlp:geoshape-city') is None:
+    if service.getDictionary('geonlp:geoshape-city') is None or \
+            service.getWordInfo('3QTYVH') is None:
         service.addDictionaryFromFile(
             jsonfile=os.path.join(data_dir, 'geoshape-city.json'),
             csvfile=os.path.join(data_dir, 'geoshape-city.csv'))
         updated = True
 
-    if service.getDictionary('geonlp:geoshape-pref') is None:
+    if service.getDictionary('geonlp:geoshape-pref') is None or \
+            service.getWordInfo('5y5nTf') is None:
         service.addDictionaryFromFile(
             jsonfile=os.path.join(data_dir, 'geoshape-pref.json'),
             csvfile=os.path.join(data_dir, 'geoshape-pref.csv'))
         updated = True
 
-    if service.getDictionary('geonlp:ksj-station-N02-2019') is None:
+    if service.getDictionary('geonlp:ksj-station-N02-2019') is None or \
+            service.getWordInfo('8AeoYz') is None:
         service.addDictionaryFromFile(
             jsonfile=os.path.join(data_dir, 'ksj-station-N02-2019.json'),
             csvfile=os.path.join(data_dir, 'ksj-station-N02-2019.csv'))

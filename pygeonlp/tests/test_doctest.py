@@ -1,12 +1,17 @@
 import doctest
 import os
+import shutil
 import unittest
 
 import pygeonlp.api as api
 
 
+def get_testdir():
+    return os.path.abspath(os.path.join(os.getcwd(), 'apitest'))
+
+
 def setup(test):
-    testdir = os.path.abspath(os.path.join(os.getcwd(), 'apitest'))
+    testdir = get_testdir()
     os.environ['GEONLP_DB_DIR'] = testdir
     os.makedirs(testdir, 0o755, exist_ok=True)
     api.setup_basic_database(db_dir=testdir)
@@ -14,6 +19,8 @@ def setup(test):
 
 
 def load_tests(loader, tests, ignore):
+    shutil.rmtree(get_testdir(), ignore_errors=True)
+
     from pygeonlp.api import devtool, temporal_filter
     modules = [
         api, api.service, api.metadata, api.dictionary, api.node,

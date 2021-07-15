@@ -155,7 +155,7 @@ def pp_path(path, indent=2, file=None):
     indent: int, optional
         インデント幅。デフォルトは2です。
     file: file descriptor, optional
-        出力先のファイルデスクリプタ。デフォルトは sys.stdout です。
+        出力先のファイルデスクリプタ。デフォルトは None です。
 
     Examples
     --------

@@ -149,7 +149,7 @@ namespace geonlp
     /// 地名語も削除するがコンパイルはしない
     /// @arg @c identifier 辞書の identifier ("geonlp:japan_pref")
     /// @return 削除に成功した場合は True, 失敗した場合は False
-    virtual bool removeDictionary(const std::string& identifier) const = 0;
+    virtual bool removeDictionary(const std::string& identifier) = 0;
 
     /// @brief 地名語辞書をコンパイルしてインデックスを更新する
     virtual void updateIndex(void) = 0;

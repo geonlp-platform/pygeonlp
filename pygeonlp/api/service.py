@@ -36,7 +36,8 @@ class Service(object):
         マッピングテーブル（キャッシュ用）。
     capi_ma : pygeonlp.capi オブジェクト
         C 実装の拡張形態素解析機能を利用するためのオブジェクト。
-
+    db_dir: str
+        このサービスが利用するデータベースディレクトリのパス。
     """
 
     def __init__(self, db_dir=None, geoword_rules={}, **options):
@@ -66,6 +67,8 @@ class Service(object):
             from . import get_db_dir
             db_dir = get_db_dir()
 
+        self.db_dir = db_dir
+
         # データベースディレクトリの存在チェック
         if not os.path.exists(db_dir):
             raise RuntimeError(
@@ -81,7 +84,7 @@ class Service(object):
             self.options['address_class'] = '^$'
 
         # capi.ma 用のオプションを構築
-        capi_options = {'data_dir': db_dir}
+        capi_options = {'data_dir': str(db_dir)}
         if 'suffix' in geoword_rules:
             if isinstance(geoword_rules['suffix'], str):
                 capi_options['suffix'] = geoword_rules['suffix']
@@ -593,6 +596,9 @@ class Service(object):
         既に同じ identifier を持つ辞書データがデータベースに登録されている場合、
         削除してから新しい辞書データを登録します。
 
+        登録した辞書を利用可能にするには、 ``setActivateDictionaries()``
+        または ``activateDictionaires()`` で有効化する必要があります。
+
         Parameters
         ----------
         jsonfile : str
@@ -620,6 +626,10 @@ class Service(object):
             raise TypeError("jsonfile と csvfile は str で指定してください。")
 
         dic = Dictionary.load(jsonfile, csvfile)
+        new_identifier = dic.get_identifier()
+        if self.getDictionary(new_identifier):
+            self.removeDictionary(new_identifier)
+
         return dic.add(self.capi_ma)
 
     def addDictionaryFromWeb(self, url, params=None, **kwargs):
@@ -627,6 +637,12 @@ class Service(object):
         指定した URL にあるページに含まれる辞書メタデータ（JSON-LD）を取得し、
         メタデータに記載されている URL から地名解析辞書（CSVファイル）を取得し、
         データベースに登録します。
+
+        既に同じ identifier を持つ辞書データがデータベースに登録されている場合、
+        削除してから新しい辞書データを登録します。
+
+        登録した辞書を利用可能にするには、 ``setActivateDictionaries()``
+        または ``activateDictionaires()`` で有効化する必要があります。
 
         Parameters
         ----------
@@ -655,6 +671,10 @@ class Service(object):
         """
         self._check_initialized()
         dic = Dictionary.download(url, params, **kwargs)
+        new_identifier = dic.get_identifier()
+        if self.getDictionary(new_identifier):
+            self.removeDictionary(new_identifier)
+
         return dic.add(self.capi_ma)
 
     def saveDictionaryFromWeb(self, jsonfile, csvfile, url,
@@ -758,16 +778,21 @@ class Service(object):
         語に含まれる辞書の内部 ID "dictionary_id" を見て
         語に辞書の識別子 "dictionary_identifier" を追加します。
         """
-        if 'dictionary_id' not in word or \
-           'dictionary_identifier' in word:
+        if word is None or 'dictionary_id' not in word or \
+                'dictionary_identifier' in word:
             return word
 
         dictionary_id = word['dictionary_id']
         if dictionary_id in self._dict_cache:
             identifier = self._dict_cache[dictionary_id]
         else:
-            identifier = self.capi_ma.getDictionaryIdentifierById(
-                dictionary_id)
+            try:
+                identifier = self.capi_ma.getDictionaryIdentifierById(
+                    dictionary_id)
+            except:
+                import pdb
+                pdb.set_trace()
+
             self._dict_cache[dictionary_id] = identifier
 
         word['dictionary_identifier'] = identifier
