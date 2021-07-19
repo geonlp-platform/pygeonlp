@@ -341,12 +341,6 @@ class Service(object):
         pattern : str, optional
             利用する辞書の identifier の正規表現。
 
-        Raises
-        ------
-        RuntimeError
-            idlist, pattern で指定した条件に一致する辞書が
-            1つも存在しない場合に発生します。
-
         Examples
         --------
         >>> from pygeonlp.api.service import Service
@@ -384,7 +378,7 @@ class Service(object):
                 continue
 
         if len(active_dictionaries) == 0:
-            raise RuntimeError("条件に一致する辞書がありません。")
+            logger.debug("条件に一致する辞書がありません。")
 
         self.capi_ma.setActiveDictionaries(active_dictionaries)
 
@@ -400,11 +394,6 @@ class Service(object):
         pattern : str
             除外する辞書の identifier を指定する正規表現。
 
-        Raises
-        ------
-        RuntimeError
-            全ての辞書が除外されてしまう場合に発生します。
-
         Examples
         --------
         >>> from pygeonlp.api.service import Service
@@ -413,9 +402,8 @@ class Service(object):
         >>> [x.get_identifier() for x in service.getActiveDictionaries()]
         ['geonlp:ksj-station-N02-2019']
         >>> service.disactivateDictionaries(pattern=r'ksj-station')
-        Traceback (most recent call last):
-          ...
-        RuntimeError: 全ての辞書が除外されます。
+        >>> [x.get_identifier() for x in service.getActiveDictionaries()]
+        []
 
         Notes
         -----
@@ -447,7 +435,7 @@ class Service(object):
             new_active_dictionaries.append(int(dic_id))
 
         if len(new_active_dictionaries) == 0:
-            raise RuntimeError("全ての辞書が除外されます。")
+            logger.debug("全ての辞書が除外されます。")
 
         self.capi_ma.setActiveDictionaries(new_active_dictionaries)
 
@@ -467,12 +455,12 @@ class Service(object):
         --------
         >>> from pygeonlp.api.service import Service
         >>> service = Service()
-        >>> service.disactivateDictionaries(pattern=r'ksj-station')
+        >>> service.disactivateDictionaries(pattern=r'.*')
         >>> [x.get_identifier() for x in service.getActiveDictionaries()]
-        ['geonlp:geoshape-city', 'geonlp:geoshape-pref']
+        []
         >>> service.activateDictionaries(pattern=r'ksj-station')
         >>> [x.get_identifier() for x in service.getActiveDictionaries()]
-        ['geonlp:geoshape-city', 'geonlp:geoshape-pref', 'geonlp:ksj-station-N02-2019']
+        ['geonlp:ksj-station-N02-2019']
 
         Notes
         -----

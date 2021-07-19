@@ -354,12 +354,6 @@ def setActiveDictionaries(idlist=None, pattern=None):
     pattern : str, optional
         利用する辞書の identifier の正規表現。
 
-    Raises
-    ------
-    RuntimeError
-        idlist, pattern で指定した条件に一致する辞書が
-        1つも存在しない場合に発生します。
-
     Examples
     --------
     >>> import pygeonlp.api as api
@@ -388,11 +382,6 @@ def disactivateDictionaries(idlist=None, pattern=None):
     pattern : str
         除外する辞書の identifier を指定する正規表現。
 
-    Raises
-    ------
-    RuntimeError
-        全ての辞書が除外されてしまう場合に発生します。
-
     Examples
     --------
     >>> import pygeonlp.api as api
@@ -401,9 +390,8 @@ def disactivateDictionaries(idlist=None, pattern=None):
     >>> [x.get_identifier() for x in api.getActiveDictionaries()]
     ['geonlp:ksj-station-N02-2019']
     >>> api.disactivateDictionaries(pattern=r'ksj-station')
-    Traceback (most recent call last):
-      ...
-    RuntimeError: 全ての辞書が除外されます。
+    >>> [x.get_identifier() for x in api.getActiveDictionaries()]
+    []
 
     Notes
     -----
@@ -430,12 +418,12 @@ def activateDictionaries(idlist=None, pattern=None):
     --------
     >>> import pygeonlp.api as api
     >>> api.init()
-    >>> api.disactivateDictionaries(pattern=r'ksj-station')
+    >>> api.disactivateDictionaries(pattern=r'.*')
     >>> sorted([x.get_identifier() for x in api.getActiveDictionaries()])
-    ['geonlp:geoshape-city', 'geonlp:geoshape-pref']
+    []
     >>> api.activateDictionaries(pattern=r'ksj-station')
     >>> sorted([x.get_identifier() for x in api.getActiveDictionaries()])
-    ['geonlp:geoshape-city', 'geonlp:geoshape-pref', 'geonlp:ksj-station-N02-2019']
+    ['geonlp:ksj-station-N02-2019']
 
     Notes
     -----
@@ -483,8 +471,8 @@ def setActiveClasses(patterns=None):
         解析対象とする固有名クラス（str）のリスト。
         省略した場合 ['.*'] （全固有名クラス）を対象とします。
 
-    Usage
-    -----
+    Examples
+    --------
     >>> import pygeonlp.api as api
     >>> api.init()
     >>> api.getActiveClasses()

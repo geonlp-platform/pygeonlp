@@ -223,7 +223,8 @@ namespace geonlp
   void MAImpl::setActiveDictionaries(const std::vector<int>& dics) {
     this->activeDictionaries.clear();
     if (dics.size() == 0) {
-      this->getDictionaryList(this->activeDictionaries);
+      ;
+      // this->getDictionaryList(this->activeDictionaries);
     } else {
       this->addActiveDictionaries(dics);
     }
@@ -898,20 +899,18 @@ namespace geonlp
   // @return      アクティブな辞書、クラスに含まれていれば true を
   //              含まれていなければ false を返す
   bool MAImpl::isInActiveDictionaryAndClass(const Geoword& geo) const {
-    bool is_in = false;
     // 辞書チェック
-    if (this->activeDictionaries.size() > 0) {
-      for (std::map<int, Dictionary>::const_iterator it = this->activeDictionaries.begin(); it != this->activeDictionaries.end(); it++) {
-        if ((*it).first == geo.get_dictionary_id()) {
-          is_in = true;
-          break;
-        }
+    bool is_in = false;
+    for (std::map<int, Dictionary>::const_iterator it = this->activeDictionaries.begin(); it != this->activeDictionaries.end(); it++) {
+      if ((*it).first == geo.get_dictionary_id()) {
+        is_in = true;
+        break;
       }
-      if (!is_in) return false;
     }
-    is_in = false;
+    if (!is_in) return false;
 
     // クラスのチェック
+    is_in = false;
     if (this->activeClasses.size() > 0) {
       std::string ne_class = geo.get_ne_class();
       boost::regex pattern;
