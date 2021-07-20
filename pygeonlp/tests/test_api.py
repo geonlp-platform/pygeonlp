@@ -42,6 +42,12 @@ class TestModuleMethods(unittest.TestCase):
         self.assertIsInstance(words, dict)
         self.assertNotIn('82wiE0', words)  # 新宿線神保町駅は鉄道施設
 
+        # "鉄道施設/.*" は除外するが "駅$" は除外しない
+        api.setActiveClasses([".*", "-鉄道施設/.*", r'.*駅$'])
+        words = api.searchWord('神保町')
+        self.assertIsInstance(words, dict)
+        self.assertIn('82wiE0', words)  # 新宿線神保町駅は鉄道駅
+
         # Reset active classes
         api.setActiveClasses()
         words = api.searchWord('神保町')

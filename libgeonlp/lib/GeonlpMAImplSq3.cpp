@@ -918,11 +918,14 @@ namespace geonlp
         if ((*it).c_str()[0] == '-') { // 除外パターン指定
           pattern = boost::regex((*it).substr(1), boost::regex_constants::egrep);
           if (boost::regex_match(ne_class, pattern)) {
-            return false; // 除外パターンに一致したら常に不一致とする
+            is_in = false; // 除外パターンに一致してもさらに調べる
+            // return false; // 除外パターンに一致したら常に不一致とする
           }
         } else if (!is_in) { // まだ一致するパターンが見つかっていない場合は探す
           pattern = boost::regex((*it), boost::regex_constants::egrep);
-          if (boost::regex_match(geo.get_ne_class(), pattern)) is_in = true;
+          if (boost::regex_match(geo.get_ne_class(), pattern)) {
+            is_in = true;
+          }
         }
       }
       if (!is_in) return false;
