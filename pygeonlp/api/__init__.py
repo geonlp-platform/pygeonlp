@@ -387,9 +387,11 @@ def disactivateDictionaries(idlist=None, pattern=None):
     >>> import pygeonlp.api as api
     >>> api.init()
     >>> api.disactivateDictionaries(pattern=r'geonlp:geoshape')
+    ['geonlp:geoshape-city', 'geonlp:geoshape-pref']
     >>> [x.get_identifier() for x in api.getActiveDictionaries()]
     ['geonlp:ksj-station-N02-2019']
     >>> api.disactivateDictionaries(pattern=r'ksj-station')
+    ['geonlp:ksj-station-N02-2019']
     >>> [x.get_identifier() for x in api.getActiveDictionaries()]
     []
 
@@ -419,9 +421,11 @@ def activateDictionaries(idlist=None, pattern=None):
     >>> import pygeonlp.api as api
     >>> api.init()
     >>> api.disactivateDictionaries(pattern=r'.*')
+    ['geonlp:geoshape-city', 'geonlp:geoshape-pref', 'geonlp:ksj-station-N02-2019']
     >>> sorted([x.get_identifier() for x in api.getActiveDictionaries()])
     []
     >>> api.activateDictionaries(pattern=r'ksj-station')
+    ['geonlp:ksj-station-N02-2019']
     >>> sorted([x.get_identifier() for x in api.getActiveDictionaries()])
     ['geonlp:ksj-station-N02-2019']
 
@@ -538,6 +542,7 @@ def addDictionaryFromFile(jsonfile, csvfile):
     True
     >>> api.updateIndex()
     >>> api.activateDictionaries(pattern=r'geoshape-city')
+    ['geonlp:geoshape-city']
     >>> 'lQccqK' in api.searchWord('和歌山市')
     True
     """
@@ -579,6 +584,7 @@ def addDictionaryFromWeb(url, params=None, **kwargs):
     True
     >>> api.updateIndex()
     >>> api.activateDictionaries(pattern=r'geoshape-city')
+    ['geonlp:geoshape-city']
     >>> geowords = api.searchWord('千代田区')
     >>> len(geowords)
     1
