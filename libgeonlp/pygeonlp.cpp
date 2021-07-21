@@ -141,6 +141,7 @@ static PyObject * geonlp_ma_get_word_info(GeonlpMA *self, PyObject *args)
       __alter_geonlpid_fieldname(geoword);
       return picojson_to_pyobject(geoword);
     }
+    Py_INCREF(Py_None);
     return Py_None;
   } catch (geonlp::ServiceRequestFormatException &e) {
     PyErr_SetString(PyExc_RuntimeError, e.what());
@@ -209,12 +210,14 @@ static PyObject * geonlp_ma_get_dictionary_info(GeonlpMA *self, PyObject *args)
       if ((self->_ptrObj)->getDictionaryById(dict_id, dict)) {
         return picojson_to_pyobject(dict);
       }
+      Py_INCREF(Py_None);
       return Py_None;
     } else if (PyUnicode_Check(pyobj)) {
       const std::string cstr = PyBytes_AsString(PyUnicode_AsUTF8String(pyobj));
       if ((self->_ptrObj)->getDictionary(cstr, dict)) {
         return picojson_to_pyobject(dict);
       }
+      Py_INCREF(Py_None);
       return Py_None;
     }
     PyErr_SetString(PyExc_TypeError, "Param must be a int or str value.");
@@ -270,6 +273,7 @@ static PyObject * geonlp_ma_set_active_dictionaries(GeonlpMA *self, PyObject *ar
     dic_ids.push_back(int(PyLong_AsLong(next)));
   }
   (self->_ptrObj)->setActiveDictionaries(dic_ids);
+  Py_INCREF(Py_None);
   return Py_None;
 }
 
@@ -312,6 +316,7 @@ static PyObject * geonlp_ma_set_active_classes(GeonlpMA *self, PyObject *args)
     }
   }
   (self->_ptrObj)->setActiveClasses(ne_classes);
+  Py_INCREF(Py_None);
   return Py_None;
 }
 
