@@ -76,11 +76,10 @@ class Node(object):
         >>> node.get_lonlat()
         {'lat': 35.674845, 'lon': 139.74534166666666}
 
-        >>> import pygeonlp.api as api
         >>> import jageocoder
+        >>> jageocoder.init()
+        >>> import pygeonlp.api as api
         >>> api.init()
-        >>> dbdir = api.get_jageocoder_db_dir()
-        >>> jageocoder.init(f'sqlite:///{dbdir}/address.db', f'{dbdir}/address.trie')
         >>> node = api.analyze('千代田区一ツ橋2-1-2', jageocoder=jageocoder)[0][0]
         >>> node.get_lonlat()
         {'lat': 35.692332, 'lon': 139.758148}

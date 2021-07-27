@@ -2,6 +2,7 @@ from logging import getLogger
 import os
 import site
 import sys
+import warnings
 
 from pygeonlp.api.service import Service, ServiceError
 
@@ -45,6 +46,8 @@ def get_db_dir():
 
 def get_jageocoder_db_dir():
     """
+    **deprecated**
+
     jageocoder の辞書が配置されているディレクトリを取得します。
     次の優先順位に従って決定します。
 
@@ -63,18 +66,10 @@ def get_jageocoder_db_dir():
     except ModuleNotFoundError:
         return None
 
-    # 環境変数 JAGEOCODER_DB_DIR をチェック
-    jageocoder_db_dir = os.environ.get('JAGEOCODER_DB_DIR')
-    if jageocoder_db_dir:
-        return os.path.abspath(jageocoder_db_dir)
-
-    # 環境変数 HOME が利用できれば $HOME/jageocoder/db
-    home = os.environ.get('HOME')
-    if home:
-        jageocoder_db_dir = os.path.join(home, 'jageocoder/db')
-        return os.path.abspath(jageocoder_db_dir)
-
-    return None
+    warnings.warn(('このメソッドはver.1.1で廃止予定です。'
+                   'jageocoder.get_db_dir() を利用してください。'),
+                  DeprecatedWarning)
+    return jageocoder.get_db_dir()
 
 
 def init(db_dir=None, geoword_rules={}, **options):

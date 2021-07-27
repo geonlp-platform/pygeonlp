@@ -10,7 +10,7 @@ epc = "*"
 jedi = "*"
 flask-jsonrpc = "*"
 gdal = "~=2.4.2"
-jageocoder = "~=0.1.9"
+jageocoder = "~=0.2.0"
 pytest = "*"
 twine = "*"
 
