@@ -68,7 +68,7 @@ def get_jageocoder_db_dir():
 
     warnings.warn(('このメソッドはver.1.1で廃止予定です。'
                    'jageocoder.get_db_dir() を利用してください。'),
-                  DeprecatedWarning)
+                  DeprecationWarning)
     return jageocoder.get_db_dir()
 
 

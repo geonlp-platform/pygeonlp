@@ -55,10 +55,18 @@ class TestModuleMethods(unittest.TestCase):
         self.assertIn('82wiE0', words)  # 新宿線神保町駅
 
     def test_geo_contains_filter(self):
-        from pygeonlp.api.spatial_filter import SpatialFilter, GeoContainsFilter, GeoDisjointFilter
+        from pygeonlp.api.spatial_filter import SpatialFilter, GeoContainsFilter
         geojson = SpatialFilter.get_geometry(
             'https://geoshape.ex.nii.ac.jp/city/geojson/20200101/13/13208A1968.geojson').ExportToJson()
         gcfilter = GeoContainsFilter(geojson)
+        result = api.geoparse('府中に行きます', filters=[gcfilter])
+        self.assertEqual(result[0]['properties']['node_type'], 'GEOWORD')
+
+    def test_geo_disjoint_filter(self):
+        from pygeonlp.api.spatial_filter import SpatialFilter, GeoDisjointFilter
+        geojson = SpatialFilter.get_geometry(
+            'https://geoshape.ex.nii.ac.jp/city/geojson/20200101/13/13208A1968.geojson').ExportToJson()
+        gcfilter = GeoDisjointFilter(geojson)
         result = api.geoparse('府中に行きます', filters=[gcfilter])
         self.assertEqual(result[0]['properties']['node_type'], 'GEOWORD')
 

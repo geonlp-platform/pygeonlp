@@ -860,12 +860,8 @@ class Service(object):
         if dictionary_id in self._dict_cache:
             identifier = self._dict_cache[dictionary_id]
         else:
-            try:
-                identifier = self.capi_ma.getDictionaryIdentifierById(
-                    dictionary_id)
-            except:
-                import pdb
-                pdb.set_trace()
+            identifier = self.capi_ma.getDictionaryIdentifierById(
+                dictionary_id)
 
             self._dict_cache[dictionary_id] = identifier
 

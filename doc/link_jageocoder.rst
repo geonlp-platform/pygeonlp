@@ -14,15 +14,15 @@ pygeonlp を住所ジオコーダー `jageocoder <https://pypi.org/project/jageo
   $ python
   >>> import jageocoder
   >>> jageocoder.install_dictionary('jusho.zip')
-  >>> jageocoder.init()
 
 インストールが完了したら `juzho.zip` は削除して構いません。
-2回目以降は ``install_dictionary()`` を実行する必要はありません。
+2回目以降は ``install_dictionary()`` を実行する代わりに
+``init()`` を実行して辞書を開いてください。
 
 .. code-block :: plaintext
 
   >>> import jageocoder
-  >>> jageocoder.ini()
+  >>> jageocoder.init()
   >>> import pygeonlp.api as api
   >>> api.init()
   >>> api.geoparse('NIIは千代田区一ツ橋2-1-2にあります。', jageocoder=jageocoder)

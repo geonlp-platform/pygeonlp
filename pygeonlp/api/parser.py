@@ -6,8 +6,6 @@ from pygeonlp.api.filter import EntityClassFilter, GreedySearchFilter
 from pygeonlp.api.linker import RankedResults, MAX_COMBINATIONS
 from pygeonlp.api.node import Node
 
-from jageocoder.tree import AddressTree
-
 logger = logging.getLogger(__name__)
 
 
@@ -93,18 +91,18 @@ class Parser(object):
 
         # jageocoder がインストールされているか確認
         try:
-            import jageocoder
-            if isinstance(jageocoder, AddressTree):
+            import jageocoder as _jageocoder
+            if isinstance(jageocoder, _jageocoder.AddressTree):
                 self.jageocoder_tree = jageocoder
             else:
                 tree = jageocoder.get_module_tree()
-                if isinstance(tree, AddressTree):
+                if isinstance(tree, _jageocoder.AddressTree):
                     self.jageocoder_tree = tree
                 else:
                     raise ParseError(
                         '"jageocoder" モジュールが初期化されていません。')
 
-        except ModuleNotFoundError:
+        except (ModuleNotFoundError, NameError,):
             raise ParseError(
                 '"jageocoder" モジュールがインストールされていません。')
 

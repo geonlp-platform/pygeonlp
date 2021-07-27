@@ -3,6 +3,11 @@
 `pygeonlp` は、自然言語テキストを解析して地名を抽出する
 ジオタギング (geo-tagging) またはジオパージング (geo-parsing) と呼ばれる処理を行なうオープンソースソフトウェアです。
 
+より詳細なドキュメントと API リファレンスが [/doc](./doc/) ディレクトリの下にあります。
+また、最新のオンラインドキュメントは
+[GeoNLP Documentation](https://geonlp.ex.nii.ac.jp/doc/pygeonlp/)
+からも参照できます。
+
 ## 使い方
 
 `pygeonlp.api` をインポートし、地名語解析辞書を登録したデータベースが

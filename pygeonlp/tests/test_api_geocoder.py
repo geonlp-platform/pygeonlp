@@ -24,7 +24,10 @@ class TestModuleMethods(unittest.TestCase):
         api.init(db_dir=testdir)
 
         # Initialize jageocoder
-        jageocoder_db_dir = jageocoder.get_db_dir()
+        jageocoder_db_dir = jageocoder.get_db_dir(mode='r')
+        if jageocoder_db_dir is None:
+            raise RuntimeError("jageocoder 辞書がインストールされていません。")
+
         jageocoder.init()
         cls.parser = api.parser.Parser(jageocoder=jageocoder)
 
