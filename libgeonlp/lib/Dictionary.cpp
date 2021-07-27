@@ -42,11 +42,11 @@ namespace geonlp
     picojson::array id_list = v.get<picojson::array>();
     for (picojson::array::iterator it = id_list.begin(); it != id_list.end(); it++) {
       if (! (*it).is<std::string>()) {
-	continue;
+        continue;
       }
       std::string id_str = (*it).get<std::string>();
       if (id_str.substr(0, 7) == "geonlp:") {
-	return id_str;
+        return id_str;
       }
     }
     throw std::runtime_error("No element starting with 'geonlp:' found.");
@@ -64,7 +64,7 @@ namespace geonlp
       if (!(*it).is<picojson::object>()) continue;
       picojson::value v2 = (*it).get("contentUrl");
       if (v2.is<std::string>()) {
-	return v2.get<std::string>();
+        return v2.get<std::string>();
       }      
     }
     throw std::runtime_error("'distribution' element found but not in the expected format.");

@@ -14,6 +14,23 @@ def setup(test):
     testdir = get_testdir()
     os.environ['GEONLP_DB_DIR'] = testdir
     os.makedirs(testdir, 0o755, exist_ok=True)
+    api.init(db_dir=testdir)
+
+    # デフォルト以外の辞書が登録されていたら
+    # データベースを作り直す
+    default_dics = [
+        'geonlp:geoshape-city',
+        'geonlp:geoshape-pref',
+        'geonlp:ksj-station-N02-2019',
+    ]
+
+    installed_dictionaries = [
+        x.get_identifier() for x in api.getDictionaries()]
+    for identifier in installed_dictionaries:
+        if identifier not in default_dics:
+            api.clearDatabase()
+            break
+
     api.setup_basic_database(db_dir=testdir)
     api.init(db_dir=testdir)
 

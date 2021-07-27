@@ -2,6 +2,7 @@ from logging import getLogger
 import os
 import site
 import sys
+import warnings
 
 from pygeonlp.api.service import Service, ServiceError
 
@@ -45,6 +46,8 @@ def get_db_dir():
 
 def get_jageocoder_db_dir():
     """
+    **deprecated**
+
     jageocoder の辞書が配置されているディレクトリを取得します。
     次の優先順位に従って決定します。
 
@@ -63,18 +66,10 @@ def get_jageocoder_db_dir():
     except ModuleNotFoundError:
         return None
 
-    # 環境変数 JAGEOCODER_DB_DIR をチェック
-    jageocoder_db_dir = os.environ.get('JAGEOCODER_DB_DIR')
-    if jageocoder_db_dir:
-        return os.path.abspath(jageocoder_db_dir)
-
-    # 環境変数 HOME が利用できれば $HOME/jageocoder/db
-    home = os.environ.get('HOME')
-    if home:
-        jageocoder_db_dir = os.path.join(home, 'jageocoder/db')
-        return os.path.abspath(jageocoder_db_dir)
-
-    return None
+    warnings.warn(('このメソッドはver.1.1で廃止予定です。'
+                   'jageocoder.get_db_dir() を利用してください。'),
+                  DeprecatedWarning)
+    return jageocoder.get_db_dir()
 
 
 def init(db_dir=None, geoword_rules={}, **options):
@@ -387,9 +382,11 @@ def disactivateDictionaries(idlist=None, pattern=None):
     >>> import pygeonlp.api as api
     >>> api.init()
     >>> api.disactivateDictionaries(pattern=r'geonlp:geoshape')
+    ['geonlp:geoshape-city', 'geonlp:geoshape-pref']
     >>> [x.get_identifier() for x in api.getActiveDictionaries()]
     ['geonlp:ksj-station-N02-2019']
     >>> api.disactivateDictionaries(pattern=r'ksj-station')
+    ['geonlp:ksj-station-N02-2019']
     >>> [x.get_identifier() for x in api.getActiveDictionaries()]
     []
 
@@ -419,9 +416,11 @@ def activateDictionaries(idlist=None, pattern=None):
     >>> import pygeonlp.api as api
     >>> api.init()
     >>> api.disactivateDictionaries(pattern=r'.*')
+    ['geonlp:geoshape-city', 'geonlp:geoshape-pref', 'geonlp:ksj-station-N02-2019']
     >>> sorted([x.get_identifier() for x in api.getActiveDictionaries()])
     []
     >>> api.activateDictionaries(pattern=r'ksj-station')
+    ['geonlp:ksj-station-N02-2019']
     >>> sorted([x.get_identifier() for x in api.getActiveDictionaries()])
     ['geonlp:ksj-station-N02-2019']
 
@@ -538,6 +537,7 @@ def addDictionaryFromFile(jsonfile, csvfile):
     True
     >>> api.updateIndex()
     >>> api.activateDictionaries(pattern=r'geoshape-city')
+    ['geonlp:geoshape-city']
     >>> 'lQccqK' in api.searchWord('和歌山市')
     True
     """
@@ -579,6 +579,7 @@ def addDictionaryFromWeb(url, params=None, **kwargs):
     True
     >>> api.updateIndex()
     >>> api.activateDictionaries(pattern=r'geoshape-city')
+    ['geonlp:geoshape-city']
     >>> geowords = api.searchWord('千代田区')
     >>> len(geowords)
     1

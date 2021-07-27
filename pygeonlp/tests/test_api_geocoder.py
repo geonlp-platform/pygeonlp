@@ -24,9 +24,8 @@ class TestModuleMethods(unittest.TestCase):
         api.init(db_dir=testdir)
 
         # Initialize jageocoder
-        jageocoder_db_dir = api.get_jageocoder_db_dir()
-        jageocoder.init(f'sqlite:///{jageocoder_db_dir}/address.db',
-                        f'{jageocoder_db_dir}/address.trie')
+        jageocoder_db_dir = jageocoder.get_db_dir()
+        jageocoder.init()
         cls.parser = api.parser.Parser(jageocoder=jageocoder)
 
     def setUp(self):

@@ -6,6 +6,7 @@ from pygeonlp.api.filter import EntityClassFilter, GreedySearchFilter
 from pygeonlp.api.linker import RankedResults, MAX_COMBINATIONS
 from pygeonlp.api.node import Node
 
+from jageocoder.tree import AddressTree
 
 logger = logging.getLogger(__name__)
 
@@ -93,14 +94,15 @@ class Parser(object):
         # jageocoder がインストールされているか確認
         try:
             import jageocoder
-            if isinstance(jageocoder, jageocoder.address.AddressTree):
+            if isinstance(jageocoder, AddressTree):
                 self.jageocoder_tree = jageocoder
-            elif isinstance(
-                    jageocoder.tree, jageocoder.address.AddressTree):
-                self.jageocoder_tree = jageocoder.tree
             else:
-                raise ParseError(
-                    '"jageocoder" モジュールが init() で初期化されていません。')
+                tree = jageocoder.get_module_tree()
+                if isinstance(tree, AddressTree):
+                    self.jageocoder_tree = tree
+                else:
+                    raise ParseError(
+                        '"jageocoder" モジュールが初期化されていません。')
 
         except ModuleNotFoundError:
             raise ParseError(
@@ -351,13 +353,12 @@ class Parser(object):
 
         Examples
         --------
+        >>> import jageocoder
+        >>> jageocoder.init()
         >>> import pygeonlp.api as api
         >>> from pygeonlp.api.devtool import pp_lattice
         >>> from pygeonlp.api.node import Node
-        >>> import jageocoder
         >>> api.init()
-        >>> dbdir = api.get_jageocoder_db_dir()
-        >>> jageocoder.init(f'sqlite:///{dbdir}/address.db', f'{dbdir}/address.trie')
         >>> parser = api.parser.Parser(jageocoder=jageocoder)
         >>> lattice = parser.analyze_sentence('アメリカ大使館：港区赤坂1-10-5')
         >>> lattice_address = parser.add_address_candidates(lattice, True)
