@@ -4,6 +4,8 @@ import site
 import sys
 import warnings
 
+import jageocoder
+
 from pygeonlp.api.service import Service, ServiceError
 
 logger = getLogger(__name__)
@@ -60,15 +62,10 @@ def get_jageocoder_db_dir():
     str
         ディレクトリの絶対パス、または None。
     """
-    try:
-        import jageocoder
-        jageocoder.tree  # Flake8 の F401 エラーを回避
-    except ModuleNotFoundError:
-        return None
-
-    warnings.warn(('このメソッドはver.1.1で廃止予定です。'
+    warnings.warn(('get_jageocoder_db_dir() はver.1.1で廃止予定です。'
                    'jageocoder.get_db_dir() を利用してください。'),
                   DeprecationWarning)
+
     return jageocoder.get_db_dir()
 
 
@@ -719,8 +716,9 @@ def geoparse(sentence, jageocoder=None, filters=None,
     ----------
     sentence : str
         解析する文字列。
-    jageocoder : jageocoder, optional
-        住所ジオコーダのインスタンス。
+    jageocoder : bool, optional
+        住所ジオコーダを利用する場合 True を指定します。
+        False または省略した場合は利用しません。
     filters : list, optional
         強制的に適用する Filter インスタンスのリスト。
     scoring_class : class, optional
@@ -814,6 +812,15 @@ def setup_basic_database(db_dir=None, src_dir=None):
             break
 
     if not data_dir:
+        files = _get_package_files()
+        for path in files:
+            pos = path.find('/pygeonlp_basedata')
+            if pos < 0:
+                continue
+
+            data_dir = path[0:pos + len('/pygeonlp_basedata')]
+
+    if not base_dir:
         raise RuntimeError("地名解析辞書がインストールされたディレクトリが見つかりません。")
 
     if db_dir is None:
@@ -863,3 +870,35 @@ def _check_initialized():
     """
     if _default_service is None:
         raise ServiceError("APIが初期化されていません。")
+
+
+def _get_package_files():
+    """
+    pip list コマンドを実行し、pygeonlp パッケージとしてインストールされた
+    ファイルのフルパス一覧を取得します。
+
+    参考： https://pip.pypa.io/en/latest/user_guide/#using-pip-from-your-program
+    """
+    import subprocess
+    import sys
+    import pygeonlp.api
+
+    show_args = [sys.executable, '-m', 'pip', 'show', '--files', 'pygeonlp']
+    result = subprocess.check_output(show_args).decode('utf-8')
+    lines = result.split("\n")
+    files = None
+    for i, line in enumerate(lines):
+        if line.strip() == "Files:":
+            files = lines[i+1:]
+            break
+
+    if files is None:
+        raise RuntimeError("パッケージ内のファイル一覧が取得できません。")
+
+    # pygeonlp.api.__file__ は '../site-packages/pygeonlp/api/__init__.py'
+    # '../site-packages/' を base_path としてフルパスを取得する
+    base_path = os.path.abspath(
+        os.path.join(pygeonlp.api.__file__, '../../..'))
+    files = [os.path.abspath(os.path.join(base_path, x.strip()))
+             for x in files]
+    return files

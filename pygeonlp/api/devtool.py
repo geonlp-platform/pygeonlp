@@ -66,12 +66,10 @@ def pp_lattice(lattice, indent=2, file=None):
 
     Examples
     --------
-    >>> import jageocoder
-    >>> jageocoder.init()
     >>> import pygeonlp.api as api
     >>> from pygeonlp.api.devtool import pp_lattice
     >>> api.init()
-    >>> parser = api.parser.Parser(jageocoder=jageocoder)
+    >>> parser = api.parser.Parser(jageocoder=True)
     >>> lattice = parser.analyze_sentence('アメリカ大使館：港区赤坂1-10-5')
     >>> pp_lattice(lattice)
     #0:'アメリカ大使館'

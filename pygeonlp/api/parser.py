@@ -2,6 +2,8 @@ import copy
 import logging
 import re
 
+import jageocoder as _jageocoder
+
 from pygeonlp.api.filter import EntityClassFilter, GreedySearchFilter
 from pygeonlp.api.linker import RankedResults, MAX_COMBINATIONS
 from pygeonlp.api.node import Node
@@ -46,9 +48,9 @@ class Parser(object):
         service : pygeonlp.service.Service, optional
             拡張形態素解析や地名語の検索を行うための Service インスタンス。
             省略した場合、 ``pygeonlp.api.default_service()`` を利用します。
-        jageocoder : jageocoder, optional
-            住所ジオコーダー jageocoder モジュール。
-            省略した場合、ジオコーディング機能は使用しません。
+        jageocoder : bool, optional
+            住所ジオコーダーを利用するかどうかを指定します。
+            False または省略した場合、ジオコーディング機能は使用しません。
         address_regex : str, optional
             住所表記の開始とみなす地名語の固有名クラスを表す正規表現。
             省略した場合、``r'^(都道府県|市区町村|行政地域|居住地名)(/.+|)'``
@@ -60,11 +62,6 @@ class Parser(object):
             ``ScoringClass`` が利用されます。
         scoring_options : any, optional
             スコアリングクラスの初期化に渡すオプションパラメータ。
-
-        Notes
-        -----
-        jageocoder パラメータには jageocoder.address.AddressTree インスタンスを
-        指定することもできます。
         """
         self.scoring_class = scoring_class
         self.scoring_options = scoring_options
@@ -85,26 +82,20 @@ class Parser(object):
             from . import default_service
             self.service = default_service()
 
-        if jageocoder is None:
+        if not jageocoder:
             self.jageocoder_tree = None
             return
 
-        # jageocoder がインストールされているか確認
-        try:
-            import jageocoder as _jageocoder
-            if isinstance(jageocoder, _jageocoder.AddressTree):
-                self.jageocoder_tree = jageocoder
-            else:
-                tree = jageocoder.get_module_tree()
-                if isinstance(tree, _jageocoder.AddressTree):
-                    self.jageocoder_tree = tree
-                else:
-                    raise ParseError(
-                        '"jageocoder" モジュールが初期化されていません。')
+        # jageocoder 辞書が利用かできるか確認し、必要ならば初期化
+        if not _jageocoder.is_initialized():
+            db_dir = _jageocoder.get_db_dir(mode='r')
+            if db_dir is None:
+                raise ParseError(
+                    'jageocoder 用住所辞書が見つかりません。')
 
-        except (ModuleNotFoundError, NameError,):
-            raise ParseError(
-                '"jageocoder" モジュールがインストールされていません。')
+            _jageocoder.init(mode='r')
+
+        self.jageocoder_tree = _jageocoder.get_module_tree()
 
         if address_regex is None:
             self.address_regex = re.compile(
@@ -348,16 +339,13 @@ class Parser(object):
         list
             住所候補を追加したラティス表現。
 
-
         Examples
         --------
-        >>> import jageocoder
-        >>> jageocoder.init()
         >>> import pygeonlp.api as api
         >>> from pygeonlp.api.devtool import pp_lattice
         >>> from pygeonlp.api.node import Node
         >>> api.init()
-        >>> parser = api.parser.Parser(jageocoder=jageocoder)
+        >>> parser = api.parser.Parser(jageocoder=True)
         >>> lattice = parser.analyze_sentence('アメリカ大使館：港区赤坂1-10-5')
         >>> lattice_address = parser.add_address_candidates(lattice, True)
         >>> pp_lattice(lattice_address)

@@ -913,8 +913,9 @@ class Service(object):
         ----------
         sentence : str
             解析する文字列。
-        jageocoder : jageocoder, optional
-            住所ジオコーダのインスタンス。
+        jageocoder : bool, optional
+            住所ジオコーダを利用する場合 True を指定します。
+            False または省略した場合は利用しません。
         filters : list, optional
             強制的に適用する Filter インスタンスのリスト。
         scoring_class : class, optional

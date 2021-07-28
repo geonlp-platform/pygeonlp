@@ -76,11 +76,9 @@ class Node(object):
         >>> node.get_lonlat()
         {'lat': 35.674845, 'lon': 139.74534166666666}
 
-        >>> import jageocoder
-        >>> jageocoder.init()
         >>> import pygeonlp.api as api
         >>> api.init()
-        >>> node = api.analyze('千代田区一ツ橋2-1-2', jageocoder=jageocoder)[0][0]
+        >>> node = api.analyze('千代田区一ツ橋2-1-2', jageocoder=True)[0][0]
         >>> node.get_lonlat()
         {'lat': 35.692332, 'lon': 139.758148}
         """

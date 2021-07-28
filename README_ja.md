@@ -182,7 +182,8 @@ $ pip install gdal
 
 ##### jageocoder のインストール（オプション）
 
-pygeonlp は [jageocoder](https://pypi.org/project/jageocoder/) がインストールされている場合、住所ジオコーディングを利用することができます。
+pygeonlp は [jageocoder](https://pypi.org/project/jageocoder/) 用の住所辞書が
+インストールされている場合、住所ジオコーディングを利用することができます。
 
 インストール方法は jageocoder のドキュメントを参照してください。
 

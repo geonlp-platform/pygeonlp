@@ -25,14 +25,15 @@ class TestModuleMethods(unittest.TestCase):
 
         # Initialize jageocoder
         jageocoder_db_dir = jageocoder.get_db_dir(mode='r')
-        if jageocoder_db_dir is None:
-            raise RuntimeError("jageocoder 辞書がインストールされていません。")
-
-        jageocoder.init()
-        cls.parser = api.parser.Parser(jageocoder=jageocoder)
+        if jageocoder_db_dir:
+            cls.parser = api.parser.Parser(jageocoder=True)
+        else:
+            cls.parser = None
 
     def setUp(self):
         self.parser = self.__class__.parser
+        if self.parser is None:
+            self.skipTest('住所辞書がインストールされていません。')
 
     def test_geoparse_with_address(self):
         """

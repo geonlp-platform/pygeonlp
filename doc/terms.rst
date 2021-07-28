@@ -172,7 +172,7 @@ Docker や仮想環境で、コードを変更せずにデータベースディ�
 住所解析を行なうと、住所候補を構成する形態素に含まれる
 「住所以外の候補」は削除され、住所ノードに統合されます。
 
-例： api.analyze("アメリカ大使館：港区赤坂1-10-5", jageocoder=jageocoder) ::
+例： api.analyze("アメリカ大使館：港区赤坂1-10-5", jageocoder=True) ::
 
   #0:'アメリカ大使館'
     アメリカ大使館(NORMAL)
@@ -186,7 +186,7 @@ Docker や仮想環境で、コードを変更せずにデータベースディ�
 住所以外の候補も残したい場合は ``keep_nodes=True`` を指定します。
 この場合、住所に該当する先頭の形態素に住所ノードが追加されます。
 
-例： api.analyze("アメリカ大使館：港区赤坂1-10-5", jageocoder=jageocoder, keep_nodes=True) ::
+例： api.analyze("アメリカ大使館：港区赤坂1-10-5", jageocoder=True, keep_nodes=True) ::
 
   #0:'アメリカ大使館'
     アメリカ大使館(NORMAL)
@@ -279,13 +279,11 @@ Docker や仮想環境で、コードを変更せずにデータベースディ�
 
 LinkedResults はこの処理を自動的に行ないます。 ::
 
-  >>> import jageocoder
-  >>> jageocoder.init()
   >>> import pygeonlp.api as api
   >>> from pygeonlp.api.linker import LinkedResults
   >>> from pygeonlp.api.devtool import pp_lattice, pp_path
   >>> api.init()
-  >>> lattice = api.analyze('アメリカ大使館：港区赤坂1-10-5', jageocoder=jageocoder, keep_nodes=True)
+  >>> lattice = api.analyze('アメリカ大使館：港区赤坂1-10-5', jageocoder=True, keep_nodes=True)
   >>> for path in LinkedResults(lattice):
   ...   pp_path(path)
   ...

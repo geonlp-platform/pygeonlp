@@ -185,8 +185,8 @@ $ pip install gdal
 
 ### Install jageocoder (Optional)
 
-`pygeonlp` can use address-geocoding if
-the [jageocoder](https://pypi.org/project/jageocoder/) is installed.
+`pygeonlp` can use address-geocoding if an address-dictionary for
+[jageocoder](https://pypi.org/project/jageocoder/) is installed.
 
 See the jageocoder documentation for installation instructions.
 
