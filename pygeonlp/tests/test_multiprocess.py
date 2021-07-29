@@ -9,6 +9,14 @@ import pygeonlp.api as api
 logger = logging.getLogger(__name__)
 # logging.basicConfig(level=logging.INFO)
 
+"""
+複数プロセスで同時アクセスを行なうテスト。
+
+このモジュールのテストを行なうには、次のコマンドを実行してください。
+
+python -m unittest -v pygeonlp.tests.test_multiprocess
+"""
+
 
 def analyze(query):
     service = api.service.Service()

@@ -5,6 +5,14 @@ import unittest
 
 import pygeonlp.api as api
 
+"""
+doc_string に書かれているサンプルコードを doctest で検証するテスト。
+
+このモジュールのテストを行なうには、次のコマンドを実行してください。
+
+python -m unittest -v pygeonlp.tests.test_doctest
+"""
+
 
 def get_testdir():
     return os.path.abspath(os.path.join(os.getcwd(), 'apitest'))

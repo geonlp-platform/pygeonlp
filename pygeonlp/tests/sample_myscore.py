@@ -1,3 +1,10 @@
+"""
+スコアリング方法のカスタマイズ
+サンプルコード
+
+このコードをテストするには以下のコマンドを実行してください。
+python sample_myscore.py
+"""
 import pygeonlp.api as api
 from pygeonlp.api.linker import RankedResults
 from pygeonlp.api.scoring import ScoringClass

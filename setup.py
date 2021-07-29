@@ -107,8 +107,8 @@ def get_libgeonlp():
         'pygeonlp.capi',
         define_macros=[
             ('MAJOR_VERSION', '1'),
-            ('MINOR_VERSION', '0'),
-            ('REVISION', '2')
+            ('MINOR_VERSION', '1'),
+            ('REVISION', '0')
         ],
         include_dirs=[LIBGEONLP_INCLUDE_DIR],
         sources=LIBGEONLP_FILES + CPYGEONLP_FILES,
@@ -120,7 +120,7 @@ def get_libgeonlp():
 # Setup tools
 setup(
     name='pygeonlp',
-    version='1.0.2',
+    version='1.1.0rc1',
     description='A Python module for geotagging Japanese texts.',
     author='GeoNLP Project Team',
     author_email='geonlp@nii.ac.jp',

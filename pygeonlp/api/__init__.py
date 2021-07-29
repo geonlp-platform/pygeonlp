@@ -62,7 +62,7 @@ def get_jageocoder_db_dir():
     str
         ディレクトリの絶対パス、または None。
     """
-    warnings.warn(('get_jageocoder_db_dir() はver.1.1で廃止予定です。'
+    warnings.warn(('get_jageocoder_db_dir() はver.1.2で廃止予定です。'
                    'jageocoder.get_db_dir() を利用してください。'),
                   DeprecationWarning)
 

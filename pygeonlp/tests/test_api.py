@@ -6,6 +6,14 @@ import pygeonlp.api as api
 
 logger = logging.getLogger(__name__)
 
+"""
+doc_string に書くには複雑過ぎる API のテスト。
+
+このモジュールのテストを行なうには、次のコマンドを実行してください。
+
+python -m unittest -v pygeonlp.tests.test_api
+"""
+
 
 class TestModuleMethods(unittest.TestCase):
 
