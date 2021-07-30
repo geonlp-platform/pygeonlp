@@ -36,7 +36,8 @@ class Service(object):
         マッピングテーブル（キャッシュ用）。
     capi_ma : pygeonlp.capi オブジェクト
         C 実装の拡張形態素解析機能を利用するためのオブジェクト。
-
+    db_dir: str
+        このサービスが利用するデータベースディレクトリのパス。
     """
 
     def __init__(self, db_dir=None, geoword_rules={}, **options):
@@ -66,6 +67,8 @@ class Service(object):
             from . import get_db_dir
             db_dir = get_db_dir()
 
+        self.db_dir = db_dir
+
         # データベースディレクトリの存在チェック
         if not os.path.exists(db_dir):
             raise RuntimeError(
@@ -81,7 +84,7 @@ class Service(object):
             self.options['address_class'] = '^$'
 
         # capi.ma 用のオプションを構築
-        capi_options = {'data_dir': db_dir}
+        capi_options = {'data_dir': str(db_dir)}
         if 'suffix' in geoword_rules:
             if isinstance(geoword_rules['suffix'], str):
                 capi_options['suffix'] = geoword_rules['suffix']
@@ -111,7 +114,10 @@ class Service(object):
                     "'address_class' は正規表現文字列で指定してください。")
 
         if 'system_dic_dir' in self.options:
-            if isinstance(self.options['system_dic_dir'], str):
+            system_dic_dir = self.options['system_dic_dir']
+            if system_dic_dir is None:
+                pass
+            elif isinstance(self.options['system_dic_dir'], str):
                 capi_options['system_dic_dir'] = self.options['system_dic_dir']
             else:
                 raise TypeError(
@@ -338,12 +344,6 @@ class Service(object):
         pattern : str, optional
             利用する辞書の identifier の正規表現。
 
-        Raises
-        ------
-        RuntimeError
-            idlist, pattern で指定した条件に一致する辞書が
-            1つも存在しない場合に発生します。
-
         Examples
         --------
         >>> from pygeonlp.api.service import Service
@@ -381,7 +381,7 @@ class Service(object):
                 continue
 
         if len(active_dictionaries) == 0:
-            raise RuntimeError("条件に一致する辞書がありません。")
+            logger.debug("条件に一致する辞書がありません。")
 
         self.capi_ma.setActiveDictionaries(active_dictionaries)
 
@@ -389,6 +389,7 @@ class Service(object):
         """
         指定した辞書を一時的に除外し、利用しないようにします。
         既に除外されている辞書は除外されたままになります。
+        新たに除外された辞書のリストを返します。
 
         Parameters
         ----------
@@ -397,22 +398,23 @@ class Service(object):
         pattern : str
             除外する辞書の identifier を指定する正規表現。
 
-        Raises
-        ------
-        RuntimeError
-            全ての辞書が除外されてしまう場合に発生します。
+        Returns
+        -------
+        list
+            新たに除外された辞書の identifier のリスト。
 
         Examples
         --------
         >>> from pygeonlp.api.service import Service
         >>> service = Service()
         >>> service.disactivateDictionaries(pattern=r'geonlp:geoshape')
+        ['geonlp:geoshape-city', 'geonlp:geoshape-pref']
         >>> [x.get_identifier() for x in service.getActiveDictionaries()]
         ['geonlp:ksj-station-N02-2019']
         >>> service.disactivateDictionaries(pattern=r'ksj-station')
-        Traceback (most recent call last):
-          ...
-        RuntimeError: 全ての辞書が除外されます。
+        ['geonlp:ksj-station-N02-2019']
+        >>> [x.get_identifier() for x in service.getActiveDictionaries()]
+        []
 
         Notes
         -----
@@ -428,6 +430,7 @@ class Service(object):
 
         current_active_dictionaries = self.capi_ma.getActiveDictionaries()
         new_active_dictionaries = []
+        disactivated_dictionaries = []
         for dic_id, dictionary in current_active_dictionaries.items():
             metadata = Metadata(dictionary)
             identifier = metadata.get_identifier()
@@ -435,23 +438,28 @@ class Service(object):
             if idlist is not None and \
                (dic_id in idlist or identifier in idlist):
                 logger.debug("id または identifier が idlist に含まれる")
+                disactivated_dictionaries.append(identifier)
                 continue
 
             if pattern is not None and re.search(pattern, identifier):
                 logger.debug("identifier が pattern に一致")
+                disactivated_dictionaries.append(identifier)
                 continue
 
             new_active_dictionaries.append(int(dic_id))
 
         if len(new_active_dictionaries) == 0:
-            raise RuntimeError("全ての辞書が除外されます。")
+            logger.debug("全ての辞書が除外されます。")
 
         self.capi_ma.setActiveDictionaries(new_active_dictionaries)
+
+        return disactivated_dictionaries
 
     def activateDictionaries(self, idlist=None, pattern=None):
         """
         指定した辞書を再び利用するようにします。
         既に利用可能な辞書は指定しなくても利用可能なままになります。
+        新たに利用可能になった辞書のリストを返します。
 
         Parameters
         ----------
@@ -460,16 +468,23 @@ class Service(object):
         pattern : str
             利用する辞書の identifier を指定する正規表現。
 
+        Returns
+        -------
+        list
+            新たに利用可能になった辞書の identifier のリスト。
+
         Examples
         --------
         >>> from pygeonlp.api.service import Service
         >>> service = Service()
-        >>> service.disactivateDictionaries(pattern=r'ksj-station')
-        >>> [x.get_identifier() for x in service.getActiveDictionaries()]
-        ['geonlp:geoshape-city', 'geonlp:geoshape-pref']
-        >>> service.activateDictionaries(pattern=r'ksj-station')
-        >>> [x.get_identifier() for x in service.getActiveDictionaries()]
+        >>> service.disactivateDictionaries(pattern=r'.*')
         ['geonlp:geoshape-city', 'geonlp:geoshape-pref', 'geonlp:ksj-station-N02-2019']
+        >>> [x.get_identifier() for x in service.getActiveDictionaries()]
+        []
+        >>> service.activateDictionaries(pattern=r'ksj-station')
+        ['geonlp:ksj-station-N02-2019']
+        >>> [x.get_identifier() for x in service.getActiveDictionaries()]
+        ['geonlp:ksj-station-N02-2019']
 
         Notes
         -----
@@ -484,6 +499,7 @@ class Service(object):
             raise TypeError("pattern は正規表現文字列で指定してください。")
 
         dictionaries = self.capi_ma.getDictionaryList()
+        activated_dictionaries = []
         active_dictionaries = [
             int(x) for x in self.capi_ma.getActiveDictionaries().keys()
         ]
@@ -491,18 +507,27 @@ class Service(object):
             metadata = Metadata(dictionary)
             identifier = metadata.get_identifier()
 
+            if int(dic_id) in active_dictionaries:
+                # 既に有効
+                continue
+
             if idlist is not None and \
                (dic_id in idlist or identifier in idlist):
                 logger.debug("id または identifier が idlist に含まれる")
                 active_dictionaries.append(int(dic_id))
+                activated_dictionaries.append(identifier)
                 continue
 
-            if pattern is not None and re.search(pattern, identifier):
+            if pattern is not None and re.search(pattern, identifier) and \
+                    int(dic_id) not in active_dictionaries:
                 logger.debug("identifier が pattern に一致")
                 active_dictionaries.append(int(dic_id))
+                activated_dictionaries.append(identifier)
                 continue
 
         self.capi_ma.setActiveDictionaries(active_dictionaries)
+
+        return activated_dictionaries
 
     def getActiveClasses(self):
         """
@@ -593,6 +618,9 @@ class Service(object):
         既に同じ identifier を持つ辞書データがデータベースに登録されている場合、
         削除してから新しい辞書データを登録します。
 
+        登録した辞書を利用可能にするには、 ``setActivateDictionaries()``
+        または ``activateDictionaires()`` で有効化する必要があります。
+
         Parameters
         ----------
         jsonfile : str
@@ -620,6 +648,10 @@ class Service(object):
             raise TypeError("jsonfile と csvfile は str で指定してください。")
 
         dic = Dictionary.load(jsonfile, csvfile)
+        new_identifier = dic.get_identifier()
+        if self.getDictionary(new_identifier):
+            self.removeDictionary(new_identifier)
+
         return dic.add(self.capi_ma)
 
     def addDictionaryFromWeb(self, url, params=None, **kwargs):
@@ -627,6 +659,12 @@ class Service(object):
         指定した URL にあるページに含まれる辞書メタデータ（JSON-LD）を取得し、
         メタデータに記載されている URL から地名解析辞書（CSVファイル）を取得し、
         データベースに登録します。
+
+        既に同じ identifier を持つ辞書データがデータベースに登録されている場合、
+        削除してから新しい辞書データを登録します。
+
+        登録した辞書を利用可能にするには、 ``setActivateDictionaries()``
+        または ``activateDictionaires()`` で有効化する必要があります。
 
         Parameters
         ----------
@@ -655,6 +693,62 @@ class Service(object):
         """
         self._check_initialized()
         dic = Dictionary.download(url, params, **kwargs)
+        new_identifier = dic.get_identifier()
+        if self.getDictionary(new_identifier):
+            self.removeDictionary(new_identifier)
+
+        return dic.add(self.capi_ma)
+
+    def addDictionaryFromCsv(self, csvfile, name=None, identifier=None):
+        """
+        指定したパスにある地名解析辞書（CSVファイル）をデータベースに登録します。
+
+        辞書の name と identifier を省略した場合、
+        CSV ファイル名から自動的に設定されます。
+
+        既に同じ identifier を持つ辞書データがデータベースに登録されている場合、
+        削除してから新しい辞書データを登録します。
+
+        登録した辞書を利用可能にするには、 ``setActivateDictionaries()``
+        または ``activateDictionaries()`` で有効化する必要があります。
+
+        Parameters
+        ----------
+        csvfile : str
+            地名解析辞書ファイルのパス。
+        name : str, optional
+            辞書名。省略した場合、 CSV ファイルの basename を利用します。
+        identifier : str, optional
+            辞書 identifier。省略した場合、 CSV ファイルの basename を取り、
+            ``geonlp:<basename>`` を利用します。
+
+        Returns
+        -------
+        bool
+            常に True。登録に失敗した場合は例外が発生します。
+
+        Examples
+        --------
+        >>> from pygeonlp.api.service import Service
+        >>> service = Service()
+        >>> service.addDictionaryFromCsv(
+        ...   'base_data/ksj-station-N02-2020.csv',
+        ...   name='日本の鉄道駅（2020年）')
+        True
+        >>> service.updateIndex()
+        True
+        >>> service.activateDictionaries(['geonlp:ksj-station-N02-2020'])
+        ['geonlp:ksj-station-N02-2020']
+        """
+        self._check_initialized()
+        if not isinstance(csvfile, str):
+            raise TypeError("csvfile は str で指定してください。")
+
+        dic = Dictionary.create(csvfile, name, identifier)
+        new_identifier = dic.get_identifier()
+        if self.getDictionary(new_identifier):
+            self.removeDictionary(new_identifier)
+
         return dic.add(self.capi_ma)
 
     def saveDictionaryFromWeb(self, jsonfile, csvfile, url,
@@ -758,8 +852,8 @@ class Service(object):
         語に含まれる辞書の内部 ID "dictionary_id" を見て
         語に辞書の識別子 "dictionary_identifier" を追加します。
         """
-        if 'dictionary_id' not in word or \
-           'dictionary_identifier' in word:
+        if word is None or 'dictionary_id' not in word or \
+                'dictionary_identifier' in word:
             return word
 
         dictionary_id = word['dictionary_id']
@@ -768,6 +862,7 @@ class Service(object):
         else:
             identifier = self.capi_ma.getDictionaryIdentifierById(
                 dictionary_id)
+
             self._dict_cache[dictionary_id] = identifier
 
         word['dictionary_identifier'] = identifier
@@ -818,8 +913,9 @@ class Service(object):
         ----------
         sentence : str
             解析する文字列。
-        jageocoder : jageocoder, optional
-            住所ジオコーダのインスタンス。
+        jageocoder : bool, optional
+            住所ジオコーダを利用する場合 True を指定します。
+            False または省略した場合は利用しません。
         filters : list, optional
             強制的に適用する Filter インスタンスのリスト。
         scoring_class : class, optional

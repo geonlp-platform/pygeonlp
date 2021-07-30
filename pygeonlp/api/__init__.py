@@ -2,8 +2,11 @@ from logging import getLogger
 import os
 import site
 import sys
+import warnings
 
-from .service import Service, ServiceError
+import jageocoder
+
+from pygeonlp.api.service import Service, ServiceError
 
 logger = getLogger(__name__)
 _default_service = None
@@ -45,6 +48,8 @@ def get_db_dir():
 
 def get_jageocoder_db_dir():
     """
+    **deprecated**
+
     jageocoder の辞書が配置されているディレクトリを取得します。
     次の優先順位に従って決定します。
 
@@ -57,24 +62,11 @@ def get_jageocoder_db_dir():
     str
         ディレクトリの絶対パス、または None。
     """
-    try:
-        import jageocoder
-        jageocoder.tree  # Flake8 の F401 エラーを回避
-    except ModuleNotFoundError:
-        return None
+    warnings.warn(('get_jageocoder_db_dir() はver.1.2で廃止予定です。'
+                   'jageocoder.get_db_dir() を利用してください。'),
+                  DeprecationWarning)
 
-    # 環境変数 JAGEOCODER_DB_DIR をチェック
-    jageocoder_db_dir = os.environ.get('JAGEOCODER_DB_DIR')
-    if jageocoder_db_dir:
-        return os.path.abspath(jageocoder_db_dir)
-
-    # 環境変数 HOME が利用できれば $HOME/jageocoder/db
-    home = os.environ.get('HOME')
-    if home:
-        jageocoder_db_dir = os.path.join(home, 'jageocoder/db')
-        return os.path.abspath(jageocoder_db_dir)
-
-    return None
+    return jageocoder.get_db_dir()
 
 
 def init(db_dir=None, geoword_rules={}, **options):
@@ -354,12 +346,6 @@ def setActiveDictionaries(idlist=None, pattern=None):
     pattern : str, optional
         利用する辞書の identifier の正規表現。
 
-    Raises
-    ------
-    RuntimeError
-        idlist, pattern で指定した条件に一致する辞書が
-        1つも存在しない場合に発生します。
-
     Examples
     --------
     >>> import pygeonlp.api as api
@@ -388,22 +374,18 @@ def disactivateDictionaries(idlist=None, pattern=None):
     pattern : str
         除外する辞書の identifier を指定する正規表現。
 
-    Raises
-    ------
-    RuntimeError
-        全ての辞書が除外されてしまう場合に発生します。
-
     Examples
     --------
     >>> import pygeonlp.api as api
     >>> api.init()
     >>> api.disactivateDictionaries(pattern=r'geonlp:geoshape')
+    ['geonlp:geoshape-city', 'geonlp:geoshape-pref']
     >>> [x.get_identifier() for x in api.getActiveDictionaries()]
     ['geonlp:ksj-station-N02-2019']
     >>> api.disactivateDictionaries(pattern=r'ksj-station')
-    Traceback (most recent call last):
-      ...
-    RuntimeError: 全ての辞書が除外されます。
+    ['geonlp:ksj-station-N02-2019']
+    >>> [x.get_identifier() for x in api.getActiveDictionaries()]
+    []
 
     Notes
     -----
@@ -430,12 +412,14 @@ def activateDictionaries(idlist=None, pattern=None):
     --------
     >>> import pygeonlp.api as api
     >>> api.init()
-    >>> api.disactivateDictionaries(pattern=r'ksj-station')
-    >>> sorted([x.get_identifier() for x in api.getActiveDictionaries()])
-    ['geonlp:geoshape-city', 'geonlp:geoshape-pref']
-    >>> api.activateDictionaries(pattern=r'ksj-station')
-    >>> sorted([x.get_identifier() for x in api.getActiveDictionaries()])
+    >>> api.disactivateDictionaries(pattern=r'.*')
     ['geonlp:geoshape-city', 'geonlp:geoshape-pref', 'geonlp:ksj-station-N02-2019']
+    >>> sorted([x.get_identifier() for x in api.getActiveDictionaries()])
+    []
+    >>> api.activateDictionaries(pattern=r'ksj-station')
+    ['geonlp:ksj-station-N02-2019']
+    >>> sorted([x.get_identifier() for x in api.getActiveDictionaries()])
+    ['geonlp:ksj-station-N02-2019']
 
     Notes
     -----
@@ -483,8 +467,8 @@ def setActiveClasses(patterns=None):
         解析対象とする固有名クラス（str）のリスト。
         省略した場合 ['.*'] （全固有名クラス）を対象とします。
 
-    Usage
-    -----
+    Examples
+    --------
     >>> import pygeonlp.api as api
     >>> api.init()
     >>> api.getActiveClasses()
@@ -514,9 +498,6 @@ def clearDatabase():
     >>> import pygeonlp.api as api
     >>> api.init()
     >>> api.clearDatabase()
-    >>> api.addDictionaryFromWeb('https://geonlp.ex.nii.ac.jp/dictionary/geoshape-city/')
-    True
-    >>> api.updateIndex()
     """
     _check_initialized()
     _default_service.clearDatabase()
@@ -529,6 +510,9 @@ def addDictionaryFromFile(jsonfile, csvfile):
 
     既に同じ identifier を持つ辞書データがデータベースに登録されている場合、
     削除してから新しい辞書データを登録します。
+
+    登録した辞書を利用可能にするには、 ``setActivateDictionaries()``
+    または ``activateDictionaires()`` で有効化する必要があります。
 
     Parameters
     ----------
@@ -549,6 +533,10 @@ def addDictionaryFromFile(jsonfile, csvfile):
     >>> api.addDictionaryFromFile('base_data/geoshape-city.json', 'base_data/geoshape-city.csv')
     True
     >>> api.updateIndex()
+    >>> api.activateDictionaries(pattern=r'geoshape-city')
+    ['geonlp:geoshape-city']
+    >>> 'lQccqK' in api.searchWord('和歌山市')
+    True
     """
     _check_initialized()
     return _default_service.addDictionaryFromFile(jsonfile, csvfile)
@@ -559,6 +547,12 @@ def addDictionaryFromWeb(url, params=None, **kwargs):
     指定した URL にあるページに含まれる辞書メタデータ（JSON-LD）を取得し、
     メタデータに記載されている URL から地名解析辞書（CSVファイル）を取得し、
     データベースに登録します。
+
+    既に同じ identifier を持つ辞書データがデータベースに登録されている場合、
+    削除してから新しい辞書データを登録します。
+
+    登録した辞書を利用可能にするには、 ``setActivateDictionaries()``
+    または ``activateDictionaires()`` で有効化する必要があります。
 
     Parameters
     ----------
@@ -578,10 +572,16 @@ def addDictionaryFromWeb(url, params=None, **kwargs):
     --------
     >>> import pygeonlp.api as api
     >>> api.init()
-    >>> api.clearDatabase()
     >>> api.addDictionaryFromWeb('https://geonlp.ex.nii.ac.jp/dictionary/geoshape-city/')
     True
     >>> api.updateIndex()
+    >>> api.activateDictionaries(pattern=r'geoshape-city')
+    ['geonlp:geoshape-city']
+    >>> geowords = api.searchWord('千代田区')
+    >>> len(geowords)
+    1
+    >>> next(iter(geowords.values()))['dictionary_identifier']
+    'geonlp:geoshape-city'
     """
     _check_initialized()
     return _default_service.addDictionaryFromWeb(url, params, **kwargs)
@@ -649,9 +649,13 @@ def removeDictionary(identifier):
     --------
     >>> import pygeonlp.api as api
     >>> api.init()
+    >>> 'lQccqK' in api.searchWord('和歌山市')
+    True
     >>> api.removeDictionary('geonlp:geoshape-city')
     True
     >>> api.updateIndex()
+    >>> 'lQccqK' in api.searchWord('和歌山市')
+    False
     """
     _check_initialized()
     return _default_service.removeDictionary(identifier)
@@ -712,8 +716,9 @@ def geoparse(sentence, jageocoder=None, filters=None,
     ----------
     sentence : str
         解析する文字列。
-    jageocoder : jageocoder, optional
-        住所ジオコーダのインスタンス。
+    jageocoder : bool, optional
+        住所ジオコーダを利用する場合 True を指定します。
+        False または省略した場合は利用しません。
     filters : list, optional
         強制的に適用する Filter インスタンスのリスト。
     scoring_class : class, optional
@@ -807,6 +812,15 @@ def setup_basic_database(db_dir=None, src_dir=None):
             break
 
     if not data_dir:
+        files = _get_package_files()
+        for path in files:
+            pos = path.find('/pygeonlp_basedata')
+            if pos < 0:
+                continue
+
+            data_dir = path[0:pos + len('/pygeonlp_basedata')]
+
+    if not base_dir:
         raise RuntimeError("地名解析辞書がインストールされたディレクトリが見つかりません。")
 
     if db_dir is None:
@@ -816,19 +830,22 @@ def setup_basic_database(db_dir=None, src_dir=None):
     service = Service(db_dir=db_dir)
 
     updated = False
-    if service.getDictionary('geonlp:geoshape-city') is None:
+    if service.getDictionary('geonlp:geoshape-city') is None or \
+            service.getWordInfo('3QTYVH') is None:
         service.addDictionaryFromFile(
             jsonfile=os.path.join(data_dir, 'geoshape-city.json'),
             csvfile=os.path.join(data_dir, 'geoshape-city.csv'))
         updated = True
 
-    if service.getDictionary('geonlp:geoshape-pref') is None:
+    if service.getDictionary('geonlp:geoshape-pref') is None or \
+            service.getWordInfo('5y5nTf') is None:
         service.addDictionaryFromFile(
             jsonfile=os.path.join(data_dir, 'geoshape-pref.json'),
             csvfile=os.path.join(data_dir, 'geoshape-pref.csv'))
         updated = True
 
-    if service.getDictionary('geonlp:ksj-station-N02-2019') is None:
+    if service.getDictionary('geonlp:ksj-station-N02-2019') is None or \
+            service.getWordInfo('8AeoYz') is None:
         service.addDictionaryFromFile(
             jsonfile=os.path.join(data_dir, 'ksj-station-N02-2019.json'),
             csvfile=os.path.join(data_dir, 'ksj-station-N02-2019.csv'))
@@ -853,3 +870,35 @@ def _check_initialized():
     """
     if _default_service is None:
         raise ServiceError("APIが初期化されていません。")
+
+
+def _get_package_files():
+    """
+    pip list コマンドを実行し、pygeonlp パッケージとしてインストールされた
+    ファイルのフルパス一覧を取得します。
+
+    参考： https://pip.pypa.io/en/latest/user_guide/#using-pip-from-your-program
+    """
+    import subprocess
+    import sys
+    import pygeonlp.api
+
+    show_args = [sys.executable, '-m', 'pip', 'show', '--files', 'pygeonlp']
+    result = subprocess.check_output(show_args).decode('utf-8')
+    lines = result.split("\n")
+    files = None
+    for i, line in enumerate(lines):
+        if line.strip() == "Files:":
+            files = lines[i+1:]
+            break
+
+    if files is None:
+        raise RuntimeError("パッケージ内のファイル一覧が取得できません。")
+
+    # pygeonlp.api.__file__ は '../site-packages/pygeonlp/api/__init__.py'
+    # '../site-packages/' を base_path としてフルパスを取得する
+    base_path = os.path.abspath(
+        os.path.join(pygeonlp.api.__file__, '../../..'))
+    files = [os.path.abspath(os.path.join(base_path, x.strip()))
+             for x in files]
+    return files

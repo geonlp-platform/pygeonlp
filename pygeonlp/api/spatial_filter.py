@@ -156,6 +156,8 @@ class SpatialFilter(Filter):
         >>> from pygeonlp.api.spatial_filter import SpatialFilter
         >>> SpatialFilter.get_geometry({'type':'Point','coordinates':[139.6917337, 35.6895014]}).ExportToWkt()
         'POINT (139.6917337 35.6895014)'
+        >>> SpatialFilter.get_geometry('https://geoshape.ex.nii.ac.jp/city/geojson/20200101/13/13101A1968.geojson').ExportToWkt()
+        'MULTIPOLYGON (((139.73150362 35.68150121,139.73119903 35.68198095,...,139.73150362 35.68150121)))'
         """
         if isinstance(geojson_or_url, str):
             try:

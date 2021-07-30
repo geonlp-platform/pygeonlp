@@ -2,10 +2,12 @@ import copy
 import logging
 import re
 
+import jageocoder as _jageocoder
+from jageocoder.itaiji import converter as itaiji_converter
+
 from pygeonlp.api.filter import EntityClassFilter, GreedySearchFilter
 from pygeonlp.api.linker import RankedResults, MAX_COMBINATIONS
 from pygeonlp.api.node import Node
-
 
 logger = logging.getLogger(__name__)
 
@@ -47,9 +49,9 @@ class Parser(object):
         service : pygeonlp.service.Service, optional
             拡張形態素解析や地名語の検索を行うための Service インスタンス。
             省略した場合、 ``pygeonlp.api.default_service()`` を利用します。
-        jageocoder : jageocoder, optional
-            住所ジオコーダー jageocoder モジュール。
-            省略した場合、ジオコーディング機能は使用しません。
+        jageocoder : bool, optional
+            住所ジオコーダーを利用するかどうかを指定します。
+            False または省略した場合、ジオコーディング機能は使用しません。
         address_regex : str, optional
             住所表記の開始とみなす地名語の固有名クラスを表す正規表現。
             省略した場合、``r'^(都道府県|市区町村|行政地域|居住地名)(/.+|)'``
@@ -61,11 +63,6 @@ class Parser(object):
             ``ScoringClass`` が利用されます。
         scoring_options : any, optional
             スコアリングクラスの初期化に渡すオプションパラメータ。
-
-        Notes
-        -----
-        jageocoder パラメータには jageocoder.address.AddressTree インスタンスを
-        指定することもできます。
         """
         self.scoring_class = scoring_class
         self.scoring_options = scoring_options
@@ -86,25 +83,20 @@ class Parser(object):
             from . import default_service
             self.service = default_service()
 
-        if jageocoder is None:
+        if not jageocoder:
             self.jageocoder_tree = None
             return
 
-        # jageocoder がインストールされているか確認
-        try:
-            import jageocoder
-            if isinstance(jageocoder, jageocoder.address.AddressTree):
-                self.jageocoder_tree = jageocoder
-            elif isinstance(
-                    jageocoder.tree, jageocoder.address.AddressTree):
-                self.jageocoder_tree = jageocoder.tree
-            else:
+        # jageocoder 辞書が利用かできるか確認し、必要ならば初期化
+        if not _jageocoder.is_initialized():
+            db_dir = _jageocoder.get_db_dir(mode='r')
+            if db_dir is None:
                 raise ParseError(
-                    '"jageocoder" モジュールが init() で初期化されていません。')
+                    'jageocoder 用住所辞書が見つかりません。')
 
-        except ModuleNotFoundError:
-            raise ParseError(
-                '"jageocoder" モジュールがインストールされていません。')
+            _jageocoder.init(mode='r')
+
+        self.jageocoder_tree = _jageocoder.get_module_tree()
 
         if address_regex is None:
             self.address_regex = re.compile(
@@ -348,16 +340,13 @@ class Parser(object):
         list
             住所候補を追加したラティス表現。
 
-
         Examples
         --------
         >>> import pygeonlp.api as api
         >>> from pygeonlp.api.devtool import pp_lattice
-        >>> import jageocoder
+        >>> from pygeonlp.api.node import Node
         >>> api.init()
-        >>> dbdir = api.get_jageocoder_db_dir()
-        >>> jageocoder.init(f'sqlite:///{dbdir}/address.db', f'{dbdir}/address.trie')
-        >>> parser = api.parser.Parser(jageocoder=jageocoder)
+        >>> parser = api.parser.Parser(jageocoder=True)
         >>> lattice = parser.analyze_sentence('アメリカ大使館：港区赤坂1-10-5')
         >>> lattice_address = parser.add_address_candidates(lattice, True)
         >>> pp_lattice(lattice_address)
@@ -398,17 +387,10 @@ class Parser(object):
         >>> node = lattice_address[2][0]
         >>> len(node.morphemes)
         6
-        >>> '東京都' in node.morphemes[0]['prop']['hypernym']
+        >>> '東京都' in node.morphemes[0].prop['hypernym']
         True
-        >>> node.morphemes[1]['node_type'] == 'NORMAL'
+        >>> node.morphemes[1].node_type == Node.NORMAL
         True
-        >>> lattice = parser.analyze_sentence('喜多方市三島町')
-        >>> lattice_address = parser.add_address_candidates(lattice, True)
-        >>> pp_lattice(lattice_address)
-        #0:'喜多方市'
-          ...
-        #1:'三島町'
-          ...
         """
         if not self.jageocoder_tree:
             return lattice
@@ -423,17 +405,35 @@ class Parser(object):
                    self.address_regex.match(node.prop.get('ne_class', '')):
                     can_be_address = True
                     break
-                """
-                ToDo: 地域・一般も住所ジオコーディングする
+                # 地域・一般の場合でも、都道府県または市区町村名から始まる場合は
+                # 住所ジオコーディングの対象とする（NEologdで結合しているケース）
                 elif node.node_type == Node.NORMAL and \
                     self._check_word(node.morphemes, {
                         'pos': '名詞',
                         'subclass1': '固有名詞',
                         'subclass2': '地域',
                         'subclass3': '一般'}):
-                    can_be_address = True
+                    # jageocoder の trie を利用して語の候補を得る
+                    prefixes = self.jageocoder_tree.trie.common_prefixes(
+                        itaiji_converter.standardize(node.surface))
+                    for prefix in prefixes.keys():
+                        if can_be_address is True:
+                            break
+
+                        # prefix と一致する正規化前の部分文字列を得る
+                        surface = ''
+                        for c in node.surface:
+                            surface += c
+                            if itaiji_converter.standardize(surface) == prefix:
+                                break
+
+                        words = self.service.searchWord(surface)
+                        for word in words.values():
+                            if self.address_regex.match(word['ne_class']):
+                                can_be_address = True
+                                break
+
                     break
-                """
 
             if can_be_address:
                 res = self.get_addresses(lattice, i)
@@ -484,7 +484,7 @@ class Parser(object):
 
         Parameters
         ----------
-        address_element : dict
+        address_element: dict
             次のような要素を持つ住所候補。
             - id: 3754681
             - name: '皆瀬'
@@ -493,7 +493,7 @@ class Parser(object):
             - level: 5
             - note: None
             - fullname: ['秋田県', '湯沢市', '皆瀬']
-        lattice_part : list of Node
+        lattice_part: list of Node
             住所候補に対応するラティス表現の部分配列。
             形態素列を作成する際に、住所要素と一致するノードを利用します。
 
@@ -533,7 +533,7 @@ class Parser(object):
             node = nodes[0]
             if node.node_type != Node.GEOWORD:
                 # 非地名語はそのまま
-                morphemes.append(node.as_dict())
+                morphemes.append(node)
                 continue
 
             dummy_node = Node(
@@ -551,7 +551,7 @@ class Parser(object):
 
             if node.surface not in address_element['fullname']:
                 # 住所要素のどの表記とも一致しない
-                morphemes.append(dummy_node.as_dict())
+                morphemes.append(dummy_node)
                 continue
 
             # 親ノードに最も関係スコアの高い地名語ノードを選ぶ
@@ -573,7 +573,7 @@ class Parser(object):
             else:
                 cand = dummy_node
 
-            morphemes.append(cand.as_dict())
+            morphemes.append(cand)
 
         return morphemes
 
@@ -584,7 +584,7 @@ class Parser(object):
 
         Parameters
         ----------
-        word : dict
+        word: dict
             形態素情報をもつ語。
 
         Return
@@ -616,9 +616,9 @@ class Parser(object):
 
         Parameters
         ----------
-        lattice : list
+        lattice: list
             analyze_sentence() が返すノードのリスト（ラティス表現）。
-        pos : int
+        pos: int
             住所抽出を開始するリストのインデックス。
 
         Returns
@@ -626,9 +626,9 @@ class Parser(object):
         dict
             以下の要素を持つ dict オブジェクトを返します。
 
-            address : jageocoder.address.AddressNode
+            address: jageocoder.address.AddressNode
                 ジオコーディングの結果, 住所ではなかった場合 None。
-            pos : int
+            pos: int
                 住所とみなされた形態素ノードの次のインデックス。
         """
         surface = ''
@@ -645,17 +645,22 @@ class Parser(object):
         if len(geocoding_result) < 1:
             return {"address": None, "pos": pos}
 
+        address_string = geocoding_result[0][1]  # 変換できた住所文字列
+        check_address = re.sub(r'番$', '番地', address_string)
+
         # 一致した文字列が形態素ノード列のどの部分に当たるかチェック
         surface = ''
         i = pos
         while i < len(lattice):
-            surface += lattice[i][0].surface
-            if len(surface) > len(geocoding_result[0][1]):
-                # 形態素 lattice[i] は住所の区切りと一致しない
-                break
+            new_surface = surface + lattice[i][0].surface
+            if len(new_surface) > len(check_address):
+                # 形態素 lattice[i] は住所の区切りと一致しないので
+                # lattice[0:i] までを利用してジオコーディングをやり直す
+                return self.get_addresses(lattice[0:i], pos)
 
             i += 1
-            if len(surface) == len(geocoding_result[0][1]):
+            surface = new_surface
+            if len(surface) == len(check_address):
                 break
 
         if i - pos == 1:
@@ -663,7 +668,7 @@ class Parser(object):
             return {"surface": None, "address": None, "pos": pos}
 
         return {
-            "surface": geocoding_result[0][1],
+            "surface": surface,
             "address": [x[0].as_dict() for x in geocoding_result],
             "pos": i,
         }
@@ -674,9 +679,9 @@ class Parser(object):
 
         Parameters
         ----------
-        sentence : str
+        sentence: str
             解析する文字列
-        filters : list
+        filters: list
             適用するフィルタオブジェクトのリスト
 
         Returns
@@ -690,7 +695,8 @@ class Parser(object):
         >>> api.init()
         >>> parser = api.parser.Parser()
         >>> parser.geoparse('国会議事堂前まで歩きました。')
-        [{'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [139.74305333333334, 35.673543333333335]}, 'properties': {'surface': '国会議事堂前', 'node_type': 'GEOWORD', 'morphemes': {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '国会議事堂前', 'pos': '名詞', 'prononciation': '', 'subclass1': '固有名詞', 'subclass2': '地名語', 'subclass3': 'QUy2yP:国会議事堂前駅', 'surface': '国会議事堂前', 'yomi': ''}, 'geoword_properties': {'body': '国会議事堂前', 'dictionary_id': 3, 'entry_id': '1b5cc77fc2c83713a6750642f373d01f', 'geolod_id': 'QUy2yP', 'hypernym': ['東京地下鉄', '9号線千代田線'], 'institution_type': '民営鉄道', 'latitude': '35.673543333333335', 'longitude': '139.74305333333334', 'ne_class': '鉄道施設/鉄道駅', 'railway_class': '普通鉄道', 'suffix': ['駅', ''], 'dictionary_identifier': 'geonlp:ksj-station-N02-2019'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': 'まで', 'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': 'まで', 'pos': '助詞', 'prononciation': 'マデ', 'subclass1': '副助詞', 'subclass2': '*', 'subclass3': '*', 'surface': 'まで', 'yomi': 'マデ'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': '歩き', 'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '五段・カ行イ音便', 'conjugation_type': '連用形', 'original_form': '歩く', 'pos': '動詞', 'prononciation': 'アルキ', 'subclass1': '自立', 'subclass2': '*', 'subclass3': '*', 'surface': '歩き', 'yomi': 'アルキ'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': 'まし', 'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '特殊・マス', 'conjugation_type': '連用形', 'original_form': 'ます', 'pos': '助動詞', 'prononciation': 'マシ', 'subclass1': '*', 'subclass2': '*', 'subclass3': '*', 'surface': 'まし', 'yomi': 'マシ'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': 'た', 'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '特殊・タ', 'conjugation_type': '基本形', 'original_form': 'た', 'pos': '助動詞', 'prononciation': 'タ', 'subclass1': '*', 'subclass2': '*', 'subclass3': '*', 'surface': 'た', 'yomi': 'タ'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': '。', 'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '。', 'pos': '記号', 'prononciation': '。', 'subclass1': '句点', 'subclass2': '*', 'subclass3': '*', 'surface': '。', 'yomi': '。'}}}]
+        [{'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [139.74305333333334, 35.673543333333335]}, 'properties': {'surface': '国会議事堂前', 'node_type': 'GEOWORD', 'morphemes': {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '国会議事堂前', 'pos': '名詞', 'prononciation': '', 'subclass1': '固有名詞', 'subclass2': '地名語', 'subclass3': 'QUy2yP:国会議事堂前駅', 'surface': '国会議事堂前', 'yomi': ''}, 'geoword_properties': {'body': '国会議事堂前', 'dictionary_id': 3, 'entry_id': '1b5cc77fc2c83713a6750642f373d01f', 'geolod_id': 'QUy2yP', 'hypernym': ['東京地下鉄', '9号線千代田線'], 'institution_type': '民営鉄道', 'latitude': '35.673543333333335', 'longitude': '139.74305333333334', 'ne_class': '鉄道施設/鉄道駅', 'railway_class': '普通鉄道', 'suffix': ['駅', ''], 'dictionary_identifier': 'geonlp:ksj-station-N02-2019'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': 'まで', 'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': 'まで', 'pos': '助詞', 'prononciation': 'マデ', 'subclass1': '副助詞', 'subclass2': '*', 'subclass3': '*', 'surface': 'まで', 'yomi': 'マデ'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': '歩き',
+            'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '五段・カ行イ音便', 'conjugation_type': '連用形', 'original_form': '歩く', 'pos': '動詞', 'prononciation': 'アルキ', 'subclass1': '自立', 'subclass2': '*', 'subclass3': '*', 'surface': '歩き', 'yomi': 'アルキ'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': 'まし', 'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '特殊・マス', 'conjugation_type': '連用形', 'original_form': 'ます', 'pos': '助動詞', 'prononciation': 'マシ', 'subclass1': '*', 'subclass2': '*', 'subclass3': '*', 'surface': 'まし', 'yomi': 'マシ'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': 'た', 'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '特殊・タ', 'conjugation_type': '基本形', 'original_form': 'た', 'pos': '助動詞', 'prononciation': 'タ', 'subclass1': '*', 'subclass2': '*', 'subclass3': '*', 'surface': 'た', 'yomi': 'タ'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': '。', 'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '。', 'pos': '記号', 'prononciation': '。', 'subclass1': '句点', 'subclass2': '*', 'subclass3': '*', 'surface': '。', 'yomi': '。'}}}]
 
         Notes
         -----
@@ -757,7 +763,7 @@ class Parser(object):
 
         Parameters
         ----------
-        lattice : list
+        lattice: list
             入力となるラティス表現。
 
         Return
@@ -881,7 +887,7 @@ class Statistics(object):
 
         Parameters
         ----------
-        lattice : list
+        lattice: list
             ラティス表現。
 
         Returns
@@ -903,7 +909,8 @@ class Statistics(object):
         >>> api.init()
         >>> parser = api.parser.Parser()
         >>> api.parser.Statistics.count_geowords(parser.analyze_sentence('国会議事堂前まで歩きました。'))
-        {'num_geowords': 1, 'num_addresses': 0, 'ne_classes': {'鉄道施設/鉄道駅': 1, '鉄道施設': 1}}
+        {'num_geowords': 1, 'num_addresses': 0,
+            'ne_classes': {'鉄道施設/鉄道駅': 1, '鉄道施設': 1}}
         """
         num_geowords = 0
         num_addresses = 0

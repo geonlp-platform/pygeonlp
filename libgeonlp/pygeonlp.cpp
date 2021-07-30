@@ -141,6 +141,7 @@ static PyObject * geonlp_ma_get_word_info(GeonlpMA *self, PyObject *args)
       __alter_geonlpid_fieldname(geoword);
       return picojson_to_pyobject(geoword);
     }
+    Py_INCREF(Py_None);
     return Py_None;
   } catch (geonlp::ServiceRequestFormatException &e) {
     PyErr_SetString(PyExc_RuntimeError, e.what());
@@ -159,7 +160,7 @@ static PyObject * geonlp_ma_search_word(GeonlpMA *self, PyObject *args)
     std::map<std::string, geonlp::Geoword> results;
     (self->_ptrObj)->getGeowordEntries(str, results);
     for (std::map<std::string, geonlp::Geoword>::iterator it = results.begin();
-	 it != results.end(); it++) {
+      it != results.end(); it++) {
       __alter_geonlpid_fieldname((*it).second);
       json_obj.set_value((*it).first, (*it).second);
     }
@@ -180,7 +181,7 @@ static PyObject * geonlp_ma_list_dictionary(GeonlpMA *self, PyObject *args)
     std::map<int, geonlp::Dictionary> dicts;
     (self->_ptrObj)->getDictionaryList(dicts);
     for (std::map<int, geonlp::Dictionary>::iterator it = dicts.begin();
-	 it != dicts.end(); it++) {
+      it != dicts.end(); it++) {
       std::stringstream ss;
       std::string dict_id;
       ss << (*it).first;
@@ -207,14 +208,16 @@ static PyObject * geonlp_ma_get_dictionary_info(GeonlpMA *self, PyObject *args)
     if (PyLong_Check(pyobj)) {
       long int dict_id = PyLong_AsLong(pyobj);
       if ((self->_ptrObj)->getDictionaryById(dict_id, dict)) {
-	return picojson_to_pyobject(dict);
+        return picojson_to_pyobject(dict);
       }
+      Py_INCREF(Py_None);
       return Py_None;
     } else if (PyUnicode_Check(pyobj)) {
       const std::string cstr = PyBytes_AsString(PyUnicode_AsUTF8String(pyobj));
       if ((self->_ptrObj)->getDictionary(cstr, dict)) {
-	return picojson_to_pyobject(dict);
+        return picojson_to_pyobject(dict);
       }
+      Py_INCREF(Py_None);
       return Py_None;
     }
     PyErr_SetString(PyExc_TypeError, "Param must be a int or str value.");
@@ -270,6 +273,7 @@ static PyObject * geonlp_ma_set_active_dictionaries(GeonlpMA *self, PyObject *ar
     dic_ids.push_back(int(PyLong_AsLong(next)));
   }
   (self->_ptrObj)->setActiveDictionaries(dic_ids);
+  Py_INCREF(Py_None);
   return Py_None;
 }
 
@@ -312,6 +316,7 @@ static PyObject * geonlp_ma_set_active_classes(GeonlpMA *self, PyObject *args)
     }
   }
   (self->_ptrObj)->setActiveClasses(ne_classes);
+  Py_INCREF(Py_None);
   return Py_None;
 }
 

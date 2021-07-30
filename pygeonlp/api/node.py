@@ -77,11 +77,8 @@ class Node(object):
         {'lat': 35.674845, 'lon': 139.74534166666666}
 
         >>> import pygeonlp.api as api
-        >>> import jageocoder
         >>> api.init()
-        >>> dbdir = api.get_jageocoder_db_dir()
-        >>> jageocoder.init(f'sqlite:///{dbdir}/address.db', f'{dbdir}/address.trie')
-        >>> node = api.analyze('千代田区一ツ橋2-1-2', jageocoder=jageocoder)[0][0]
+        >>> node = api.analyze('千代田区一ツ橋2-1-2', jageocoder=True)[0][0]
         >>> node.get_lonlat()
         {'lat': 35.692332, 'lon': 139.758148}
         """
@@ -163,10 +160,15 @@ class Node(object):
         dict
             JSON 出力可能な dict オブジェクト。
         """
+        if isinstance(self.morphemes, list):
+            morphemes = [x.as_dict() for x in self.morphemes]
+        else:
+            morphemes = self.morphemes
+
         obj = {
             "surface": self.surface,
             "node_type": self.__get_type_string(),
-            "morphemes": self.morphemes,
+            "morphemes": morphemes,
             "geometry": self.geometry,
             "prop": self.prop,
         }
@@ -188,15 +190,22 @@ class Node(object):
         dict
             GeoJSON Feature 形式に変換可能な dict オブジェクト。
         """
+        if isinstance(self.morphemes, list):
+            # 住所の場合、ネストしている内部の Node も GeoJSON dict に展開する
+            morphemes = [x.as_geojson() for x in self.morphemes]
+        else:
+            morphemes = self.morphemes
+
         feature = {
             "type": "Feature",
             "geometry": self.geometry,
             "properties": {
                 "surface": self.surface,
                 "node_type": self.__get_type_string(),
-                "morphemes": self.morphemes,
+                "morphemes": morphemes,
             }
         }
+
         if self.node_type == Node.GEOWORD:
             feature['properties']['geoword_properties'] = self.prop
         elif self.node_type == Node.ADDRESS:

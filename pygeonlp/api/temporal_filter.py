@@ -205,6 +205,10 @@ class TimeExistsFilter(TemporalFilter):
     ['まし(NORMAL)']
     ['た(NORMAL)']
     ['。(NORMAL)']
+
+    Notes
+    -----
+    このフィルタは TimeOverlapsFilter と同じです。
     """
 
     def filter_func(self, candidate):
@@ -464,6 +468,10 @@ class TimeOverlapsFilter(TemporalFilter):
     ['まし(NORMAL)']
     ['た(NORMAL)']
     ['。(NORMAL)']
+
+    Notes
+    -----
+    このフィルタは TimeExistsFilter と同じです。
     """
 
     def filter_func(self, candidate):

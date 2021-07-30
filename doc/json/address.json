@@ -1,0 +1,169 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      139.758148,
+      35.692332
+    ]
+  },
+  "properties": {
+    "surface": "千代田区一ツ橋２－１－",
+    "node_type": "ADDRESS",
+    "morphemes": [{
+        "surface": "千代田区",
+        "node_type": "GEOWORD",
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "千代田区",
+          "pos": "名詞",
+          "prononciation": "",
+          "subclass1": "固有名詞",
+          "subclass2": "地名語",
+          "subclass3": "WWIY7G:千代田区",
+          "surface": "千代田区",
+          "yomi": ""
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            139.753634,
+            35.694003
+          ]
+        },
+        "prop": {
+          "address": "東京都千代田区",
+          "body": "千代田",
+          "body_variants": "千代田",
+          "code": {},
+          "countyname": "",
+          "countyname_variants": "",
+          "dictionary_id": 1,
+          "entry_id": "13101A1968",
+          "geolod_id": "WWIY7G",
+          "hypernym": [
+            "東京都"
+          ],
+          "latitude": "35.69400300",
+          "longitude": "139.75363400",
+          "ne_class": "市区町村",
+          "prefname": "東京都",
+          "prefname_variants": "東京都",
+          "source": "1/千代田区役所/千代田区九段南1-2-1/P34-14_13.xml",
+          "suffix": [
+            "区"
+          ],
+          "valid_from": "",
+          "valid_to": "",
+          "dictionary_identifier": "geonlp:geoshape-city"
+        }
+      },
+      {
+        "surface": "一ツ橋",
+        "node_type": "NORMAL",
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "一ツ橋",
+          "pos": "名詞",
+          "prononciation": "ヒトツバシ",
+          "subclass1": "固有名詞",
+          "subclass2": "地域",
+          "subclass3": "一般",
+          "surface": "一ツ橋",
+          "yomi": "ヒトツバシ"
+        },
+        "geometry": null,
+        "prop": null
+      },
+      {
+        "surface": "２",
+        "node_type": "NORMAL",
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "２",
+          "pos": "名詞",
+          "prononciation": "ニ",
+          "subclass1": "数",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "２",
+          "yomi": "ニ"
+        },
+        "geometry": null,
+        "prop": null
+      },
+      {
+        "surface": "－",
+        "node_type": "NORMAL",
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "*",
+          "pos": "記号",
+          "prononciation": "",
+          "subclass1": "一般",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "－",
+          "yomi": ""
+        },
+        "geometry": null,
+        "prop": null
+      },
+      {
+        "surface": "１",
+        "node_type": "NORMAL",
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "１",
+          "pos": "名詞",
+          "prononciation": "イチ",
+          "subclass1": "数",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "１",
+          "yomi": "イチ"
+        },
+        "geometry": null,
+        "prop": null
+      },
+      {
+        "surface": "－",
+        "node_type": "NORMAL",
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "*",
+          "pos": "記号",
+          "prononciation": "",
+          "subclass1": "一般",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "－",
+          "yomi": ""
+        },
+        "geometry": null,
+        "prop": null
+      }
+    ],
+    "address_properties": {
+      "id": 11460296,
+      "name": "1番",
+      "x": 139.758148,
+      "y": 35.692332,
+      "level": 7,
+      "note": null,
+      "fullname": [
+        "東京都",
+        "千代田区",
+        "一ツ橋",
+        "二丁目",
+        "1番"
+      ]
+    }
+  }
+}

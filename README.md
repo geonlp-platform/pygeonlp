@@ -3,6 +3,11 @@
 `pygeonlp` is an open source software for geotagging/geoparsing 
 Japanese natural language text to extract place names.
 
+More detailed Japanese documentation and API references are available
+in the [/doc](./doc/) directory.
+You can also find the latest online documentation at
+[GeoNLP Documentation](https://geonlp.ex.nii.ac.jp/doc/pygeonlp/).
+
 ## How To Use
 
 Import `pygeonlp.api` and initialize it by specifying the directory
@@ -180,8 +185,8 @@ $ pip install gdal
 
 ### Install jageocoder (Optional)
 
-`pygeonlp` can use address-geocoding if
-the [jageocoder](https://pypi.org/project/jageocoder/) is installed.
+`pygeonlp` can use address-geocoding if an address-dictionary for
+[jageocoder](https://pypi.org/project/jageocoder/) is installed.
 
 See the jageocoder documentation for installation instructions.
 

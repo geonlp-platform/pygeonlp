@@ -24,4 +24,7 @@ __pycache__/
 *.sq3
 .geonlp-dic-util/
 
+# Environmetal variables
+/.env
+
 !.gitkeep

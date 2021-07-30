@@ -68,12 +68,8 @@ def pp_lattice(lattice, indent=2, file=None):
     --------
     >>> import pygeonlp.api as api
     >>> from pygeonlp.api.devtool import pp_lattice
-    >>> import jageocoder
     >>> api.init()
-    >>> dbdir = api.get_jageocoder_db_dir()
-    >>> jageocoder.init(f'sqlite:///{dbdir}/address.db',
-    ...   f'{dbdir}/address.trie')
-    >>> parser = api.parser.Parser(jageocoder=jageocoder)
+    >>> parser = api.parser.Parser(jageocoder=True)
     >>> lattice = parser.analyze_sentence('アメリカ大使館：港区赤坂1-10-5')
     >>> pp_lattice(lattice)
     #0:'アメリカ大使館'
@@ -155,7 +151,7 @@ def pp_path(path, indent=2, file=None):
     indent: int, optional
         インデント幅。デフォルトは2です。
     file: file descriptor, optional
-        出力先のファイルデスクリプタ。デフォルトは sys.stdout です。
+        出力先のファイルデスクリプタ。デフォルトは None です。
 
     Examples
     --------

@@ -30,10 +30,10 @@ namespace geonlp {
     // 指定されたパスを確認
     if (basename.length() > 0) {
       if (basename[basename.length() -1] == '/') {
-	// ディレクトリを指定された場合はデフォルトファイル名を追加する
-	rcfilepath = rcfilepath + filename;
+        // ディレクトリを指定された場合はデフォルトファイル名を追加する
+        rcfilepath = rcfilepath + filename;
       } else {
-	rcfilepath = basename;
+        rcfilepath = basename;
       }
     }
     if (is_file_exists(rcfilepath)) {
@@ -45,7 +45,7 @@ namespace geonlp {
     if (p) {
       rcfilepath = std::string(p);
       if (rcfilepath[rcfilepath.length() - 1] == '/') {
-	rcfilepath = rcfilepath.substr(0, rcfilepath.length() - 1);
+        rcfilepath = rcfilepath.substr(0, rcfilepath.length() - 1);
       }
       rcfilepath = rcfilepath + "/" + filename;
     }
@@ -80,7 +80,7 @@ namespace geonlp {
     try {
       boost::property_tree::ptree prop;
       read_ini(filepath, prop);
-			
+
       formatter = prop.get<std::string>("formatter", "");
 
       // suffix
@@ -90,15 +90,15 @@ namespace geonlp {
       boost::split(suffix_data_strs, suffix_str, boost::is_any_of("|"));
 
       for (std::vector<std::string>::iterator it = suffix_data_strs.begin(); 
-	   it != suffix_data_strs.end(); it++) {
-	std::vector<std::string> v;
-	boost::split(v, (*it), boost::is_any_of(","));
-	if (v.size() == 3) {
-	  Suffix s(v[0], v[1], v[2]);
-	  suffix.push_back(s);
-	}
+           it != suffix_data_strs.end(); it++) {
+        std::vector<std::string> v;
+        boost::split(v, (*it), boost::is_any_of(","));
+        if (v.size() == 3) {
+          Suffix s(v[0], v[1], v[2]);
+          suffix.push_back(s);
+        }
       }
-			
+
       // spatial
       spatial.clear();
       spatial_str = prop.get<std::string>("spatial", "");
@@ -140,17 +140,17 @@ namespace geonlp {
       // dams_path
       dams_path = prop.get<std::string>("dams_path", "");
       if (dams_path.empty()) {
-	// GeoNLP のライブラリパスを探す
-	dams_path = this->get_data_dir() + "dams";
-	if (!is_file_exists(dams_path + ".dat")) dams_path = "";
+        // GeoNLP のライブラリパスを探す
+        dams_path = this->get_data_dir() + "dams";
+        if (!is_file_exists(dams_path + ".dat")) dams_path = "";
 
-	// DAMS のデフォルトパスを探す
-	dams_path = std::string(damswrapper::default_dic_path()) + "dams";
-	if (!is_file_exists(dams_path + ".dat")) dams_path = "";
+        // DAMS のデフォルトパスを探す
+        dams_path = std::string(damswrapper::default_dic_path()) + "dams";
+        if (!is_file_exists(dams_path + ".dat")) dams_path = "";
       }
       if (dams_path.empty()) {
-	std::string msg = std::string("'dams_path' property is not set in the profile, and DAMS dictionary files can't be found in default paths (") + this->get_data_dir() + "dams.dat, " + damswrapper::default_dic_path() + "dams.dat).";
-	throw std::runtime_error(msg);
+        std::string msg = std::string("'dams_path' property is not set in the profile, and DAMS dictionary files can't be found in default paths (") + this->get_data_dir() + "dams.dat, " + damswrapper::default_dic_path() + "dams.dat).";
+        throw std::runtime_error(msg);
       }
 #endif /* HAVE_LIBDAMS */
 
@@ -166,67 +166,67 @@ namespace geonlp {
       // suffix
       v = options.get("suffix");
       if (v.is<std::string>()) {
-	suffix.clear();
-	suffix_str = v.get<std::string>();
-	std::vector<std::string> suffix_data_strs;
-	boost::split(suffix_data_strs, suffix_str, boost::is_any_of("|"));
+        suffix.clear();
+        suffix_str = v.get<std::string>();
+        std::vector<std::string> suffix_data_strs;
+        boost::split(suffix_data_strs, suffix_str, boost::is_any_of("|"));
 
-	for (std::vector<std::string>::iterator it = suffix_data_strs.begin(); 
-	     it != suffix_data_strs.end(); it++) {
-	  std::vector<std::string> v;
-	  boost::split(v, (*it), boost::is_any_of(","));
-	  if (v.size() == 3) {
-	    Suffix s(v[0], v[1], v[2]);
-	    suffix.push_back(s);
-	  }
-	}
+        for (std::vector<std::string>::iterator it = suffix_data_strs.begin(); 
+             it != suffix_data_strs.end(); it++) {
+          std::vector<std::string> v;
+          boost::split(v, (*it), boost::is_any_of(","));
+          if (v.size() == 3) {
+            Suffix s(v[0], v[1], v[2]);
+            suffix.push_back(s);
+          }
+        }
       }
-			
+
       // spatial
       v = options.get("spatial");
       if (v.is<std::string>()) {
-	spatial.clear();
-	spatial_str = v.get<std::string>();
-	boost::split(spatial, spatial_str, boost::is_any_of("|"));
+        spatial.clear();
+        spatial_str = v.get<std::string>();
+        boost::split(spatial, spatial_str, boost::is_any_of("|"));
       }
 
       // non_geoword
       v = options.get("non_geoword");
       if (v.is<std::string>()) {
-	non_geoword.clear();
-	non_geoword_str = v.get<std::string>();
-	boost::split(non_geoword, non_geoword_str, boost::is_any_of("|"));
+        non_geoword.clear();
+        non_geoword_str = v.get<std::string>();
+        boost::split(non_geoword, non_geoword_str, boost::is_any_of("|"));
       }
 
       // データファイルディレクトリを取得
       // 最後が '/' で終わっていない場合、追加する
       v = options.get("data_dir");
       if (!v.is<std::string>()) {
-	throw std::runtime_error("A string value must be set to 'data_dir'.");
+        throw std::runtime_error("A string value must be set to 'data_dir'.");
       }
       if (v.is<std::string>()) {
-	data_dir = v.get<std::string>();
-	if (data_dir.empty()) {
-	  throw std::runtime_error("data_dir property is not set in the profile.");
-	}
-	if (data_dir.at(data_dir.length() - 1) != '/') data_dir += "/";
+        data_dir = v.get<std::string>();
+        if (data_dir.empty()) {
+          throw std::runtime_error("data_dir property is not set in the profile.");
+        }
+        if (data_dir.at(data_dir.length() - 1) != '/') data_dir += "/";
       }
 
       // log_dir
       v = options.get("log_dir");
       if (v.is<std::string>()) {
-	log_dir = v.get<std::string>();
-	if (log_dir.empty()) log_dir = "";
-	else if (log_dir.at(log_dir.length() - 1) != '/') log_dir += "/";
+        log_dir = v.get<std::string>();
+        if (log_dir.empty()) log_dir = "";
+        else if (log_dir.at(log_dir.length() - 1) != '/') log_dir += "/";
       }
 
       // system_dic_dir
       v = options.get("system_dic_dir");
       if (v.is<std::string>()) {
-	system_dic_dir = v.get<std::string>();
-	if (system_dic_dir.at(system_dic_dir.length() - 1) != '/') {
-	  system_dic_dir += "/";
-	}
+        system_dic_dir = v.get<std::string>();
+        if (system_dic_dir.at(system_dic_dir.length() - 1) != '/') {
+          system_dic_dir += "/";
+        }
       }
 
     } catch (std::runtime_error& e) {
@@ -245,15 +245,15 @@ namespace geonlp {
     std::vector<std::string> suffix_data_strs;
     boost::split(suffix_data_strs, this->suffix_str, boost::is_any_of("|"));
     for (std::vector<std::string>::iterator it = suffix_data_strs.begin(); 
-	 it != suffix_data_strs.end(); it++) {
+         it != suffix_data_strs.end(); it++) {
       std::vector<std::string> v;
       boost::split(v, (*it), boost::is_any_of(","));
       if (v.size() == 3) {
-	Suffix s(v[0], v[1], v[2]);
-	this->suffix.push_back(s);
+        Suffix s(v[0], v[1], v[2]);
+        this->suffix.push_back(s);
       }
     }
-			
+
     // spatial
     this->spatial.clear();
     this->spatial_str = "付近|周辺|周囲|経由|沿線|沿岸|沿い|沖|上流|下流|河口|出身|地区|－|間|地|発|着";

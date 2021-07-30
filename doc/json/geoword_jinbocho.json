@@ -1,0 +1,46 @@
+{
+  "type": "Feature",
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      139.757845,
+      35.6960275
+    ]
+  },
+  "properties": {
+    "surface": "神保町",
+    "node_type": "GEOWORD",
+    "morphemes": {
+      "conjugated_form": "*",
+      "conjugation_type": "*",
+      "original_form": "神保町",
+      "pos": "名詞",
+      "prononciation": "",
+      "subclass1": "固有名詞",
+      "subclass2": "地名語",
+      "subclass3": "82wiE0:神保町駅",
+      "surface": "神保町",
+      "yomi": ""
+    },
+    "geoword_properties": {
+      "body": "神保町",
+      "dictionary_id": 4,
+      "entry_id": "2891e10e9314a0b378fac6aace6d2a7f",
+      "geolod_id": "82wiE0",
+      "hypernym": [
+        "東京都",
+        "10号線新宿線"
+      ],
+      "institution_type": "公営鉄道",
+      "latitude": "35.6960275",
+      "longitude": "139.757845",
+      "ne_class": "鉄道施設/鉄道駅",
+      "railway_class": "普通鉄道",
+      "suffix": [
+        "駅",
+        ""
+      ],
+      "dictionary_identifier": "geonlp:ksj-station-N02-2019"
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import chardet
+import json
 import os
 import tempfile
 
@@ -104,6 +105,64 @@ class Dictionary(object):
             csvtext = csvdata.decode(encoding['encoding'])
 
         metadata = Metadata.loads(jsonld)
+
+        return cls(metadata, csvtext)
+
+    @classmethod
+    def create(cls, csvfile, name=None, identifier=None):
+        """
+        指定したパスにある地名解析辞書（CSVファイル）を読み込み
+        Dictionary インスタンスを作成します。
+
+        Parameters
+        ----------
+        csvfile : str
+            地名解析辞書ファイルのパス
+        name : str, optional
+            辞書名。省略した場合、 CSV ファイルの basename を利用します。
+        identifier : str, optional
+            辞書 identifier。省略した場合、 CSV ファイルの basename を取り、
+            ``geonlp:<basename>`` を利用します。
+
+        Returns
+        -------
+        Dictionary
+            作成した Dictionary インスタンス。
+        """
+        if not isinstance(csvfile, str):
+            raise TypeError("csvfile は str で指定してください。")
+
+        if not os.path.exists(csvfile):
+            raise FileNotFoundError(f"csvfile({csvfile}) が見つかりません。")
+
+        abspath = os.path.abspath(csvfile)
+        basename = os.path.basename(csvfile)
+        if basename.lower()[-4:] == '.csv':
+            basename = basename[0:-4]
+
+        if name is None:
+            name = basename
+
+        if identifier is None:
+            identifier = 'geonlp:' + basename
+
+        ld = {
+            'name': name,
+            'url': abspath,
+            'distribution': [{
+                '@type': "CopiedData",
+                'contentUrl': abspath,
+                'encodingFormat': 'text/csv',
+            }],
+            'identifier': [identifier],
+        }
+
+        with open(csvfile, 'rb') as f:
+            csvdata = f.read()
+            encoding = chardet.detect(csvdata)
+            csvtext = csvdata.decode(encoding['encoding'])
+
+        metadata = Metadata.loads(json.dumps(ld))
 
         return cls(metadata, csvtext)
 

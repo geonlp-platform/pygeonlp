@@ -1,19 +1,51 @@
 import doctest
 import os
+import shutil
 import unittest
 
 import pygeonlp.api as api
 
+"""
+doc_string に書かれているサンプルコードを doctest で検証するテスト。
+
+このモジュールのテストを行なうには、次のコマンドを実行してください。
+
+python -m unittest -v pygeonlp.tests.test_doctest
+"""
+
+
+def get_testdir():
+    return os.path.abspath(os.path.join(os.getcwd(), 'apitest'))
+
 
 def setup(test):
-    testdir = os.path.abspath(os.path.join(os.getcwd(), 'apitest'))
+    testdir = get_testdir()
     os.environ['GEONLP_DB_DIR'] = testdir
     os.makedirs(testdir, 0o755, exist_ok=True)
+    api.init(db_dir=testdir)
+
+    # デフォルト以外の辞書が登録されていたら
+    # データベースを作り直す
+    default_dics = [
+        'geonlp:geoshape-city',
+        'geonlp:geoshape-pref',
+        'geonlp:ksj-station-N02-2019',
+    ]
+
+    installed_dictionaries = [
+        x.get_identifier() for x in api.getDictionaries()]
+    for identifier in installed_dictionaries:
+        if identifier not in default_dics:
+            api.clearDatabase()
+            break
+
     api.setup_basic_database(db_dir=testdir)
     api.init(db_dir=testdir)
 
 
 def load_tests(loader, tests, ignore):
+    shutil.rmtree(get_testdir(), ignore_errors=True)
+
     from pygeonlp.api import devtool, temporal_filter
     modules = [
         api, api.service, api.metadata, api.dictionary, api.node,

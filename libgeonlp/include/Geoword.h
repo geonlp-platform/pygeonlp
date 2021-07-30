@@ -76,7 +76,7 @@ namespace geonlp
     /// 経緯度を実数値として取得する
     /// 正常な値であれば true, 空欄または範囲外の場合は false を返す
     bool getCoordinates(double& lat, double& lon) const;
-	
+
     // 定義済み項目についてはメソッドを用意し、型のチェックを行う
     inline void set_geonlp_id(const std::string& v) { this->_set_string("geonlp_id", v); }
     const std::string get_geonlp_id() const;

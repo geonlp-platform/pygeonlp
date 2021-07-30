@@ -74,55 +74,58 @@ namespace geonlp
     if (!fs_csv.is_open()) return 0;
     CSVReader csv(fs_csv);
     int lineno = 0;
+    Geoword geoword_in;
     std::vector<std::string> fields;
     std::vector<std::string> tokens;
-    Geoword geoword_in;
     std::vector<Geoword> geowords;
+    fields.clear();
+    tokens.clear();
+    geowords.clear();
     while (!csv.Read(tokens)) {
       geoword_in.clear();
       if (lineno == 0) {
-	// 見出し行
-	for (unsigned int i = 0; i < tokens.size(); i++) {
-	  rtrim(tokens[i]);
-	  fields.push_back(tokens[i]);
-	}
+        // 見出し行
+        for (unsigned int i = 0; i < tokens.size(); i++) {
+          rtrim(tokens[i]);
+          fields.push_back(tokens[i]);
+        }
       } else {
-	// データ行
-	for (unsigned int i = 0; i < tokens.size(); i++) {
-	  rtrim(tokens[i]);
-	  // 複数可のフィールドはフィールド名を明示的に
-	  // 指定することで、文字列が分割され、配列として登録される
-	  if (fields[i] == "prefix") {
-	    geoword_in.set_prefix(tokens[i]);
-	  } else if (fields[i] == "suffix") {
-	    geoword_in.set_suffix(tokens[i]);
-	  } else if (fields[i] == "prefix_kana") {
-	    geoword_in.set_prefix_kana(tokens[i]);
-	  } else if (fields[i] == "suffix_kana") {
-	    geoword_in.set_suffix_kana(tokens[i]);
-	  } else if (fields[i] == "hypernym") {
-	    geoword_in.set_hypernym(tokens[i]);
-	  } else if (fields[i] == "code") {
-	    geoword_in.set_code(tokens[i]);
-	  } else {
-	    geoword_in.set_value(fields[i], tokens[i]);
-	  }
-	}
-	geoword_in.set_dictionary_id(dic_id);
-	if (!geoword_in.has_key("geonlp_id")) {
-	  if (geoword_in.has_key("geolod_id")) {
-	    // geolod_id がセットされているので geonlp_id に乗せ換える
-	    geoword_in.set_geonlp_id(geoword_in._get_string("geolod_id"));
-	    geoword_in.erase("geolod_id");
-	  } else if (geoword_in.has_key("entry_id")) {
-	    // geonlp_id がセットされていないので内部IDをセットする
-	    std::string tmp_id = dic_id_str + geoword_in.get_entry_id();
-	    geoword_in.set_geonlp_id(tmp_id);
-	  }
-	}
-	if (geoword_in.isValid(err)) {
-	  geowords.push_back(geoword_in);
-	}
+        // データ行
+        for (unsigned int i = 0; i < tokens.size(); i++) {
+          rtrim(tokens[i]);
+          // 複数可のフィールドはフィールド名を明示的に
+          // 指定することで、文字列が分割され、配列として登録される
+          if (fields[i] == "prefix") {
+            geoword_in.set_prefix(tokens[i]);
+          } else if (fields[i] == "suffix") {
+            geoword_in.set_suffix(tokens[i]);
+          } else if (fields[i] == "prefix_kana") {
+            geoword_in.set_prefix_kana(tokens[i]);
+          } else if (fields[i] == "suffix_kana") {
+            geoword_in.set_suffix_kana(tokens[i]);
+          } else if (fields[i] == "hypernym") {
+            geoword_in.set_hypernym(tokens[i]);
+          } else if (fields[i] == "code") {
+            geoword_in.set_code(tokens[i]);
+          } else {
+            geoword_in.set_value(fields[i], tokens[i]);
+          }
+        }
+        geoword_in.set_dictionary_id(dic_id);
+        if (!geoword_in.has_key("geonlp_id")) {
+          if (geoword_in.has_key("geolod_id")) {
+            // geolod_id がセットされているので geonlp_id に乗せ換える
+            geoword_in.set_geonlp_id(geoword_in._get_string("geolod_id"));
+            geoword_in.erase("geolod_id");
+          } else if (geoword_in.has_key("entry_id")) {
+            // geonlp_id がセットされていないので内部IDをセットする
+            std::string tmp_id = dic_id_str + geoword_in.get_entry_id();
+            geoword_in.set_geonlp_id(tmp_id);
+          }
+        }
+        if (geoword_in.isValid(err)) {
+          geowords.push_back(geoword_in);
+        }
       }
       lineno++;
     }
