@@ -417,9 +417,10 @@ class Parser(object):
                     prefixes = self.jageocoder_tree.trie.common_prefixes(
                         itaiji_converter.standardize(node.surface))
                     if node.morphemes['original_form'] != '':
-                        prefixes.update(self.jageocoder_tree.trie.common_prefixes(
-                            itaiji_converter.standardize(
-                                node.morphemes['original_form'])))
+                        prefixes.update(
+                            self.jageocoder_tree.trie.common_prefixes(
+                                itaiji_converter.standardize(
+                                    node.morphemes['original_form'])))
 
                     for prefix in prefixes.keys():
                         if can_be_address is True:
@@ -843,7 +844,9 @@ class Parser(object):
 
         while pos_from < len(lattice):
             lattice_part = lattice[pos_from:pos_to]
-            if self.ranker.count_combinations(lattice_part) < MAX_COMBINATIONS:
+            if pos_to - pos_from == 1 or \
+                    self.ranker.count_combinations(
+                        lattice_part) < MAX_COMBINATIONS:
                 logger.debug("--- pos {} - {}".format(pos_from, pos_to))
                 for i in range(pos_from, pos_to):
                     nodes = lattice[i]
@@ -915,7 +918,10 @@ class Parser(object):
 
             # 半分にする、ただし住所表現は分割しない
             i = pos_from
-            while i < pos_to - 1:
+            while i < pos_to:
+                logger.debug(
+                    '半分 i={i}, pos_from={pos_from}, pos_to={pos_to}'.format(
+                        i=i, pos_from=pos_from, pos_to=pos_to))
                 if i >= pos_from + int((pos_to - pos_from) / 2):
                     pos_to = i
                     break
