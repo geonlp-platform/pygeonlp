@@ -641,7 +641,9 @@ namespace geonlp
       if (standardized.length() > lpair.length) {
         // この長さを持つ候補は存在しないので、最後の一単語を削って再チェック
         for (unsigned int l = standardized.length(); l > lpair.length;) {
-          if (s == end) return 0; // 一致する地名語は見つからなかった
+          if (s == end) {
+            break; // これ以上削れない
+          }
           end--;
           surface = joinGeowords(s, end);
 #ifdef HAVE_LIBDAMS
@@ -718,29 +720,25 @@ namespace geonlp
         return ret.size();
       }
 
-      // 一素性になったら終了。
-      if ( s== end){
-        break;
-      }
-
       std::string withoutSuffix;
       // 接尾辞を削ってみる
-      if ( end->canBeSuffix()){
+      if (end->canBeSuffix()) {
         withoutSuffix = removeSuffix(surface, end->get_suffix().get_surface());
-        if ( withoutSuffix.length() == 0) break;
-        //      if ( findGeowordNode( withoutSuffix, node)){
+        if (withoutSuffix.length() == 0) break;
         if (withoutSuffix.length() == lpair.length) {
           std::string alternative = "*";
           node = getGeowordNode(lpair.value, alternative);
-          ret.push_back( node);
-          ret.push_back( suffixNode( end->get_suffix()));
+          ret.push_back(node);
+          ret.push_back(suffixNode(end->get_suffix()));
           return ret.size();
         }
       }
 
+      // 一素性になったら終了
+      if (s == end) break;
+
       // darts 候補の方が短いので、もう一度候補を取得しなおす
       lpair = getLongestResultWithDarts(key);
-
     }
     return ret.size();
   }

@@ -663,8 +663,9 @@ class Parser(object):
             if len(surface) == len(check_address):
                 break
 
-        if i - pos == 1:
-            # 先頭の要素だけが住所要素の場合は住所とみなさない
+        if i - pos == 1 and lattice[pos][0].node_type == Node.GEOWORD:
+            # 先頭の要素だけが住所要素を構成し、
+            # 地名語なら住所とみなさない（地名語とする）
             return {"surface": None, "address": None, "pos": pos}
 
         return {
