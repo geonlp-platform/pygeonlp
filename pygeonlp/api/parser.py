@@ -416,6 +416,11 @@ class Parser(object):
                     # jageocoder の trie を利用して語の候補を得る
                     prefixes = self.jageocoder_tree.trie.common_prefixes(
                         itaiji_converter.standardize(node.surface))
+                    if node.morphemes['original_form'] != '':
+                        prefixes.update(self.jageocoder_tree.trie.common_prefixes(
+                            itaiji_converter.standardize(
+                                node.morphemes['original_form'])))
+
                     for prefix in prefixes.keys():
                         if can_be_address is True:
                             break
@@ -610,6 +615,59 @@ class Parser(object):
         })
         return alternative
 
+    def get_surface_candidates(self, lattice, pos, limit, candidates):
+        """
+        ラティス表現の単語列の pos 番目から、 limit で指定した
+        文字数を超える位置までの表記のリストを取得します。
+
+        単語の surface と original_form の組み合わせを列挙します。
+
+        Parameters
+        ----------
+        lattice: list
+            analyze_sentence() が返すノードのリスト（ラティス表現）。
+        pos: int
+            表記リストの先頭となるノードのインデックス。
+        limit: int
+            文字列の長さ（limit を超えたノードを含む）
+        candidates: list
+            pos-1 番目の単語列までで得られた候補リスト
+
+        Returns
+        -------
+        list
+            単語列（単語表記のリスト）のリスト
+        """
+        if pos == len(lattice):
+            return candidates
+
+        nodes = lattice[pos]
+        new_candidates = []
+        updated = False
+        for candidate in candidates:
+            if len(''.join(candidate)) > limit:
+                new_candidates.append(candidate)
+                continue
+
+            updated = True
+            node = nodes[0]
+            if node.morphemes['pos'] != '名詞':
+                new_candidates.append(candidate + [node.surface])
+            else:
+                original_form = node.morphemes['original_form']
+                if node.morphemes['original_form'] not in (
+                        '', '*', node.surface):
+                    new_candidates.append(
+                        candidate + [node.morphemes['original_form']])
+                else:
+                    new_candidates.append(candidate + [node.surface])
+
+        if updated:
+            return self.get_surface_candidates(
+                lattice, pos + 1, limit, new_candidates)
+
+        return new_candidates
+
     def get_addresses(self, lattice, pos):
         """
         ラティス表現の単語列から住所部分を抽出します。
@@ -631,47 +689,51 @@ class Parser(object):
             pos: int
                 住所とみなされた形態素ノードの次のインデックス。
         """
-        surface = ''
-        i = pos
-        while i < len(lattice):
-            surface += lattice[i][0].surface
-            i += 1
-            if len(surface) > 50:
-                # 住所文字列は最長で 50 文字と仮定
-                break
+        surface_candidates = self.get_surface_candidates(
+            lattice, pos, 50, [['']])
 
-        geocoding_result = self.jageocoder_tree.search(surface)
+        max_geocoding_result = ''
+        for surface_candidate in surface_candidates:
+            surface = ''.join(surface_candidate)
+            geocoding_result = self.jageocoder_tree.search(surface)
+            if len(geocoding_result) == 0:
+                continue
 
-        if len(geocoding_result) < 1:
+            if len(geocoding_result[0][1]) > len(max_geocoding_result):
+                max_geocoding_result = geocoding_result[0][1]
+                best_surfaces = surface_candidate[1:]  # 先頭の '' を除去
+                best_geocoding_result = geocoding_result
+
+        if max_geocoding_result == '':
             return {"address": None, "pos": pos}
 
-        address_string = geocoding_result[0][1]  # 変換できた住所文字列
+        address_string = max_geocoding_result  # 変換できた住所文字列
         check_address = re.sub(r'番$', '番地', address_string)
 
         # 一致した文字列が形態素ノード列のどの部分に当たるかチェック
         surface = ''
-        i = pos
-        while i < len(lattice):
-            new_surface = surface + lattice[i][0].surface
+        i = 0
+        while i < len(best_surfaces):
+            new_surface = surface + best_surfaces[i]
             if len(new_surface) > len(check_address):
                 # 形態素 lattice[i] は住所の区切りと一致しないので
                 # lattice[0:i] までを利用してジオコーディングをやり直す
-                return self.get_addresses(lattice[0:i], pos)
+                return self.get_addresses(lattice[0:pos + i], pos)
 
             i += 1
             surface = new_surface
             if len(surface) == len(check_address):
                 break
 
-        if i - pos == 1 and lattice[pos][0].node_type == Node.GEOWORD:
+        if i == 1 and lattice[pos][0].node_type == Node.GEOWORD:
             # 先頭の要素だけが住所要素を構成し、
             # 地名語なら住所とみなさない（地名語とする）
             return {"surface": None, "address": None, "pos": pos}
 
         return {
-            "surface": surface,
-            "address": [x[0].as_dict() for x in geocoding_result],
-            "pos": i,
+            "surface": ''.join([x[0].surface for x in lattice[pos: pos+i]]),
+            "address": [x[0].as_dict() for x in best_geocoding_result],
+            "pos": pos + i,
         }
 
     def geoparse(self, sentence, filters=None):
