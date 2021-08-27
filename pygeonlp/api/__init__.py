@@ -474,7 +474,7 @@ def setActiveClasses(patterns=None):
     >>> api.getActiveClasses()
     ['.*']
     >>> api.searchWord('東京都')
-    {'ALRYpP': {'address': '新宿区西新宿２－８－１', 'address_level': '1"', 'body': '東京', 'body_kana': 'トウキョウ', 'code': {'jisx0401': '13', 'lasdec': '130001'}, 'dictionary_id': 2, 'entry_id': '13', 'fullname': '東京都', 'geolod_id': 'ALRYpP', 'latitude': '35.6895', 'longitude': '139.69164', 'ne_class': '都道府県', 'phone': '03-5321-1111', 'suffix': ['都', ''], 'suffix_kana': ['ト', ''], 'dictionary_identifier': 'geonlp:geoshape-pref'}}
+    {'QknGsa': {...'dictionary_identifier': 'geonlp:geoshape-pref'}}
     >>> api.setActiveClasses(['.*', '-都道府県'])
     >>> api.searchWord('東京都')
     {}

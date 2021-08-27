@@ -295,7 +295,7 @@ class Service(object):
         --------
         >>> from pygeonlp.api.service import Service
         >>> service = Service()
-        >>> [x.get_identifier() for x in service.getDictionaries()]
+        >>> sorted([x.get_identifier() for x in service.getDictionaries()])
         ['geonlp:geoshape-city', 'geonlp:geoshape-pref', 'geonlp:ksj-station-N02-2019']
         """
         self._check_initialized()
@@ -323,7 +323,7 @@ class Service(object):
         --------
         >>> from pygeonlp.api.service import Service
         >>> service = Service()
-        >>> [x.get_identifier() for x in service.getActiveDictionaries()]
+        >>> sorted([x.get_identifier() for x in service.getActiveDictionaries()])
         ['geonlp:geoshape-city', 'geonlp:geoshape-pref', 'geonlp:ksj-station-N02-2019']
         """
         self._check_initialized()
@@ -349,8 +349,8 @@ class Service(object):
         >>> from pygeonlp.api.service import Service
         >>> service = Service()
         >>> service.setActiveDictionaries(pattern=r'geonlp:geoshape')
-        >>> [x.get_identifier() for x in service.getActiveDictionaries()]
-        ['geonlp:geoshape-pref', 'geonlp:geoshape-city']
+        >>> sorted([x.get_identifier() for x in service.getActiveDictionaries()])
+        ['geonlp:geoshape-city', 'geonlp:geoshape-pref']
 
         Notes
         -----
@@ -572,7 +572,7 @@ class Service(object):
         >>> service.getActiveClasses()
         ['.*']
         >>> service.searchWord('東京都')
-        {'ALRYpP': {'address': '新宿区西新宿２－８－１', 'address_level': '1"', 'body': '東京', 'body_kana': 'トウキョウ', 'code': {'jisx0401': '13', 'lasdec': '130001'}, 'dictionary_id': 2, 'entry_id': '13', 'fullname': '東京都', 'geolod_id': 'ALRYpP', 'latitude': '35.6895', 'longitude': '139.69164', 'ne_class': '都道府県', 'phone': '03-5321-1111', 'suffix': ['都', ''], 'suffix_kana': ['ト', ''], 'dictionary_identifier': 'geonlp:geoshape-pref'}}
+        {'QknGsa': {...'dictionary_identifier': 'geonlp:geoshape-pref'}}
         >>> service.setActiveClasses(['.*', '-都道府県'])
         >>> service.searchWord('東京都')
         {}

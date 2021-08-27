@@ -127,8 +127,10 @@ class Node(object):
         """
 
         hypernym = None
+        fullname = None
         if self.node_type == Node.GEOWORD:
             hypernym = self.prop.get('hypernym')
+            fullname = self.prop.get('fullname')
 
         if self.node_type == Node.ADDRESS:
             res = "{}({}:{})[{}]".format(
@@ -139,8 +141,12 @@ class Node(object):
         elif hypernym:
             res = "{}({}:{})".format(self.surface,
                                      self.__get_type_string(), hypernym)
+        elif fullname:
+            res = "{}({},{})".format(
+                self.surface, self.__get_type_string(), fullname)
         else:
-            res = "{}({})".format(self.surface, self.__get_type_string())
+            res = "{}({})".format(
+                self.surface, self.__get_type_string())
 
         return res
 

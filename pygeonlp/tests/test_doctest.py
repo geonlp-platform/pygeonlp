@@ -52,7 +52,7 @@ def load_tests(loader, tests, ignore):
         api.parser, api.linker, devtool,
         api.filter, temporal_filter,
     ]
-
+    
     try:
         from pygeonlp.api import spatial_filter
         spatial_filter.SpatialFilter.get_geometry_from_geojson(
