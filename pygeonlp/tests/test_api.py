@@ -27,7 +27,7 @@ class TestModuleMethods(unittest.TestCase):
     def test_search_word(self):
         words = api.searchWord('神保町')
         self.assertIsInstance(words, dict)
-        self.assertIn('82wiE0', words)  # 新宿線神保町駅
+        self.assertIn('AGGwyc', words)  # 新宿線神保町駅
 
     def test_set_dictionaries(self):
         # Set active dictionaries and check the results
@@ -48,19 +48,19 @@ class TestModuleMethods(unittest.TestCase):
         api.setActiveClasses(classes)
         words = api.searchWord('神保町')
         self.assertIsInstance(words, dict)
-        self.assertNotIn('82wiE0', words)  # 新宿線神保町駅は鉄道施設
+        self.assertNotIn('AGGwyc', words)  # 新宿線神保町駅は鉄道施設
 
         # "鉄道施設/.*" は除外するが "駅$" は除外しない
         api.setActiveClasses([".*", "-鉄道施設/.*", r'.*駅$'])
         words = api.searchWord('神保町')
         self.assertIsInstance(words, dict)
-        self.assertIn('82wiE0', words)  # 新宿線神保町駅は鉄道駅
+        self.assertIn('AGGwyc', words)  # 新宿線神保町駅は鉄道駅
 
         # Reset active classes
         api.setActiveClasses()
         words = api.searchWord('神保町')
         self.assertIsInstance(words, dict)
-        self.assertIn('82wiE0', words)  # 新宿線神保町駅
+        self.assertIn('AGGwyc', words)  # 新宿線神保町駅
 
     def test_geo_contains_filter(self):
         from pygeonlp.api.spatial_filter import SpatialFilter, GeoContainsFilter
