@@ -129,16 +129,67 @@ class TestModuleMethods(unittest.TestCase):
         住所を含む文の解析を geoparse() で実行した結果を確認する。
         """
         answer = [
-            '{"type": "Feature", "geometry": null, "properties": {"surface": "NII", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "NII", "pos": "名詞", "prononciation": "エヌアイアイ", "subclass1": "固有名詞", "subclass2": "一般", "subclass3": "*", "surface": "NII", "yomi": "エヌアイアイ"}}}',
-            '{"type": "Feature", "geometry": null, "properties": {"surface": "は", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "は", "pos": "助詞", "prononciation": "ワ", "subclass1": "係助詞", "subclass2": "*", "subclass3": "*", "surface": "は", "yomi": "ハ"}}}',
-            '{"type": "Feature", "geometry": {"type": "Point", "coordinates": [139.758148, 35.692332]}, "properties": {"surface": "千代田区一ツ橋2-1", "node_type": "ADDRESS", "morphemes": [{"type": "Feature", "geometry": null, "properties": {"surface": "千代田区一ツ橋", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "千代田区一ツ橋", "pos": "名詞", "prononciation": "チヨダクヒトツバシ", "subclass1": "固有名詞", "subclass2": "地域", "subclass3": "一般", "surface": "千代田区一ツ橋", "yomi": "チヨダクヒトツバシ"}}}, {"type": "Feature", "geometry": null, "properties": {"surface": "2", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "*", "pos": "名詞", "prononciation": "", "subclass1": "数", "subclass2": "*", "subclass3": "*", "surface": "2", "yomi": ""}}}, {"type": "Feature", "geometry": null, "properties": {"surface": "-1", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "−1", "pos": "名詞", "prononciation": "マイナスイチ", "subclass1": "固有名詞", "subclass2": "一般", "subclass3": "*", "surface": "-1", "yomi": "マイナスイチ"}}}], "address_properties": {"id": 11460296, "name": "1番", "x": 139.758148, "y": 35.692332, "level": 7, "note": null, "fullname": ["東京都", "千代田区", "一ツ橋", "二丁目", "1番"]}}}',
-            '{"type": "Feature", "geometry": null, "properties": {"surface": "-2", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "−2", "pos": "名詞", "prononciation": "マイナスニ", "subclass1": "固有名詞", "subclass2": "一般", "subclass3": "*", "surface": "-2", "yomi": "マイナスニ"}}}',
-            '{"type": "Feature", "geometry": null, "properties": {"surface": "に", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "に", "pos": "助詞", "prononciation": "ニ", "subclass1": "格助詞", "subclass2": "一般", "subclass3": "*", "surface": "に", "yomi": "ニ"}}}',
-            '{"type": "Feature", "geometry": null, "properties": {"surface": "あり", "node_type": "NORMAL", "morphemes": {"conjugated_form": "五段・ラ行", "conjugation_type": "連用形", "original_form": "ある", "pos": "動詞", "prononciation": "アリ", "subclass1": "自立", "subclass2": "*", "subclass3": "*", "surface": "あり", "yomi": "アリ"}}}',
-            '{"type": "Feature", "geometry": null, "properties": {"surface": "ます", "node_type": "NORMAL", "morphemes": {"conjugated_form": "特殊・マス", "conjugation_type": "基本形", "original_form": "ます", "pos": "助動詞", "prononciation": "マス", "subclass1": "*", "subclass2": "*", "subclass3": "*", "surface": "ます", "yomi": "マス"}}}',
-            '{"type": "Feature", "geometry": null, "properties": {"surface": "。", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "。", "pos": "記号", "prononciation": "。", "subclass1": "句点", "subclass2": "*", "subclass3": "*", "surface": "。", "yomi": "。"}}}',
+            {"surface": "NII", "node_type": "NORMAL"},
+            {"surface": "は", "node_type": "NORMAL"},
+            {"surface": "千代田区一ツ橋2-1", "node_type": "ADDRESS"},
+            {"surface": "-2", "node_type": "NORMAL"},
+            {"surface": "に", "node_type": "NORMAL"},
+            {"surface": "あり", "node_type": "NORMAL"},
+            {"surface": "ます", "node_type": "NORMAL"},
+            {"surface": "。", "node_type": "NORMAL"},
         ]
         result = self.parser.geoparse('NIIは千代田区一ツ橋2-1-2にあります。')
         for i, feature in enumerate(result):
-            geojson = json.dumps(feature, ensure_ascii=False)
-            self.assertEqual(geojson, answer[i])
+            prop = feature['properties']
+            self.assertEqual(prop['surface'], answer[i]['surface'])
+            self.assertEqual(prop['node_type'], answer[i]['node_type'])
+
+    def test_geoparse_combined_address(self):
+        """
+        「多摩市落合1-15」の「多摩市落合」が一語として解析されるため
+        地名語として抽出できない場合も住所として解析できることを確認する。
+        """
+        result = self.parser.geoparse('多摩市落合1-15-2')
+        self.assertEqual(result[0]['properties']['surface'], '多摩市落合1-15')
+        self.assertEqual(result[0]['properties']['node_type'], 'ADDRESS')
+
+    def test_geoparse_combined_address_oneword(self):
+        """
+        「鹿児島県枕崎市」が一語として解析され、住所表記がそこで完了していても
+        住所として解析できることを確認する。
+        """
+        result = self.parser.geoparse('鹿児島県枕崎市')
+        self.assertEqual(result[0]['properties']['surface'], '鹿児島県枕崎市')
+        self.assertEqual(result[0]['properties']['node_type'], 'ADDRESS')
+
+    def test_ma_with_suffix_oneword(self):
+        """
+        「世田谷区内」のように1語として解析される語に対しても
+        suffix（内）を除去した「世田谷区」が抽出できることを確認する。
+        """
+        nodes = api.ma_parseNode('世田谷区内の')
+        self.assertEqual(nodes[1]['surface'], '世田谷区')
+        self.assertEqual(nodes[1]['subclass2'], '地名語')
+        self.assertEqual(nodes[2]['surface'], '内')
+        self.assertEqual(nodes[2]['subclass1'], '接尾')
+
+    def test_geoparse_combined_address_oneword(self):
+        """
+        「鹿児島県枕崎市」が一語として解析され、住所表記がそこで完了していても
+        住所として解析できることを確認する。
+        """
+        result = self.parser.geoparse('鹿児島県枕崎市')
+        self.assertEqual(result[0]['properties']['surface'], '鹿児島県枕崎市')
+        self.assertEqual(result[0]['properties']['node_type'], 'ADDRESS')
+
+    def test_geoparse_originalform_address(self):
+        """
+        「東京・世田谷区」の original_form 「東京都世田谷区」を利用して
+        住所として解析できることを確認する。
+        """
+        result = self.parser.geoparse('東京・世田谷区')
+        self.assertEqual(result[0]['properties']['surface'], '東京・世田谷区')
+        self.assertEqual(result[0]['properties']['node_type'], 'ADDRESS')
+        self.assertEqual(
+            result[0]['properties']['address_properties']['fullname'],
+            ['東京都', '世田谷区'])

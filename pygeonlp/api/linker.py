@@ -188,7 +188,7 @@ class RankedResults(object):
     (41, ["福島(GEOWORD:['阪神電気鉄道', '本線'])", 'は(NORMAL)', "大阪(GEOWORD:['西日本旅客鉄道', '東海道線'])", 'から(NORMAL)', '2(NORMAL)', '分(NORMAL)', 'です(NORMAL)', '。(NORMAL)'])
     (41, ["福島(GEOWORD:['阪神電気鉄道', '本線'])", 'は(NORMAL)', "大阪(GEOWORD:['西日本旅客鉄道', '大阪環状線'])", 'から(NORMAL)', '2(NORMAL)', '分(NORMAL)', 'です(NORMAL)', '。(NORMAL)'])
     (36, ["福島(GEOWORD:['福島交通', '飯坂線'])", 'は(NORMAL)', "大阪(GEOWORD:['西日本旅客鉄道', '東海道線'])", 'から(NORMAL)', '2(NORMAL)', '分(NORMAL)', 'です(NORMAL)', '。(NORMAL)'])
-
+    
     Attributes
     ----------
     scoring_class : class instance

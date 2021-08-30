@@ -29,7 +29,7 @@ def setup(test):
     default_dics = [
         'geonlp:geoshape-city',
         'geonlp:geoshape-pref',
-        'geonlp:ksj-station-N02-2019',
+        'geonlp:ksj-station-N02',
     ]
 
     installed_dictionaries = [
@@ -52,7 +52,7 @@ def load_tests(loader, tests, ignore):
         api.parser, api.linker, devtool,
         api.filter, temporal_filter,
     ]
-
+    
     try:
         from pygeonlp.api import spatial_filter
         spatial_filter.SpatialFilter.get_geometry_from_geojson(
@@ -72,4 +72,4 @@ def load_tests(loader, tests, ignore):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(failfast=True)

@@ -416,6 +416,12 @@ class Parser(object):
                     # jageocoder の trie を利用して語の候補を得る
                     prefixes = self.jageocoder_tree.trie.common_prefixes(
                         itaiji_converter.standardize(node.surface))
+                    if node.morphemes['original_form'] != '':
+                        prefixes.update(
+                            self.jageocoder_tree.trie.common_prefixes(
+                                itaiji_converter.standardize(
+                                    node.morphemes['original_form'])))
+
                     for prefix in prefixes.keys():
                         if can_be_address is True:
                             break
@@ -610,6 +616,45 @@ class Parser(object):
         })
         return alternative
 
+    def get_surfaces(self, lattice, pos_from, limit):
+        """
+        ラティス表現の単語列の pos 番目から、 limit で指定した
+        文字数を超える位置までの表記のリストを取得します。
+
+        単語の surface と original_form の組み合わせを列挙します。
+
+        Parameters
+        ----------
+        lattice: list
+            analyze_sentence() が返すノードのリスト（ラティス表現）。
+        pos_from: int
+            表記リストの先頭となるノードのインデックス。
+        limit: int
+            文字列の長さ（limit を超えたノードを含む）
+
+        Returns
+        -------
+        list
+            単語列（単語表記のリスト）
+        """
+        candidate = []
+        for pos in range(pos_from, len(lattice)):
+
+            nodes = lattice[pos]
+            updated = False
+            if len(''.join(candidate)) > limit:
+                break
+
+            node = nodes[0]
+            original_form = node.morphemes['original_form']
+            if node.morphemes['pos'] != '名詞' or \
+                    original_form in ('', '*', node.surface):
+                candidate.append(node.surface)
+            else:
+                candidate.append(original_form)
+
+        return candidate
+
     def get_addresses(self, lattice, pos):
         """
         ラティス表現の単語列から住所部分を抽出します。
@@ -631,18 +676,9 @@ class Parser(object):
             pos: int
                 住所とみなされた形態素ノードの次のインデックス。
         """
-        surface = ''
-        i = pos
-        while i < len(lattice):
-            surface += lattice[i][0].surface
-            i += 1
-            if len(surface) > 50:
-                # 住所文字列は最長で 50 文字と仮定
-                break
-
-        geocoding_result = self.jageocoder_tree.search(surface)
-
-        if len(geocoding_result) < 1:
+        surfaces = self.get_surfaces(lattice, pos, 50)
+        geocoding_result = self.jageocoder_tree.search(''.join(surfaces))
+        if len(geocoding_result) == 0:
             return {"address": None, "pos": pos}
 
         address_string = geocoding_result[0][1]  # 変換できた住所文字列
@@ -650,27 +686,27 @@ class Parser(object):
 
         # 一致した文字列が形態素ノード列のどの部分に当たるかチェック
         surface = ''
-        i = pos
-        while i < len(lattice):
-            new_surface = surface + lattice[i][0].surface
-            if len(new_surface) > len(check_address):
+        i = 0
+        while i < len(surfaces):
+            surface += surfaces[i]
+            if len(surface) > len(check_address):
                 # 形態素 lattice[i] は住所の区切りと一致しないので
                 # lattice[0:i] までを利用してジオコーディングをやり直す
-                return self.get_addresses(lattice[0:i], pos)
+                return self.get_addresses(lattice[0:pos + i], pos)
 
             i += 1
-            surface = new_surface
             if len(surface) == len(check_address):
                 break
 
-        if i - pos == 1:
-            # 先頭の要素だけが住所要素の場合は住所とみなさない
-            return {"surface": None, "address": None, "pos": pos}
+        if i == 1 and lattice[pos][0].node_type == Node.GEOWORD:
+            # 先頭の要素だけが住所要素を構成し、
+            # 地名語なら住所とみなさない（地名語とする）
+            return {"address": None, "pos": pos}
 
         return {
-            "surface": surface,
+            "surface": ''.join([x[0].surface for x in lattice[pos: pos+i]]),
             "address": [x[0].as_dict() for x in geocoding_result],
-            "pos": i,
+            "pos": pos + i,
         }
 
     def geoparse(self, sentence, filters=None):
@@ -695,8 +731,7 @@ class Parser(object):
         >>> api.init()
         >>> parser = api.parser.Parser()
         >>> parser.geoparse('国会議事堂前まで歩きました。')
-        [{'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [139.74305333333334, 35.673543333333335]}, 'properties': {'surface': '国会議事堂前', 'node_type': 'GEOWORD', 'morphemes': {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '国会議事堂前', 'pos': '名詞', 'prononciation': '', 'subclass1': '固有名詞', 'subclass2': '地名語', 'subclass3': 'QUy2yP:国会議事堂前駅', 'surface': '国会議事堂前', 'yomi': ''}, 'geoword_properties': {'body': '国会議事堂前', 'dictionary_id': 3, 'entry_id': '1b5cc77fc2c83713a6750642f373d01f', 'geolod_id': 'QUy2yP', 'hypernym': ['東京地下鉄', '9号線千代田線'], 'institution_type': '民営鉄道', 'latitude': '35.673543333333335', 'longitude': '139.74305333333334', 'ne_class': '鉄道施設/鉄道駅', 'railway_class': '普通鉄道', 'suffix': ['駅', ''], 'dictionary_identifier': 'geonlp:ksj-station-N02-2019'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': 'まで', 'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': 'まで', 'pos': '助詞', 'prononciation': 'マデ', 'subclass1': '副助詞', 'subclass2': '*', 'subclass3': '*', 'surface': 'まで', 'yomi': 'マデ'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': '歩き',
-            'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '五段・カ行イ音便', 'conjugation_type': '連用形', 'original_form': '歩く', 'pos': '動詞', 'prononciation': 'アルキ', 'subclass1': '自立', 'subclass2': '*', 'subclass3': '*', 'surface': '歩き', 'yomi': 'アルキ'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': 'まし', 'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '特殊・マス', 'conjugation_type': '連用形', 'original_form': 'ます', 'pos': '助動詞', 'prononciation': 'マシ', 'subclass1': '*', 'subclass2': '*', 'subclass3': '*', 'surface': 'まし', 'yomi': 'マシ'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': 'た', 'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '特殊・タ', 'conjugation_type': '基本形', 'original_form': 'た', 'pos': '助動詞', 'prononciation': 'タ', 'subclass1': '*', 'subclass2': '*', 'subclass3': '*', 'surface': 'た', 'yomi': 'タ'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': '。', 'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '。', 'pos': '記号', 'prononciation': '。', 'subclass1': '句点', 'subclass2': '*', 'subclass3': '*', 'surface': '。', 'yomi': '。'}}}]
+        [{'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [139.74305333333334, 35.673543333333335]}, 'properties': {'surface': '国会議事堂前', 'node_type': 'GEOWORD', 'morphemes': {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '国会議事堂前', 'pos': '名詞', 'prononciation': '', 'subclass1': '固有名詞', 'subclass2': '地名語', 'subclass3': 'cE8W4w:国会議事堂前駅', 'surface': '国会議事堂前', 'yomi': ''}, 'geoword_properties': {'body': '国会議事堂前', 'dictionary_id': 3, 'entry_id': '4NFELa', 'geolod_id': 'cE8W4w', 'hypernym': ['東京地下鉄', '9号線千代田線'], 'institution_type': '民営鉄道', 'latitude': '35.673543333333335', 'longitude': '139.74305333333334', 'ne_class': '鉄道施設/鉄道駅', 'railway_class': '普通鉄道', 'suffix': ['駅', ''], 'dictionary_identifier': 'geonlp:ksj-station-N02'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': 'まで', 'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': 'まで', 'pos': '助詞', 'prononciation': 'マデ', 'subclass1': '副助詞', 'subclass2': '*', 'subclass3': '*', 'surface': 'まで', 'yomi': 'マデ'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': '歩き', 'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '五段・カ行イ音便', 'conjugation_type': '連用形', 'original_form': '歩く', 'pos': '動詞', 'prononciation': 'アルキ', 'subclass1': '自立', 'subclass2': '*', 'subclass3': '*', 'surface': '歩き', 'yomi': 'アルキ'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': 'まし', 'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '特殊・マス', 'conjugation_type': '連用形', 'original_form': 'ます', 'pos': '助動詞', 'prononciation': 'マシ', 'subclass1': '*', 'subclass2': '*', 'subclass3': '*', 'surface': 'まし', 'yomi': 'マシ'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': 'た', 'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '特殊・タ', 'conjugation_type': '基本形', 'original_form': 'た', 'pos': '助動詞', 'prononciation': 'タ', 'subclass1': '*', 'subclass2': '*', 'subclass3': '*', 'surface': 'た', 'yomi': 'タ'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': '。', 'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '。', 'pos': '記号', 'prononciation': '。', 'subclass1': '句点', 'subclass2': '*', 'subclass3': '*', 'surface': '。', 'yomi': '。'}}}]
 
         Notes
         -----
@@ -780,7 +815,9 @@ class Parser(object):
 
         while pos_from < len(lattice):
             lattice_part = lattice[pos_from:pos_to]
-            if self.ranker.count_combinations(lattice_part) < MAX_COMBINATIONS:
+            if pos_to - pos_from == 1 or \
+                    self.ranker.count_combinations(
+                        lattice_part) < MAX_COMBINATIONS:
                 logger.debug("--- pos {} - {}".format(pos_from, pos_to))
                 for i in range(pos_from, pos_to):
                     nodes = lattice[i]
@@ -852,7 +889,10 @@ class Parser(object):
 
             # 半分にする、ただし住所表現は分割しない
             i = pos_from
-            while i < pos_to - 1:
+            while i < pos_to:
+                logger.debug(
+                    '半分 i={i}, pos_from={pos_from}, pos_to={pos_to}'.format(
+                        i=i, pos_from=pos_from, pos_to=pos_to))
                 if i >= pos_from + int((pos_to - pos_from) / 2):
                     pos_to = i
                     break
