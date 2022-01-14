@@ -7,7 +7,7 @@ scoring モジュールは、一通りのジオパージング処理を行なう
 
 from logging import getLogger
 
-from pygeonlp.api.linker import RankedResults
+from pygeonlp.api.linker import Evaluator
 from pygeonlp.api.node import Node
 
 logger = getLogger(__name__)
@@ -88,8 +88,8 @@ class ScoringClass(object):
                 "オプションパラメータは整数値で指定してください。")
 
         score = 0
-        geowords = RankedResults.collect_geowords(path)
-        addresses = RankedResults.collect_addresses(path)
+        geowords = Evaluator.collect_geowords(path)
+        addresses = Evaluator.collect_addresses(path)
         geonodes = geowords + addresses
         score += len(path) - len(geonodes)  # 住所・地名語以外は +1
 

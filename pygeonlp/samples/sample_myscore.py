@@ -6,7 +6,7 @@
 python sample_myscore.py
 """
 import pygeonlp.api as api
-from pygeonlp.api.linker import RankedResults
+from pygeonlp.api.linker import Evaluator
 from pygeonlp.api.scoring import ScoringClass
 
 api.init()
@@ -37,7 +37,7 @@ class MyScoringClass(ScoringClass):
 
         target_class = self.options
         score = 0
-        geowords = RankedResults.collect_geowords(path)
+        geowords = Evaluator.collect_geowords(path)
         for geoword in geowords:
             if geoword.prop['ne_class'].startswith(target_class):
                 score += 1

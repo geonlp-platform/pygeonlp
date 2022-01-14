@@ -167,7 +167,7 @@ class LinkedResults(object):
         self.counters[0] = -1
 
 
-class RankedResults(object):
+class Evaluator(object):
     """
     ラティス表現から、指定したメソッドで計算したスコアの高いものから
     順に並べたパス表現を作成します。
@@ -177,9 +177,9 @@ class RankedResults(object):
     Examples
     --------
     >>> import pygeonlp.api as api
-    >>> from pygeonlp.api.linker import RankedResults
+    >>> from pygeonlp.api.linker import Evaluator
     >>> api.init()
-    >>> rr = RankedResults(max_results=5)
+    >>> rr = Evaluator(max_results=5)
     >>> for x in rr.get(api.analyze('福島は大阪から2分です。')):
     ...   (x['score'], [n.simple() for n in x['result']])
     ...
@@ -188,7 +188,7 @@ class RankedResults(object):
     (41, ["福島(GEOWORD:['阪神電気鉄道', '本線'])", 'は(NORMAL)', "大阪(GEOWORD:['西日本旅客鉄道', '東海道線'])", 'から(NORMAL)', '2(NORMAL)', '分(NORMAL)', 'です(NORMAL)', '。(NORMAL)'])
     (41, ["福島(GEOWORD:['阪神電気鉄道', '本線'])", 'は(NORMAL)', "大阪(GEOWORD:['西日本旅客鉄道', '大阪環状線'])", 'から(NORMAL)', '2(NORMAL)', '分(NORMAL)', 'です(NORMAL)', '。(NORMAL)'])
     (36, ["福島(GEOWORD:['福島交通', '飯坂線'])", 'は(NORMAL)', "大阪(GEOWORD:['西日本旅客鉄道', '東海道線'])", 'から(NORMAL)', '2(NORMAL)', '分(NORMAL)', 'です(NORMAL)', '。(NORMAL)'])
-    
+
     Attributes
     ----------
     scoring_class : class instance
@@ -220,13 +220,15 @@ class RankedResults(object):
             可能な入力が与えられた場合は例外 LinkerError を発生します。
             デフォルト値は linker.MAX_COMBINATIONS です。
         """
+        from .scoring import ScoringClass
         self.scoring_class = scoring_class
         self.max_results = max_results
         self.max_combinations = max_combinations
 
         if self.scoring_class is None:
-            from .scoring import ScoringClass
             self.scorer = ScoringClass(scoring_options)
+        elif isinstance(self.scoring_class, ScoringClass):
+            self.scorer = self.scoring_class
         else:
             self.scorer = scoring_class(scoring_options)
 

@@ -18,7 +18,7 @@ class Node(object):
     """
     形態素ノードを表すクラス。
 
-    service.analyze() が返すラティス表現や、 linker.RankedResults.get() が
+    service.analyze() が返すラティス表現や、 linker.Evaluator.get() が
     返すパス表現では、形態素は Node インスタンスとして格納されます。
 
     Attributes
@@ -80,7 +80,7 @@ class Node(object):
         >>> api.init()
         >>> node = api.analyze('千代田区一ツ橋2-1-2', jageocoder=True)[0][0]
         >>> node.get_lonlat()
-        {'lat': 35.692332, 'lon': 139.758148}
+        {'lat': 35.694003, 'lon': 139.753634}
         """
         if self.node_type == self.__class__.GEOWORD:
             return {

@@ -6,8 +6,8 @@ import jageocoder as _jageocoder
 from jageocoder.itaiji import converter as itaiji_converter
 
 from pygeonlp.api.filter import EntityClassFilter, GreedySearchFilter
-from pygeonlp.api.linker import RankedResults, MAX_COMBINATIONS
 from pygeonlp.api.node import Node
+from pygeonlp.api.service import Service
 
 logger = logging.getLogger(__name__)
 
@@ -29,74 +29,48 @@ class Parser(object):
         利用する Service インスタンス。
     jageocoder_tree : jageocoder.address.AddressTree
         住所ジオコーダー jageocoder の AddressTree インスタンス。
+        利用しない場合は False を指定してください。
     address_regex : regex
         住所要素の先頭になりえる固有名クラスの正規表現（コンパイル済み）。
     scoring_class : class
         パスのスコアリングに利用するクラス。
-    scoring_options : any
-        スコアリングクラスを初期化する際のオプションパラメータ。
-    scorer : service.ScoringClass instance
-        スコアリングを行なうクラスインスタンス。
     """
 
-    def __init__(self, service=None, jageocoder=None, address_regex=None,
-                 scoring_class=None, scoring_options=None):
+    def __init__(self, db_dir=None, jageocoder=None, address_regex=None,
+                 **options):
         """
         パーザを初期化します。
 
         Parameters
         ----------
-        service : pygeonlp.service.Service, optional
-            拡張形態素解析や地名語の検索を行うための Service インスタンス。
-            省略した場合、 ``pygeonlp.api.default_service()`` を利用します。
-        jageocoder : bool, optional
-            住所ジオコーダーを利用するかどうかを指定します。
-            False または省略した場合、ジオコーディング機能は使用しません。
+        db_dir : PathLike, optional
+            データベースディレクトリ。
+            省略した場合は ``api.init.get_db_dir()`` が返す値を利用します。
+        jageocoder : jageocoder.tree.AddressTree, optional
+            利用する住所ジオコーダーを指定します。省略した場合、
+            jageocoder モジュールのデフォルトオブジェクトを利用します。
+            False を指定した場合、ジオコーディング機能を利用しません。
         address_regex : str, optional
             住所表記の開始とみなす地名語の固有名クラスを表す正規表現。
             省略した場合、``r'^(都道府県|市区町村|行政地域|居住地名)(/.+|)'``
             を利用します。
-        scoring_class : class, optional
-            パスのスコアとノード間のスコアを計算する関数を持つ
-            スコアリングクラス。
-            指定しない場合、``pygeonlp.api.scoring`` モジュール内の
-            ``ScoringClass`` が利用されます。
-        scoring_options : any, optional
-            スコアリングクラスの初期化に渡すオプションパラメータ。
         """
-        self.scoring_class = scoring_class
-        self.scoring_options = scoring_options
-        self.ranker = RankedResults(
-            scoring_class=self.scoring_class,
-            scoring_options=self.scoring_options,
-            max_results=1, max_combinations=MAX_COMBINATIONS)
+        self.service = Service(db_dir=db_dir, **options)
 
-        self.service = service
-
-        if self.scoring_class is None:
-            from .scoring import ScoringClass
-            self.scorer = ScoringClass(scoring_options)
-        else:
-            self.scorer = scoring_class(scoring_options)
-
-        if service is None:
-            from . import default_service
-            self.service = default_service()
-
-        if not jageocoder:
+        if jageocoder is False:
             self.jageocoder_tree = None
-            return
 
-        # jageocoder 辞書が利用かできるか確認し、必要ならば初期化
-        if not _jageocoder.is_initialized():
-            db_dir = _jageocoder.get_db_dir(mode='r')
-            if db_dir is None:
-                raise ParseError(
-                    'jageocoder 用住所辞書が見つかりません。')
+        else:
+            # jageocoder 辞書が初期化されていなければ初期化
+            if not _jageocoder.is_initialized():
+                db_dir = _jageocoder.get_db_dir(mode='r')
+                if db_dir is None:
+                    raise ParseError(
+                        'jageocoder 用住所辞書が見つかりません。')
 
-            _jageocoder.init(mode='r')
+                _jageocoder.init(mode='r')
 
-        self.jageocoder_tree = _jageocoder.get_module_tree()
+            self.jageocoder_tree = _jageocoder.get_module_tree()
 
         if address_regex is None:
             self.address_regex = re.compile(
@@ -104,7 +78,7 @@ class Parser(object):
         else:
             self.address_regex = re.compile(address_regex)
 
-    def _check_word(self, word, filter):
+    def check_word(self, word, filter):
         """
         Word の形態素情報が filter に含まれる全ての key, value と
         一致しているかどうかを調べます。
@@ -195,13 +169,13 @@ class Parser(object):
             # 人名チェック 1 - 姓, 名 または 人名, 人名の場合
             if next_word is not None and \
                (word['conjugated_form'] == '名詞-固有名詞-人名-姓' or
-                self._check_word(word, {
+                self.check_word(word, {
                     'pos': '名詞',
                     'subclass1': '固有名詞',
                     'subclass2': '人名'
                 })) and \
                (next_word['conjugated_form'] == '名詞-固有名詞-人名-名' or
-                    self._check_word(next_word, {
+                    self.check_word(next_word, {
                         'pos': '名詞',
                         'subclass1': '固有名詞',
                         'subclass2': '人名'
@@ -219,7 +193,7 @@ class Parser(object):
 
             # 人名チェック 2 - 名詞, 名詞-接尾-人名 の場合
             if word['pos'] == '名詞' and \
-               self._check_word(next_word, {
+               self.check_word(next_word, {
                    'pos': '名詞',
                    'subclass1': '接尾',
                    'subclass2': '人名'
@@ -234,7 +208,7 @@ class Parser(object):
             # 人名チェック 3 - 名詞, 名詞, 名詞-接尾-人名 の場合
             if word['pos'] == '名詞' and \
                 next_word['pos'] == '名詞' and \
-               self._check_word(nnext_word, {
+               self.check_word(nnext_word, {
                    'pos': '名詞',
                    'subclass1': '接尾',
                    'subclass2': '人名'
@@ -408,7 +382,7 @@ class Parser(object):
                 # 地域・一般の場合でも、都道府県または市区町村名から始まる場合は
                 # 住所ジオコーディングの対象とする（NEologdで結合しているケース）
                 elif node.node_type == Node.NORMAL and \
-                    self._check_word(node.morphemes, {
+                    self.check_word(node.morphemes, {
                         'pos': '名詞',
                         'subclass1': '固有名詞',
                         'subclass2': '地域',
@@ -508,9 +482,6 @@ class Parser(object):
         list of Node
             住所要素ごとに対応する形態素 Node を作成し、
             リストを返します。
-            パラメータ例では "秋田県" に対応するノード、
-            "湯沢市" に対応するノード、 "皆瀬" に対応するノードを
-            作成します。
         """
         morphemes = []
         parent = Node(
@@ -569,10 +540,11 @@ class Parser(object):
                     # 固有名クラスが住所表記のものではない
                     score = 0
                 else:
-                    score = self.scorer.node_relation_score(parent, node)
+                    score = self._calc_node_score_by_distance(parent, node)
                     if score > max_score:
                         cand = node
                         max_score = score
+
             if cand:
                 # 親ノードと関係のある候補が見つかった場合
                 parent = cand
@@ -582,6 +554,21 @@ class Parser(object):
             morphemes.append(cand)
 
         return morphemes
+
+    def _calc_node_score_by_distance(self, node0, node1) -> int:
+        score = 0
+        # 距離が近いほど高得点を返す
+        try:
+            dist = node0.distance(node1)
+            if dist < 10000.0:  # 10km 以下
+                score += 5
+            else:
+                # 50km までは 1 点追加
+                score += int(50000.0 / dist)
+        except RuntimeError:
+            pass
+
+        return score
 
     def _get_alternative_word(self, word):
         """
@@ -598,11 +585,11 @@ class Parser(object):
         dict
             復元した形態素情報を追加した語。
         """
-        if not self._check_word(word,
-                                {'pos': '名詞',
-                                 'subclass1': '固有名詞',
-                                 'subclass2': '地名語'
-                                 }) or word['conjugated_form'] == '*':
+        if not self.check_word(word,
+                               {'pos': '名詞',
+                                'subclass1': '固有名詞',
+                                'subclass2': '地名語'
+                                }) or word['conjugated_form'] == '*':
             return word
 
         pos_args = word['conjugated_form'].split('-')
@@ -709,293 +696,35 @@ class Parser(object):
             "pos": pos + i,
         }
 
-    def geoparse(self, sentence, filters=None):
+    def analyze(self, sentence, **kwargs):
         """
-        文を解析して GeoJSON Feature 形式に変換可能な dict のリストを返します。
+        文を解析した結果をラティス表現で返します。
 
         Parameters
         ----------
-        sentence: str
-            解析する文字列
-        filters: list
-            適用するフィルタオブジェクトのリスト
+        sentence : str
+            解析するテキスト。
 
         Returns
         -------
         list
-            GeoJSON Feature 形式に変換可能な dict のリスト。
+            解析結果のラティス表現。
 
         Examples
         --------
-        >>> import pygeonlp.api as api
-        >>> api.init()
-        >>> parser = api.parser.Parser()
-        >>> parser.geoparse('国会議事堂前まで歩きました。')
-        [{'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [139.74305333333334, 35.673543333333335]}, 'properties': {'surface': '国会議事堂前', 'node_type': 'GEOWORD', 'morphemes': {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '国会議事堂前', 'pos': '名詞', 'prononciation': '', 'subclass1': '固有名詞', 'subclass2': '地名語', 'subclass3': 'cE8W4w:国会議事堂前駅', 'surface': '国会議事堂前', 'yomi': ''}, 'geoword_properties': {'body': '国会議事堂前', 'dictionary_id': 3, 'entry_id': '4NFELa', 'geolod_id': 'cE8W4w', 'hypernym': ['東京地下鉄', '9号線千代田線'], 'institution_type': '民営鉄道', 'latitude': '35.673543333333335', 'longitude': '139.74305333333334', 'ne_class': '鉄道施設/鉄道駅', 'railway_class': '普通鉄道', 'suffix': ['駅', ''], 'dictionary_identifier': 'geonlp:ksj-station-N02'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': 'まで', 'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': 'まで', 'pos': '助詞', 'prononciation': 'マデ', 'subclass1': '副助詞', 'subclass2': '*', 'subclass3': '*', 'surface': 'まで', 'yomi': 'マデ'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': '歩き', 'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '五段・カ行イ音便', 'conjugation_type': '連用形', 'original_form': '歩く', 'pos': '動詞', 'prononciation': 'アルキ', 'subclass1': '自立', 'subclass2': '*', 'subclass3': '*', 'surface': '歩き', 'yomi': 'アルキ'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': 'まし', 'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '特殊・マス', 'conjugation_type': '連用形', 'original_form': 'ます', 'pos': '助動詞', 'prononciation': 'マシ', 'subclass1': '*', 'subclass2': '*', 'subclass3': '*', 'surface': 'まし', 'yomi': 'マシ'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': 'た', 'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '特殊・タ', 'conjugation_type': '基本形', 'original_form': 'た', 'pos': '助動詞', 'prononciation': 'タ', 'subclass1': '*', 'subclass2': '*', 'subclass3': '*', 'surface': 'た', 'yomi': 'タ'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': '。', 'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '。', 'pos': '記号', 'prononciation': '。', 'subclass1': '句点', 'subclass2': '*', 'subclass3': '*', 'surface': '。', 'yomi': '。'}}}]
+        >>> from pygeonlp.api.parser import Parser
+        >>> parser = Parser()
+        >>> parser.analyze('今日は国会議事堂前まで歩きました。')
+        [[{"surface": "今日", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "今日", "pos": "名詞", "prononciation": "キョー", "subclass1": "副詞可能", "subclass2": "*", "subclass3": "*", "surface": "今日", "yomi": "キョウ"}, "geometry": null, "prop": null}], [{"surface": "は", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "は", "pos": "助詞", "prononciation": "ワ", "subclass1": "係助詞", "subclass2": "*", "subclass3": "*", "surface": "は", "yomi": "ハ"}, "geometry": null, "prop": null}], [{"surface": "国会議事堂前", "node_type": "GEOWORD", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "国会議事堂前", "pos": "名詞", "prononciation": "", "subclass1": "固有名詞", "subclass2": "地名語", "subclass3": "Bn4q6d:国会議事堂前駅", "surface": "国会議事堂前", "yomi": ""}, "geometry": {"type": "Point", "coordinates": [139.74534166666666, 35.674845]}, "prop": {"body": "国会議事堂前", "dictionary_id": 3, "entry_id": "LrGGxY", "geolod_id": "Bn4q6d", "hypernym": ["東京地下鉄", "4号線丸ノ内線"], "institution_type": "民営鉄道", "latitude": "35.674845", "longitude": "139.74534166666666", "ne_class": "鉄道施設/鉄道駅", "railway_class": "普通鉄道", "suffix": ["駅", ""], "dictionary_identifier": "geonlp:ksj-station-N02"}}, {"surface": "国会議事堂前", "node_type": "GEOWORD", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "国会議事堂前", "pos": "名詞", "prononciation": "", "subclass1": "固有名詞", "subclass2": "地名語", "subclass3": "cE8W4w:国会議事堂前駅", "surface": "国会議事堂前", "yomi": ""}, "geometry": {"type": "Point", "coordinates": [139.74305333333334, 35.673543333333335]}, "prop": {"body": "国会議事堂前", "dictionary_id": 3, "entry_id": "4NFELa", "geolod_id": "cE8W4w", "hypernym": ["東京地下鉄", "9号線千代田線"], "institution_type": "民営鉄道", "latitude": "35.673543333333335", "longitude": "139.74305333333334", "ne_class": "鉄道施設/鉄道駅", "railway_class": "普通鉄道", "suffix": ["駅", ""], "dictionary_identifier": "geonlp:ksj-station-N02"}}], [{"surface": "まで", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "まで", "pos": "助詞", "prononciation": "マデ", "subclass1": "副助詞", "subclass2": "*", "subclass3": "*", "surface": "まで", "yomi": "マデ"}, "geometry": null, "prop": null}], [{"surface": "歩き", "node_type": "NORMAL", "morphemes": {"conjugated_form": "五段・カ行イ音便", "conjugation_type": "連用形", "original_form": "歩く", "pos": "動詞", "prononciation": "アルキ", "subclass1": "自立", "subclass2": "*", "subclass3": "*", "surface": "歩き", "yomi": "アルキ"}, "geometry": null, "prop": null}], [{"surface": "まし", "node_type": "NORMAL", "morphemes": {"conjugated_form": "特殊・マス", "conjugation_type": "連用形", "original_form": "ます", "pos": "助動詞", "prononciation": "マシ", "subclass1": "*", "subclass2": "*", "subclass3": "*", "surface": "まし", "yomi": "マシ"}, "geometry": null, "prop": null}], [{"surface": "た", "node_type": "NORMAL", "morphemes": {"conjugated_form": "特殊・タ", "conjugation_type": "基本形", "original_form": "た", "pos": "助動詞", "prononciation": "タ", "subclass1": "*", "subclass2": "*", "subclass3": "*", "surface": "た", "yomi": "タ"}, "geometry": null, "prop": null}], [{"surface": "。", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "。", "pos": "記号", "prononciation": "。", "subclass1": "句点", "subclass2": "*", "subclass3": "*", "surface": "。", "yomi": "。"}, "geometry": null, "prop": null}]]
 
         Notes
         -----
-        このメソッドは解析結果から適切なフィルタを判断し、
-        候補の絞り込みやランキングを行ないます。
+        ラティス表現では全ての地名語の候補を列挙して返します。
+        ``analyze_sentence()`` に住所ジオコーディングの結果も追加します。
         """
-        lattice = self.analyze_sentence(sentence)
+        varray = self.analyze_sentence(sentence, **kwargs)
 
-        search_plan = "exhaustive"
-        if filters is None:
-            filters = []
-
-        gstat = Statistics.count_geowords(lattice)
-        ne_classes = gstat['ne_classes']
-        num_geowords = gstat['num_geowords']
-
-        if num_geowords >= 5 and \
-           ne_classes.get('都道府県', 0) / num_geowords >= 0.75:
-            # 都道府県リスト
-            filters.append(EntityClassFilter(r'都道府県/?.*'))
-            search_plan = "greedy"
-        elif num_geowords >= 5 and \
-                ne_classes.get('市区町村', 0) / num_geowords >= 0.75:
-            # 市区町村リスト
-            filters.append(EntityClassFilter(r'(都道府県|市区町村)/?.*'))
-            search_plan = "greedy"
-        elif num_geowords >= 5 and \
-                ne_classes.get('鉄道施設', 0) / num_geowords >= 0.75:
-            # 鉄道駅リスト
-            filters.append(EntityClassFilter(r'(市区町村|鉄道施設)/?.*'))
-            search_plan = "greedy"
-
-        if search_plan == "greedy":
-            # 地震速報や時刻表など同種の地名語が多数出現する場合
-            filters.append(GreedySearchFilter(
-                scoring_class=self.scoring_class,
-                scoring_options=self.scoring_options))
-
-        for f in filters:
-            lattice = f(lattice)
-
-        results = []
         if self.jageocoder_tree:
-            lattice = self.add_address_candidates(lattice)
+            varray = self.add_address_candidates(varray, **kwargs)
 
-        for lattice_part in self.get_processible_lattice_part(lattice):
-            if len(lattice_part) < 1:
-                continue    # 空行
-
-            results += self.ranker.get(lattice_part)
-
-        features = []
-        for result in results:
-            nodes = result['result']
-            for node in nodes:
-                features.append(node.as_geojson())
-
-        return features
-
-    def get_processible_lattice_part(self, lattice):
-        """
-        組み合わせの候補数が MAX_COMBINATIONS 未満になるように
-        ラティスの先頭部分から区切りの良い一部分を抽出するジェネレータ。
-
-        Parameters
-        ----------
-        lattice: list
-            入力となるラティス表現。
-
-        Return
-        ------
-        list
-            先頭部分から切り出した部分的なラティス表現。
-
-        Note
-        ----
-        この関数はジェネレータなので yield で返します。
-        """
-        pos_from = 0
-        pos_to = len(lattice)
-
-        while pos_from < len(lattice):
-            lattice_part = lattice[pos_from:pos_to]
-            if pos_to - pos_from == 1 or \
-                    self.ranker.count_combinations(
-                        lattice_part) < MAX_COMBINATIONS:
-                logger.debug("--- pos {} - {}".format(pos_from, pos_to))
-                for i in range(pos_from, pos_to):
-                    nodes = lattice[i]
-                    logger.debug("{}:'{}' has {} nodes".format(
-                        i, nodes[0].surface, len(nodes)))
-                logger.debug("---")
-                yield lattice_part
-
-                pos_from = pos_to
-                pos_to = len(lattice)
-                continue
-
-            # 組み合わせ数が多すぎるので分割する
-            eliminated = False
-
-            # 句点で分割してみる
-            for i in range(pos_from, pos_to - 1):
-                node = lattice[i][0]  # i 番目のノード集合の先頭
-                if node.node_type != Node.ADDRESS and \
-                        node.morphemes['subclass1'] == '句点':
-                    pos_to = i + 1
-                    eliminated = True
-                    break
-
-            if eliminated:
-                continue
-
-            # 改行で分割してみる
-            for i in range(pos_from, pos_to - 1):
-                node = lattice[i][0]  # i 番目のノード集合の先頭
-                if node.node_type != Node.ADDRESS and \
-                    self._check_word(node.morphemes,
-                                     {'pos': '記号',
-                                      'subclass1': '制御コード',
-                                      'subclass2': '改行'}):
-                    pos_to = i + 1
-                    eliminated = True
-                    break
-
-            if eliminated:
-                continue
-
-            # 記号で分割してみる
-            for i in range(pos_from, pos_to - 1):
-                node = lattice[i][0]  # i 番目のノード集合の先頭
-                if node.node_type != Node.ADDRESS and \
-                    self._check_word(node.morphemes,
-                                     {'pos': '記号',
-                                      'subclass1': '一般'}) and \
-                        node.surface in ('／/★●○◎■□◇'):
-                    pos_to = i + 1
-                    eliminated = True
-                    break
-
-            if eliminated:
-                continue
-
-            # 読点で分割してみる
-            for i in range(pos_from, pos_to - 1):
-                node = lattice[i][0]  # i 番目のノード集合の先頭
-                if node.node_type != Node.ADDRESS and \
-                        node.morphemes['subclass1'] == '読点':
-                    pos_to = i + 1
-                    eliminated = True
-                    break
-
-            if eliminated:
-                continue
-
-            # 半分にする、ただし住所表現は分割しない
-            i = pos_from
-            while i < pos_to:
-                logger.debug(
-                    '半分 i={i}, pos_from={pos_from}, pos_to={pos_to}'.format(
-                        i=i, pos_from=pos_from, pos_to=pos_to))
-                if i >= pos_from + int((pos_to - pos_from) / 2):
-                    pos_to = i
-                    break
-
-                has_non_address_node = False
-                for node in lattice[i]:
-                    if node.node_type != Node.ADDRESS:
-                        has_non_address_node = True
-                        break
-
-                node_width = 1
-                if has_non_address_node:
-                    # 住所ノード以外も保存されている場合
-                    for node in lattice[i]:
-                        if isinstance(node.morphemes, list):
-                            # 住所ノードは複数の形態素を含む
-                            node_width = len(node.morphemes)
-                            break
-
-                i += node_width
-
-
-class Statistics(object):
-
-    @staticmethod
-    def count_geowords(lattice):
-        """
-        ラティス表現を高速に粗く解析し、
-        地名語候補を含む形態素の数や ne_class の分布などを集計します。
-
-        詳細な解析を行うためのプランを決定する前処理として利用します。
-
-        Parameters
-        ----------
-        lattice: list
-            ラティス表現。
-
-        Returns
-        -------
-        dict
-            以下の要素を含む集計結果を返します。
-
-            num_geowords: int
-                地名語候補を1つ以上含む形態素ノードの数。
-            num_addresses: int
-                住所候補を1つ以上含む形態素ノードの数。
-            ne_classes: dict
-                固有名クラスをキー、そのクラスの地名語を1つ以上含む
-                形態素ノードの数を値とする dict。
-
-        Examples
-        --------
-        >>> import pygeonlp.api as api
-        >>> api.init()
-        >>> parser = api.parser.Parser()
-        >>> api.parser.Statistics.count_geowords(parser.analyze_sentence('国会議事堂前まで歩きました。'))
-        {'num_geowords': 1, 'num_addresses': 0,
-            'ne_classes': {'鉄道施設/鉄道駅': 1, '鉄道施設': 1}}
-        """
-        num_geowords = 0
-        num_addresses = 0
-        ne_classes = {}
-        for nodes in lattice:
-            contains_geoword = False
-            contains_address = False
-            ne_list = []
-            for node in nodes:
-                if node.node_type == Node.NORMAL:
-                    continue
-
-                if node.node_type == Node.ADDRESS:
-                    contains_address = True
-                    continue
-
-                if node.node_type == Node.GEOWORD:
-                    contains_geoword = True
-                    ne_class = node.prop.get('ne_class', None)
-                    if ne_class:
-                        ne_list.append(ne_class)
-
-            if contains_geoword:
-                num_geowords += 1
-
-            if contains_address:
-                num_addresses += 1
-
-            for ne in set(ne_list):
-                if ne in ne_classes:
-                    ne_classes[ne] += 1
-                else:
-                    ne_classes[ne] = 1
-
-                if '/' not in ne:
-                    continue
-
-                ne_basic = ne[0: ne.find('/')]
-                if ne_basic in ne_classes:
-                    ne_classes[ne_basic] += 1
-                else:
-                    ne_classes[ne_basic] = 1
-
-        return {
-            "num_geowords": num_geowords,
-            "num_addresses": num_addresses,
-            "ne_classes": ne_classes,
-        }
+        return varray

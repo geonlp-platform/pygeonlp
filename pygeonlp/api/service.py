@@ -2,12 +2,12 @@ from collections.abc import Iterable
 from logging import getLogger
 import os
 import re
+from typing import Optional, Union
 
 from pygeonlp import capi
 
 from pygeonlp.api.dictionary import Dictionary
 from pygeonlp.api.metadata import Metadata
-from pygeonlp.api.parser import Parser
 
 logger = getLogger(__name__)
 
@@ -21,13 +21,7 @@ class ServiceError(RuntimeError):
 
 class Service(object):
     """
-    GeoNLP API を提供するサービスクラスです。
-
-    pygeonlp.api.init() を実行すると、このクラスのインスタンスが
-    _default_service として作成されて利用されます。
-
-    異なる辞書を利用する複数のサービスを並行して利用したい場合などは
-    Service のインスタンスを複数作成し、それぞれのメソッドを呼びだしてください。
+    文の解析や地名語の検索機能を提供する低水準APIサービスクラスです。
 
     Attributes
     ----------
@@ -40,13 +34,15 @@ class Service(object):
         このサービスが利用するデータベースディレクトリのパス。
     """
 
-    def __init__(self, db_dir=None, geoword_rules={}, **options):
+    def __init__(self,
+                 db_dir: Union[str, bytes, os.PathLike, None] = None,
+                 geoword_rules: dict = {}, **options):
         """
         このサービスが利用する辞書や、各種設定を初期化します。
 
         Parameters
         ----------
-        db_dir : str, optional
+        db_dir : PathLike, optional
             利用するデータベースディレクトリのパス。
             省略した場合は ``api.get_db_dir()`` で決定します。
         geoword_rules: dict, optional
@@ -56,8 +52,44 @@ class Service(object):
 
         Notes
         -----
-        geoword_rules, options の詳細およびデフォルト値は
-        ``pygeonlp.api.init()`` を参照してください。
+        地名語抽出ルールとして指定できる項目は以下の通りです。
+
+        suffix : list of str
+            地名接尾語を定義します。通常、一般名詞などの前に地名がくる場合、
+            地名修飾語として解析されます。
+            例：千代田区立 -> 千代田（名詞・固有名詞・地名語）＋区立（名詞・一般）
+
+            地名接尾語として「立」を定義すると、
+            千代田区（名詞・固有名詞・地名語）＋立（名詞・接尾・地名語）と
+            解析されるようになります。
+            地名接尾辞は "立,リツ,リツ" のように表層形、読み、発音を
+            カンマで区切った文字列として定義してください。
+            デフォルト値は ["前,マエ,マエ", "内,ナイ,ナイ", "立,リツ,リツ",
+            "境,サカイ,サカイ", "東,ヒガシ,ヒガシ", "西,ニシ,ニシ",
+            "南,ミナミ,ミナミ", "北,キタ,キタ"] です。
+
+        excluded_word : list of str
+            非地名語を定義します。
+            地名解析辞書に登録されている語は地名語として解析されます。
+            例：本部に行く -> 本部（名詞・固有名詞・地名語）＋に（助詞）……
+            しかし特定の語を地名語として解析したくない場合は非地名語として
+            定義してください。
+            デフォルト値は ["本部","一部","月"] です。
+
+
+        その他の解析オプションは以下の通りです。
+
+        address_class : str
+            住所要素とみなす固有名クラスを正規表現で指定します。
+            たとえば固有名クラスが「都道府県」である地名語から始まる住所表記だけを
+            住所として解析したい（市区町村から始まる場合は無視したい）場合は
+            r"^都道府県" を指定します。
+            デフォルト値は r"^(都道府県|市区町村|行政地域|居住地名)(/.+|)" です。
+
+        system_dic_dir : str
+            MeCab システム辞書のディレクトリを指定します。
+            省略した場合はデフォルトのシステム辞書を利用します。
+
         """
         self._dict_cache = {}
         self.options = options
@@ -248,63 +280,6 @@ class Service(object):
             results[k] = self._add_dict_identifier(w)
 
         return results
-
-    def getDictionary(self, id_or_identifier):
-        """
-        指定した id または identifier を持つ辞書のメタデータを返します。
-        id, identifier に一致する辞書が存在しない場合は None を返します。
-
-        Parameters
-        ----------
-        id_or_identifier : str or int
-            str の場合は辞書 identifier で指定。
-            int の場合は内部辞書 id で指定。
-
-        Returns
-        -------
-        Metadata
-            Metadata インスタンス。
-
-        Examples
-        --------
-        >>> from pygeonlp.api.service import Service
-        >>> service = Service()
-        >>> service.getDictionary('geonlp:ksj-station-N02')
-        {"@context": "https://schema.org/", "@type": "Dataset", "alternateName": "", "creator": [{"@type": "Organization", "name": "株式会社情報試作室", "sameAs": "https://www.info-proto.com/"}], "dateModified": "2021-08-27T17:18:18+09:00", "description": "国土数値情報「鉄道データ（N02）」から作成した、日本の鉄道駅（地下鉄を含む）の辞書です。hypernym には運営者名と路線名を記載しています。「都営」ではなく「東京都」のようになっていますので注意してください。自由フィールドとして、railway_classに「鉄道区分」、institution_typeに「事業者種別」を含みます。", "distribution": [{"@type": "DataDownload", "contentUrl": "https://www.info-proto.com/static/ksj-station-N02.csv", "encodingFormat": "text/csv"}], "identifier": ["geonlp:ksj-station-N02"], "isBasedOn": {"@type": "CreativeWork", "name": "国土数値情報 鉄道データ", "url": "https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N02-v2_2.html"}, "keywords": ["GeoNLP", "地名辞書"], "license": "https://creativecommons.org/licenses/by/4.0/", "name": "国土数値情報 鉄道データ（駅）", "size": "10191", "spatialCoverage": {"@type": "Place", "geo": {"@type": "GeoShape", "box": "26.193265 127.652285 45.41616333333333 145.59723"}}, "temporalCoverage": "../..", "url": "https://www.info-proto.com/static/ksj-station-N02.html"}
-        """
-        self._check_initialized()
-        if id_or_identifier is None:
-            return self.capi_ma.getDictionaryList()
-
-        jsonld = self.capi_ma.getDictionaryInfo(id_or_identifier)
-        if jsonld:
-            return Metadata(jsonld)
-
-        return None
-
-    def getDictionaries(self):
-        """
-        インストール済み辞書のメタデータ一覧を返します。
-
-        Returns
-        -------
-        list
-            Metadata インスタンスのリスト。
-
-        Examples
-        --------
-        >>> from pygeonlp.api.service import Service
-        >>> service = Service()
-        >>> sorted([x.get_identifier() for x in service.getDictionaries()])
-        ['geonlp:geoshape-city', 'geonlp:geoshape-pref', 'geonlp:ksj-station-N02']
-        """
-        self._check_initialized()
-        dictionaries = []
-        for id, metadata in self.capi_ma.getDictionaryList().items():
-            # metadata['_internal_id'] = int(id)
-            dictionaries.append(Metadata(metadata))
-
-        return dictionaries
 
     def getActiveDictionaries(self):
         """
@@ -588,258 +563,6 @@ class Service(object):
 
         self.capi_ma.setActiveClasses(patterns)
 
-    def clearDatabase(self):
-        """
-        データベースに登録されている辞書をクリアします。
-        データベース内の地名語も全て削除されます。
-
-        この関数は、データベースを作り直す際に利用します。
-
-        Examples
-        --------
-        >>> from pygeonlp.api.service import Service
-        >>> service = Service()
-        >>> service.clearDatabase()
-        True
-        >>> service.addDictionaryFromWeb(
-        ...   'https://geonlp.ex.nii.ac.jp/dictionary/geoshape-city/')
-        True
-        >>> service.updateIndex()
-        True
-        """
-        self._check_initialized()
-        return self.capi_ma.clearDatabase()
-
-    def addDictionaryFromFile(self, jsonfile, csvfile):
-        """
-        指定したパスにある辞書メタデータ（JSONファイル）と
-        地名解析辞書（CSVファイル）をデータベースに登録します。
-
-        既に同じ identifier を持つ辞書データがデータベースに登録されている場合、
-        削除してから新しい辞書データを登録します。
-
-        登録した辞書を利用可能にするには、 ``setActivateDictionaries()``
-        または ``activateDictionaires()`` で有効化する必要があります。
-
-        Parameters
-        ----------
-        jsonfile : str
-            辞書メタデータファイルのパス。
-        csvfile : str
-            地名解析辞書ファイルのパス。
-
-        Returns
-        -------
-        bool
-            常に True。登録に失敗した場合は例外が発生します。
-
-        Examples
-        --------
-        >>> from pygeonlp.api.service import Service
-        >>> service = Service()
-        >>> service.addDictionaryFromFile(
-        ...   'base_data/geoshape-city.json', 'base_data/geoshape-city.csv')
-        True
-        >>> service.updateIndex()
-        True
-        """
-        self._check_initialized()
-        if not isinstance(jsonfile, str) or not isinstance(csvfile, str):
-            raise TypeError("jsonfile と csvfile は str で指定してください。")
-
-        dic = Dictionary.load(jsonfile, csvfile)
-        new_identifier = dic.get_identifier()
-        if self.getDictionary(new_identifier):
-            self.removeDictionary(new_identifier)
-
-        return dic.add(self.capi_ma)
-
-    def addDictionaryFromWeb(self, url, params=None, **kwargs):
-        """
-        指定した URL にあるページに含まれる辞書メタデータ（JSON-LD）を取得し、
-        メタデータに記載されている URL から地名解析辞書（CSVファイル）を取得し、
-        データベースに登録します。
-
-        既に同じ identifier を持つ辞書データがデータベースに登録されている場合、
-        削除してから新しい辞書データを登録します。
-
-        登録した辞書を利用可能にするには、 ``setActivateDictionaries()``
-        または ``activateDictionaires()`` で有効化する必要があります。
-
-        Parameters
-        ----------
-        url : str
-            辞書メタデータを含むウェブページの URL。
-        params : dict, optional
-            requests.get に渡す params パラメータ。
-        **kwargs : dict, optional
-            requests.get に渡す kwargs パラメータ。
-
-        Returns
-        -------
-        bool
-            常に True。登録に失敗した場合は例外が発生します。
-
-        Examples
-        --------
-        >>> from pygeonlp.api.service import Service
-        >>> service = Service()
-        >>> service.clearDatabase()
-        True
-        >>> service.addDictionaryFromWeb('https://geonlp.ex.nii.ac.jp/dictionary/geoshape-city/')
-        True
-        >>> service.updateIndex()
-        True
-        """
-        self._check_initialized()
-        dic = Dictionary.download(url, params, **kwargs)
-        new_identifier = dic.get_identifier()
-        if self.getDictionary(new_identifier):
-            self.removeDictionary(new_identifier)
-
-        return dic.add(self.capi_ma)
-
-    def addDictionaryFromCsv(self, csvfile, name=None, identifier=None):
-        """
-        指定したパスにある地名解析辞書（CSVファイル）をデータベースに登録します。
-
-        辞書の name と identifier を省略した場合、
-        CSV ファイル名から自動的に設定されます。
-
-        既に同じ identifier を持つ辞書データがデータベースに登録されている場合、
-        削除してから新しい辞書データを登録します。
-
-        登録した辞書を利用可能にするには、 ``setActivateDictionaries()``
-        または ``activateDictionaries()`` で有効化する必要があります。
-
-        Parameters
-        ----------
-        csvfile : str
-            地名解析辞書ファイルのパス。
-        name : str, optional
-            辞書名。省略した場合、 CSV ファイルの basename を利用します。
-        identifier : str, optional
-            辞書 identifier。省略した場合、 CSV ファイルの basename を取り、
-            ``geonlp:<basename>`` を利用します。
-
-        Returns
-        -------
-        bool
-            常に True。登録に失敗した場合は例外が発生します。
-
-        Examples
-        --------
-        >>> from pygeonlp.api.service import Service
-        >>> service = Service()
-        >>> service.addDictionaryFromCsv(
-        ...   'base_data/ksj-station-N02-2020.csv',
-        ...   name='日本の鉄道駅（2020年）')
-        True
-        >>> service.updateIndex()
-        True
-        >>> service.activateDictionaries(['geonlp:ksj-station-N02-2020'])
-        ['geonlp:ksj-station-N02-2020']
-        """
-        self._check_initialized()
-        if not isinstance(csvfile, str):
-            raise TypeError("csvfile は str で指定してください。")
-
-        dic = Dictionary.create(csvfile, name, identifier)
-        new_identifier = dic.get_identifier()
-        if self.getDictionary(new_identifier):
-            self.removeDictionary(new_identifier)
-
-        return dic.add(self.capi_ma)
-
-    def saveDictionaryFromWeb(self, jsonfile, csvfile, url,
-                              params=None, **kwargs):
-        """
-        指定した URL にあるページに含まれる辞書メタデータ（JSON-LD）を取得し、
-        メタデータに記載されている URL から地名解析辞書（CSVファイル）を取得し、
-        指定されたファイルに保存します。
-
-        Parameters
-        ----------
-        jsonfile : str
-            json-ld を保存するファイル名。
-        csvfile : str
-            CSV データを保存するファイル名。
-        url : str
-            辞書メタデータを含むウェブページの URL。
-        params : dict, optional
-            requests.get に渡す params パラメータ。
-        **kwargs : dict, optional
-            requests.get に渡す kwargs パラメータ。
-
-        Returns
-        -------
-        bool
-            常に True。ダウンロードに失敗した場合は例外が発生します。
-
-        Examples
-        --------
-        >>> from pygeonlp.api.service import Service
-        >>> service = Service()
-        >>> service.saveDictionaryFromWeb('geoshape.json', 'geoshape.csv', 'https://geonlp.ex.nii.ac.jp/dictionary/geoshape-city/')
-        True
-        >>> import os
-        >>> os.remove('geoshape.json')
-        >>> os.remove('geoshape.csv')
-        """
-        self._check_initialized()
-        dic = Dictionary.download(url, params, **kwargs)
-        return dic.save(jsonfile, csvfile)
-
-    def removeDictionary(self, identifier):
-        """
-        identifier で指定した辞書をデータベースから削除します。
-
-        Parameters
-        ----------
-        identifier : str
-            辞書の identifier ("geonlp:xxxxx")。
-
-        Returns
-        -------
-        bool
-            常に True。
-
-        Raises
-        ------
-        RuntimeError
-            指定した辞書が登録されていない場合は RUntimeError が発生します。
-
-        Examples
-        --------
-        >>> from pygeonlp.api.service import Service
-        >>> service = Service()
-        >>> service.removeDictionary('geonlp:geoshape-city')
-        True
-        >>> service.updateIndex()
-        True
-        """
-        self._check_initialized()
-        ret = self.capi_ma.removeDictionary(identifier)
-        return ret
-
-    def updateIndex(self):
-        """
-        辞書のインデックスを更新して検索可能にします。
-
-        Examples
-        --------
-        >>> from pygeonlp.api.service import Service
-        >>> service = Service()
-        >>> service.clearDatabase()
-        True
-        >>> service.addDictionaryFromWeb('https://geonlp.ex.nii.ac.jp/dictionary/geoshape-city/')
-        True
-        >>> service.updateIndex()
-        True
-        """
-        self._check_initialized()
-        return self.capi_ma.updateIndex()
-
     def _check_initialized(self):
         """
         capi オブジェクトが初期化されていることを確認します。
@@ -867,86 +590,3 @@ class Service(object):
 
         word['dictionary_identifier'] = identifier
         return word
-
-    def analyze(self, sentence, **kwargs):
-        """
-        文を解析した結果をラティス表現で返します。
-
-        Parameters
-        ----------
-        sentence : str
-            解析するテキスト。
-
-        Returns
-        -------
-        list
-            解析結果のラティス表現。
-
-        Examples
-        --------
-        >>> from pygeonlp.api.service import Service
-        >>> service = Service()
-        >>> service.analyze('今日は国会議事堂前まで歩きました。')
-        [[{"surface": "今日", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "今日", "pos": "名詞", "prononciation": "キョー", "subclass1": "副詞可能", "subclass2": "*", "subclass3": "*", "surface": "今日", "yomi": "キョウ"}, "geometry": null, "prop": null}], [{"surface": "は", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "は", "pos": "助詞", "prononciation": "ワ", "subclass1": "係助詞", "subclass2": "*", "subclass3": "*", "surface": "は", "yomi": "ハ"}, "geometry": null, "prop": null}], [{"surface": "国会議事堂前", "node_type": "GEOWORD", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "国会議事堂前", "pos": "名詞", "prononciation": "", "subclass1": "固有名詞", "subclass2": "地名語", "subclass3": "Bn4q6d:国会議事堂前駅", "surface": "国会議事堂前", "yomi": ""}, "geometry": {"type": "Point", "coordinates": [139.74534166666666, 35.674845]}, "prop": {"body": "国会議事堂前", "dictionary_id": 3, "entry_id": "LrGGxY", "geolod_id": "Bn4q6d", "hypernym": ["東京地下鉄", "4号線丸ノ内線"], "institution_type": "民営鉄道", "latitude": "35.674845", "longitude": "139.74534166666666", "ne_class": "鉄道施設/鉄道駅", "railway_class": "普通鉄道", "suffix": ["駅", ""], "dictionary_identifier": "geonlp:ksj-station-N02"}}, {"surface": "国会議事堂前", "node_type": "GEOWORD", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "国会議事堂前", "pos": "名詞", "prononciation": "", "subclass1": "固有名詞", "subclass2": "地名語", "subclass3": "cE8W4w:国会議事堂前駅", "surface": "国会議事堂前", "yomi": ""}, "geometry": {"type": "Point", "coordinates": [139.74305333333334, 35.673543333333335]}, "prop": {"body": "国会議事堂前", "dictionary_id": 3, "entry_id": "4NFELa", "geolod_id": "cE8W4w", "hypernym": ["東京地下鉄", "9号線千代田線"], "institution_type": "民営鉄道", "latitude": "35.673543333333335", "longitude": "139.74305333333334", "ne_class": "鉄道施設/鉄道駅", "railway_class": "普通鉄道", "suffix": ["駅", ""], "dictionary_identifier": "geonlp:ksj-station-N02"}}], [{"surface": "まで", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "まで", "pos": "助詞", "prononciation": "マデ", "subclass1": "副助詞", "subclass2": "*", "subclass3": "*", "surface": "まで", "yomi": "マデ"}, "geometry": null, "prop": null}], [{"surface": "歩き", "node_type": "NORMAL", "morphemes": {"conjugated_form": "五段・カ行イ音便", "conjugation_type": "連用形", "original_form": "歩く", "pos": "動詞", "prononciation": "アルキ", "subclass1": "自立", "subclass2": "*", "subclass3": "*", "surface": "歩き", "yomi": "アルキ"}, "geometry": null, "prop": null}], [{"surface": "まし", "node_type": "NORMAL", "morphemes": {"conjugated_form": "特殊・マス", "conjugation_type": "連用形", "original_form": "ます", "pos": "助動詞", "prononciation": "マシ", "subclass1": "*", "subclass2": "*", "subclass3": "*", "surface": "まし", "yomi": "マシ"}, "geometry": null, "prop": null}], [{"surface": "た", "node_type": "NORMAL", "morphemes": {"conjugated_form": "特殊・タ", "conjugation_type": "基本形", "original_form": "た", "pos": "助動詞", "prononciation": "タ", "subclass1": "*", "subclass2": "*", "subclass3": "*", "surface": "た", "yomi": "タ"}, "geometry": null, "prop": null}], [{"surface": "。", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "。", "pos": "記号", "prononciation": "。", "subclass1": "句点", "subclass2": "*", "subclass3": "*", "surface": "。", "yomi": "。"}, "geometry": null, "prop": null}]]
-
-        Notes
-        -----
-        ラティス表現では全ての地名語の候補を列挙して返します。
-        """
-        jageocoder = kwargs.get('jageocoder', None)
-        address_regex = self.options.get('address_regex', None)
-        parser = Parser(service=self, jageocoder=jageocoder,
-                        address_regex=address_regex)
-        varray = parser.analyze_sentence(sentence, **kwargs)
-
-        if jageocoder:
-            varray = parser.add_address_candidates(varray, **kwargs)
-
-        return varray
-
-    def geoparse(self, sentence, jageocoder=None, filters=None,
-                 scoring_class=None, scoring_options=None):
-        """
-        文を解析した結果を GeoJSON Feature 形式に変換可能な dict のリストを返します。
-
-        Parameters
-        ----------
-        sentence : str
-            解析する文字列。
-        jageocoder : bool, optional
-            住所ジオコーダを利用する場合 True を指定します。
-            False または省略した場合は利用しません。
-        filters : list, optional
-            強制的に適用する Filter インスタンスのリスト。
-        scoring_class : class, optional
-            パスのスコアとノード間のスコアを計算するメソッドをもつ
-            スコアリングクラス。
-            省略した場合は ``scoring.ScoringClass`` を利用します。
-        scoring_options : any, optional
-            スコアリングクラスの初期化に渡すオプションパラメータ。
-
-        Returns
-        -------
-        list
-            形態素で分割した各要素のジオメトリや形態素情報、地名語情報を
-            GeoJSON Feature 形式に変換可能な dict で表現し、
-            そのリストを返します。
-
-        Examples
-        --------
-        >>> import json
-        >>> from pygeonlp.api.service import Service
-        >>> service = Service()
-        >>> json.dumps({'type':'FeatureCollection', 'features':service.geoparse('今日は 国会議事堂前まで歩きました。')}, ensure_ascii=False)
-        '{"type": "FeatureCollection", "features": [{"type": "Feature", "geometry": null, "properties": {"surface": "今日", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "今日", "pos": "名詞", "prononciation": "キョー", "subclass1": "副詞可能", "subclass2": "*", "subclass3": "*", "surface": "今日", "yomi": "キョウ"}}}, {"type": "Feature", "geometry": null, "properties": {"surface": "は", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "は", "pos": "助詞", "prononciation": "ワ", "subclass1": "係助詞", "subclass2": "*", "subclass3": "*", "surface": "は", "yomi": "ハ"}}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [139.74305333333334, 35.673543333333335]}, "properties": {"surface": "国会議事堂前", "node_type": "GEOWORD", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "国会議事堂前", "pos": "名詞", "prononciation": "", "subclass1": "固有名詞", "subclass2": "地名語", "subclass3": "cE8W4w:国会議事堂前駅", "surface": "国会議事堂前", "yomi": ""}, "geoword_properties": {"body": "国会議事堂前", "dictionary_id": 3, "entry_id": "4NFELa", "geolod_id": "cE8W4w", "hypernym": ["東京地下鉄", "9号線千代田線"], "institution_type": "民営鉄道", "latitude": "35.673543333333335", "longitude": "139.74305333333334", "ne_class": "鉄道施設/鉄道駅", "railway_class": "普通鉄道", "suffix": ["駅", ""], "dictionary_identifier": "geonlp:ksj-station-N02"}}}, {"type": "Feature", "geometry": null, "properties": {"surface": "まで", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "まで", "pos": "助詞", "prononciation": "マデ", "subclass1": "副助詞", "subclass2": "*", "subclass3": "*", "surface": "まで", "yomi": "マデ"}}}, {"type": "Feature", "geometry": null, "properties": {"surface": "歩き", "node_type": "NORMAL", "morphemes": {"conjugated_form": "五段・カ行イ音便", "conjugation_type": "連用形", "original_form": "歩く", "pos": "動詞", "prononciation": "アルキ", "subclass1": "自立", "subclass2": "*", "subclass3": "*", "surface": "歩き", "yomi": "アルキ"}}}, {"type": "Feature", "geometry": null, "properties": {"surface": "まし", "node_type": "NORMAL", "morphemes": {"conjugated_form": "特殊・マス", "conjugation_type": "連用形", "original_form": "ます", "pos": "助動詞", "prononciation": "マシ", "subclass1": "*", "subclass2": "*", "subclass3": "*", "surface": "まし", "yomi": "マシ"}}}, {"type": "Feature", "geometry": null, "properties": {"surface": "た", "node_type": "NORMAL", "morphemes": {"conjugated_form": "特殊・タ", "conjugation_type": "基本形", "original_form": "た", "pos": "助動詞", "prononciation": "タ", "subclass1": "*", "subclass2": "*", "subclass3": "*", "surface": "た", "yomi": "タ"}}}, {"type": "Feature", "geometry": null, "properties": {"surface": "。", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "。", "pos": "記号", "prononciation": "。", "subclass1": "句点", "subclass2": "*", "subclass3": "*", "surface": "。", "yomi": "。"}}}]}'
-
-        Notes
-        -----
-        このメソッドは解析結果から適切なフィルタを判断し、候補の絞り込みやランキングを行ないます。
-        """
-        address_regex = self.options.get('address_class', None)
-        parser = Parser(service=self, jageocoder=jageocoder,
-                        address_regex=address_regex,
-                        scoring_class=scoring_class,
-                        scoring_options=scoring_options)
-        return parser.geoparse(sentence, filters)

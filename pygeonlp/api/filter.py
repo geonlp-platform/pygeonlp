@@ -42,12 +42,13 @@ class Filter(object):
 
     def apply(self, input, **kwargs):
         """
-        入力データの各候補ノードに対して ``filter_func()`` を適用し、
+        入力データの各形態素に対して ``apply_filter()`` を適用し、
         合格したノードだけを残した結果を返します。
 
-        この実装では、各候補ノードに含まれる情報のみを利用してフィルタ処理を行なうため、
-        前後の形態素を見て判定する必要があるフィルタクラスでは、このメソッドを
-        上書きする必要があります。
+        ``apply_filter()`` では一つの形態素に対応する候補ノードの
+        リストに含まれる情報のみを利用してフィルタ処理を行なうため、
+        前後の形態素を見て判定する必要があるフィルタクラスでは、
+        ``apply()`` メソッドを上書きする必要があります。
 
         Parameters
         ----------
@@ -62,7 +63,7 @@ class Filter(object):
         output = [None] * len(input)
         for i in range(len(input)):
             candidates = input[i]
-            output[i] = self._apply_filter(candidates, **kwargs)
+            output[i] = self.apply_filter(candidates, **kwargs)
 
             if len(output[i]) > 0:
                 continue
@@ -104,7 +105,7 @@ class Filter(object):
 
         return output
 
-    def _apply_filter(self, candidates, default=None, **kwargs):
+    def apply_filter(self, candidates, default=None, **kwargs):
         '''
         ラティス表現の1つの形態素に対する複数の候補ノードに対して
         順番に ``filter_func()`` を適用し、条件に一致しないノードを
@@ -112,6 +113,12 @@ class Filter(object):
 
         default で指定された地名語 ID を持つノードが条件に一致した場合、
         結果候補ノードリストの先頭に配置します。
+
+        ``filter_func()`` では個々の候補ノードに含まれる情報のみを
+        利用してフィルタへの合否判定処理を行なうため、
+        1つの形態素に対する候補ノードを比較して最適なものを
+        選択する必要があるフィルタクラスでは、
+        ``apply_filter()`` メソッドを上書きする必要があります。
 
         Parameters
         ----------
