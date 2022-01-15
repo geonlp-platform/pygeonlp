@@ -6,6 +6,8 @@ import unittest
 
 import pygeonlp.api as api
 
+logger = logging.getLogger(__name__)
+
 """
 doc_string に書かれているサンプルコードを doctest で検証するテスト。
 

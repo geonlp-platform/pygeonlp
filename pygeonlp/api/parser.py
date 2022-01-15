@@ -5,7 +5,6 @@ import re
 import jageocoder as _jageocoder
 from jageocoder.itaiji import converter as itaiji_converter
 
-from pygeonlp.api.filter import EntityClassFilter, GreedySearchFilter
 from pygeonlp.api.node import Node
 from pygeonlp.api.service import Service
 
@@ -628,7 +627,6 @@ class Parser(object):
         for pos in range(pos_from, len(lattice)):
 
             nodes = lattice[pos]
-            updated = False
             if len(''.join(candidate)) > limit:
                 break
 

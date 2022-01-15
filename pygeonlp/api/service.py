@@ -2,11 +2,10 @@ from collections.abc import Iterable
 from logging import getLogger
 import os
 import re
-from typing import Optional, Union
+from typing import Union
 
 from pygeonlp import capi
 
-from pygeonlp.api.dictionary import Dictionary
 from pygeonlp.api.metadata import Metadata
 
 logger = getLogger(__name__)

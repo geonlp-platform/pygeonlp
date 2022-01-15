@@ -1,11 +1,13 @@
-import json
 import logging
 import os
-from typing import Optional
+import site
+import sys
 
 from docopt import docopt
 import pygeonlp.api
 from pygeonlp.api.dict_manager import DictManager
+
+logger = logging.getLogger(__name__)
 
 HELP = """
 'pygeonlp' は、自然言語テキストを解析して地名を抽出する
@@ -51,37 +53,6 @@ Examples:
 """.format(p='pygeonlp.api')
 
 
-def _get_package_files():
-    """
-    pip list コマンドを実行し、pygeonlp パッケージとしてインストールされた
-    ファイルのフルパス一覧を取得します。
-
-    参考： https://pip.pypa.io/en/latest/user_guide/#using-pip-from-your-program
-    """
-    import subprocess
-    import pygeonlp.api
-
-    show_args = [sys.executable, '-m', 'pip', 'show', '--files', 'pygeonlp']
-    result = subprocess.check_output(show_args).decode('utf-8')
-    lines = result.split("\n")
-    files = None
-    for i, line in enumerate(lines):
-        if line.strip() == "Files:":
-            files = lines[i+1:]
-            break
-
-    if files is None:
-        raise RuntimeError("パッケージ内のファイル一覧が取得できません。")
-
-    # pygeonlp.api.__file__ は '../site-packages/pygeonlp/api/__init__.py'
-    # '../site-packages/' を base_path としてフルパスを取得する
-    base_path = os.path.abspath(
-        os.path.join(pygeonlp.api.__file__, '../../..'))
-    files = [os.path.abspath(os.path.join(base_path, x.strip()))
-             for x in files]
-    return files
-
-
 def setup_basic_database(db_dir=None, src_dir=None):
     """
     基本的な地名解析辞書を登録したデータベースを作成します。
@@ -121,7 +92,7 @@ def setup_basic_database(db_dir=None, src_dir=None):
             break
 
     if not data_dir:
-        files = _get_package_files()
+        files = DictManager.get_package_files()
         for path in files:
             pos = path.find('/pygeonlp_basedata')
             if pos < 0:

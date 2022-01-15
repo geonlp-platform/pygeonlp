@@ -1,9 +1,4 @@
-import copy
 import logging
-import re
-
-import jageocoder as _jageocoder
-from jageocoder.itaiji import converter as itaiji_converter
 
 from pygeonlp.api.parser import Parser
 from pygeonlp.api.filter import EntityClassFilter, GreedySearchFilter

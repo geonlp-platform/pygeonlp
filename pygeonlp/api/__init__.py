@@ -1,14 +1,12 @@
 from logging import getLogger
 import os
-import site
-import sys
 import warnings
 
 from deprecated import deprecated
 import jageocoder
 
 from pygeonlp.api.dict_manager import DictManager
-from pygeonlp.api.workflow import Workflow
+from pygeonlp.api.workflow import Workflow, WorkflowError
 
 logger = getLogger(__name__)
 _default_workflow = None
@@ -572,7 +570,7 @@ def _check_initialized():
         init() を呼ぶ前に API メソッドを利用しようとすると発生します。
     """
     if _default_workflow is None:
-        raise ServiceError("APIが初期化されていません。")
+        raise WorkflowError("APIが初期化されていません。")
 
 
 def getActiveDictionaries():

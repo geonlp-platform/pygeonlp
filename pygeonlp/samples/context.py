@@ -11,17 +11,10 @@ from pygeonlp.api.linker import Evaluator
 from pygeonlp.api.filter import Filter
 from pygeonlp.api.node import Node
 from pygeonlp.api.scoring import ScoringClass
-from pygeonlp.api.spatial_filter import SpatialFilter, GeoContainsFilter
+from pygeonlp.api.spatial_filter import GeoContainsFilter
 from pygeonlp.api.workflow import Workflow
 
 logger = getLogger(__name__)
-
-try:
-    from osgeo import ogr
-except ModuleNotFoundError:
-    raise FilterError((
-        "SpatialFilter を利用するには 'gdal' パッケージを"
-        "インストールしてください。"))
 
 
 class Context(object):
@@ -287,7 +280,6 @@ class ContextWorkflow(Workflow):
 
 
 if __name__ == '__main__':
-    import json
     import logging
     from pygeonlp.api.workflow import Workflow
     from pygeonlp.api.devtool import pp_geojson
