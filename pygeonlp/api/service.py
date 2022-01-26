@@ -49,8 +49,8 @@ class Service(object):
         options : dict, optional
             その他の解析オプションを指定します。
 
-        Notes
-        -----
+        Note
+        ----
         地名語抽出ルールとして指定できる項目は以下の通りです。
 
         suffix : list of str
@@ -326,8 +326,8 @@ class Service(object):
         >>> sorted([x.get_identifier() for x in service.getActiveDictionaries()])
         ['geonlp:geoshape-city', 'geonlp:geoshape-pref']
 
-        Notes
-        -----
+        Note
+        ----
         idlist と pattern のどちらかは指定する必要があります。
         """
         self._check_initialized()
@@ -390,8 +390,8 @@ class Service(object):
         >>> [x.get_identifier() for x in service.getActiveDictionaries()]
         []
 
-        Notes
-        -----
+        Note
+        ----
         idlist と pattern を同時に指定した場合、どちらか一方の条件に
         一致する辞書は除外されます。
         """
@@ -460,8 +460,8 @@ class Service(object):
         >>> [x.get_identifier() for x in service.getActiveDictionaries()]
         ['geonlp:ksj-station-N02']
 
-        Notes
-        -----
+        Note
+        ----
         idlist と pattern を同時に指定した場合、どちらか一方の条件に
         一致する辞書は利用可能になります。
         """

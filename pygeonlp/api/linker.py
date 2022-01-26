@@ -222,6 +222,7 @@ class Evaluator(object):
         """
         from .scoring import ScoringClass
         self.scoring_class = scoring_class
+        self.scoring_options = scoring_options
         self.max_results = max_results
         self.max_combinations = max_combinations
 

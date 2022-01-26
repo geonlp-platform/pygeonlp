@@ -44,8 +44,8 @@ class TemporalFilter(Filter):
         date_to : str, datetime.date, datetime.datetime, optional
             期間の終了日時。
 
-        Notes
-        -----
+        Note
+        ----
         date_to を省略した場合、 date_from が表す一時点が期間になります。
         たとえば TimeExistsFilter('2001-01-01') は、 2001年1月1日時点に
         存在していた地名語ノードを残すフィルタになります。
@@ -206,8 +206,8 @@ class TimeExistsFilter(TemporalFilter):
     ['た(NORMAL)']
     ['。(NORMAL)']
 
-    Notes
-    -----
+    Note
+    ----
     このフィルタは TimeOverlapsFilter と同じです。
     """
 
@@ -469,8 +469,8 @@ class TimeOverlapsFilter(TemporalFilter):
     ['た(NORMAL)']
     ['。(NORMAL)']
 
-    Notes
-    -----
+    Note
+    ----
     このフィルタは TimeExistsFilter と同じです。
     """
 

@@ -246,8 +246,8 @@ class Node(object):
         >>> sorted(api.analyze('国会議事堂前')[0][0].get_notations())
         ['国会議事堂前', '国会議事堂前駅']
 
-        Notes
-        -----
+        Note
+        ----
         何度も計算しないように、計算した結果は ``_attr['notations']`` に保持します。
         """
         if 'notations' in self._attr:
@@ -288,8 +288,8 @@ class Node(object):
         >>> api.analyze('国会議事堂前')[0][0].get_point_object().ExportToWkt()
         'POINT (139.745341666667 35.674845)'
 
-        Notes
-        -----
+        Note
+        ----
         ``gdal`` がインストールされていない場合は None を返します。
         何度も計算しないように、計算した結果は ``_attr['point']`` に保持します。
         """

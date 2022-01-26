@@ -85,8 +85,8 @@ def init(db_dir=None, **options):
     >>> import pygeonlp.api as api
     >>> api.init()
 
-    Notes
-    -----
+    Note
+    ----
     実際には、この関数は初期化した Workflow オブジェクト ``_default_workflow``
     および DictManager オブジェクト ``_default_manager`` を作成し、
     利用可能な状態にします。
@@ -496,25 +496,23 @@ def analyze(sentence, **kwargs):
     >>> api.analyze('今日は国会議事堂前まで歩きました。')
     [[{"surface": "今日", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "今日", "pos": "名詞", "prononciation": "キョー", "subclass1": "副詞可能", "subclass2": "*", "subclass3": "*", "surface": "今日", "yomi": "キョウ"}, "geometry": null, "prop": null}], [{"surface": "は", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "は", "pos": "助詞", "prononciation": "ワ", "subclass1": "係助詞", "subclass2": "*", "subclass3": "*", "surface": "は", "yomi": "ハ"}, "geometry": null, "prop": null}], [{"surface": "国会議事堂前", "node_type": "GEOWORD", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "国会議事堂前", "pos": "名詞", "prononciation": "", "subclass1": "固有名詞", "subclass2": "地名語", "subclass3": "Bn4q6d:国会議事堂前駅", "surface": "国会議事堂前", "yomi": ""}, "geometry": {"type": "Point", "coordinates": [139.74534166666666, 35.674845]}, "prop": {"body": "国会議事堂前", "dictionary_id": 3, "entry_id": "LrGGxY", "geolod_id": "Bn4q6d", "hypernym": ["東京地下鉄", "4号線丸ノ内線"], "institution_type": "民営鉄道", "latitude": "35.674845", "longitude": "139.74534166666666", "ne_class": "鉄道施設/鉄道駅", "railway_class": "普通鉄道", "suffix": ["駅", ""], "dictionary_identifier": "geonlp:ksj-station-N02"}}, {"surface": "国会議事堂前", "node_type": "GEOWORD", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "国会議事堂前", "pos": "名詞", "prononciation": "", "subclass1": "固有名詞", "subclass2": "地名語", "subclass3": "cE8W4w:国会議事堂前駅", "surface": "国会議事堂前", "yomi": ""}, "geometry": {"type": "Point", "coordinates": [139.74305333333334, 35.673543333333335]}, "prop": {"body": "国会議事堂前", "dictionary_id": 3, "entry_id": "4NFELa", "geolod_id": "cE8W4w", "hypernym": ["東京地下鉄", "9号線千代田線"], "institution_type": "民営鉄道", "latitude": "35.673543333333335", "longitude": "139.74305333333334", "ne_class": "鉄道施設/鉄道駅", "railway_class": "普通鉄道", "suffix": ["駅", ""], "dictionary_identifier": "geonlp:ksj-station-N02"}}], [{"surface": "まで", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "まで", "pos": "助詞", "prononciation": "マデ", "subclass1": "副助詞", "subclass2": "*", "subclass3": "*", "surface": "まで", "yomi": "マデ"}, "geometry": null, "prop": null}], [{"surface": "歩き", "node_type": "NORMAL", "morphemes": {"conjugated_form": "五段・カ行イ音便", "conjugation_type": "連用形", "original_form": "歩く", "pos": "動詞", "prononciation": "アルキ", "subclass1": "自立", "subclass2": "*", "subclass3": "*", "surface": "歩き", "yomi": "アルキ"}, "geometry": null, "prop": null}], [{"surface": "まし", "node_type": "NORMAL", "morphemes": {"conjugated_form": "特殊・マス", "conjugation_type": "連用形", "original_form": "ます", "pos": "助動詞", "prononciation": "マシ", "subclass1": "*", "subclass2": "*", "subclass3": "*", "surface": "まし", "yomi": "マシ"}, "geometry": null, "prop": null}], [{"surface": "た", "node_type": "NORMAL", "morphemes": {"conjugated_form": "特殊・タ", "conjugation_type": "基本形", "original_form": "た", "pos": "助動詞", "prononciation": "タ", "subclass1": "*", "subclass2": "*", "subclass3": "*", "surface": "た", "yomi": "タ"}, "geometry": null, "prop": null}], [{"surface": "。", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "。", "pos": "記号", "prononciation": "。", "subclass1": "句点", "subclass2": "*", "subclass3": "*", "surface": "。", "yomi": "。"}, "geometry": null, "prop": null}]]
 
-    Notes
-    -----
+    Note
+    ----
     ラティス表現では全ての地名語の候補を列挙して返します。
     """
     _check_initialized()
     return _default_workflow.parser.analyze(sentence, **kwargs)
 
 
-def geoparse(sentence, workflow=None):
+def geoparse(sentence):
     """
-    文を解析した結果を GeoJSON Feature 形式に変換可能な dict のリストを返します。
+    Default Workflow を利用して文を解析した結果を、
+    GeoJSON Feature 形式に変換可能な dict のリストとして返します。
 
     Parameters
     ----------
     sentence : str
         解析する文字列。
-    workflow : Workflow, optional
-        解析フローを制御する Workflow オブジェクト。
-        省略した場合は全てデフォルト値によるフローを利用します。
 
     Returns
     -------
@@ -531,8 +529,8 @@ def geoparse(sentence, workflow=None):
     >>> json.dumps({'type':'FeatureCollection', 'features':api.geoparse('今日は国会議事堂前まで歩きました。')}, ensure_ascii=False)
     '{"type": "FeatureCollection", "features": [{"type": "Feature", "geometry": null, "properties": {"surface": "今日", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "今日", "pos": "名詞", "prononciation": "キョー", "subclass1": "副詞可能", "subclass2": "*", "subclass3": "*", "surface": "今日", "yomi": "キョウ"}}}, {"type": "Feature", "geometry": null, "properties": {"surface": "は", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "は", "pos": "助詞", "prononciation": "ワ", "subclass1": "係助詞", "subclass2": "*", "subclass3": "*", "surface": "は", "yomi": "ハ"}}}, {"type": "Feature", "geometry": {"type": "Point", "coordinates": [139.74305333333334, 35.673543333333335]}, "properties": {"surface": "国会議事堂前", "node_type": "GEOWORD", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "国会議事堂前", "pos": "名詞", "prononciation": "", "subclass1": "固有名詞", "subclass2": "地名語", "subclass3": "cE8W4w:国会議事堂前駅", "surface": "国会議事堂前", "yomi": ""}, "geoword_properties": {"body": "国会議事堂前", "dictionary_id": 3, "entry_id": "4NFELa", "geolod_id": "cE8W4w", "hypernym": ["東京地下鉄", "9号線千代田線"], "institution_type": "民営鉄道", "latitude": "35.673543333333335", "longitude": "139.74305333333334", "ne_class": "鉄道施設/鉄道駅", "railway_class": "普通鉄道", "suffix": ["駅", ""], "dictionary_identifier": "geonlp:ksj-station-N02"}}}, {"type": "Feature", "geometry": null, "properties": {"surface": "まで", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "まで", "pos": "助詞", "prononciation": "マデ", "subclass1": "副助詞", "subclass2": "*", "subclass3": "*", "surface": "まで", "yomi": "マデ"}}}, {"type": "Feature", "geometry": null, "properties": {"surface": "歩き", "node_type": "NORMAL", "morphemes": {"conjugated_form": "五段・カ行イ音便", "conjugation_type": "連用形", "original_form": "歩く", "pos": "動詞", "prononciation": "アルキ", "subclass1": "自立", "subclass2": "*", "subclass3": "*", "surface": "歩き", "yomi": "アルキ"}}}, {"type": "Feature", "geometry": null, "properties": {"surface": "まし", "node_type": "NORMAL", "morphemes": {"conjugated_form": "特殊・マス", "conjugation_type": "連用形", "original_form": "ます", "pos": "助動詞", "prononciation": "マシ", "subclass1": "*", "subclass2": "*", "subclass3": "*", "surface": "まし", "yomi": "マシ"}}}, {"type": "Feature", "geometry": null, "properties": {"surface": "た", "node_type": "NORMAL", "morphemes": {"conjugated_form": "特殊・タ", "conjugation_type": "基本形", "original_form": "た", "pos": "助動詞", "prononciation": "タ", "subclass1": "*", "subclass2": "*", "subclass3": "*", "surface": "た", "yomi": "タ"}}}, {"type": "Feature", "geometry": null, "properties": {"surface": "。", "node_type": "NORMAL", "morphemes": {"conjugated_form": "*", "conjugation_type": "*", "original_form": "。", "pos": "記号", "prononciation": "。", "subclass1": "句点", "subclass2": "*", "subclass3": "*", "surface": "。", "yomi": "。"}}}]}'
 
-    Notes
-    -----
+    Note
+    ----
     このメソッドは、文字列の解析、フィルタによる絞り込み、
     ランキングなどの一連の処理を行ないます。
     """
@@ -616,8 +614,8 @@ def setActiveDictionaries(idlist=None, pattern=None):
     >>> sorted([x.get_identifier() for x in api.getActiveDictionaries()])
     ['geonlp:geoshape-city', 'geonlp:geoshape-pref']
 
-    Notes
-    -----
+    Note
+    ----
     idlist と pattern のどちらかは指定する必要があります。
     """
     _check_initialized()
@@ -649,8 +647,8 @@ def disactivateDictionaries(idlist=None, pattern=None):
     >>> [x.get_identifier() for x in api.getActiveDictionaries()]
     []
 
-    Notes
-    -----
+    Note
+    ----
     idlist と pattern を同時に指定した場合、どちらか一方の条件に
     一致する辞書は除外されます。
     """
@@ -683,8 +681,8 @@ def activateDictionaries(idlist=None, pattern=None):
     >>> sorted([x.get_identifier() for x in api.getActiveDictionaries()])
     ['geonlp:ksj-station-N02']
 
-    Notes
-    -----
+    Note
+    ----
     idlist と pattern を同時に指定した場合、どちらか一方の条件に
     一致する辞書は利用可能になります。
     """

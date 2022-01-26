@@ -47,10 +47,8 @@ class MyScoringClass(ScoringClass):
 
 if __name__ == '__main__':
     print("'鉄道施設' が多い候補を優先した場合。")
-    print(api.geoparse(
-        '和歌山市は晴れ。',
-        scoring_class=MyScoringClass, scoring_options='鉄道施設', ))
+    api.init(scoring_class=MyScoringClass, scoring_options='鉄道施設')
+    print(api.geoparse('和歌山市は晴れ。'))
     print("'市区町村' が多い候補を優先した場合。")
-    print(api.geoparse(
-        '和歌山市は晴れ。',
-        scoring_class=MyScoringClass, scoring_options='市区町村'))
+    api.init(scoring_class=MyScoringClass, scoring_options='市区町村')
+    print(api.geoparse('和歌山市は晴れ。'))

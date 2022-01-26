@@ -1,5 +1,18 @@
 """
 コンテキスト情報を利用した geoparsing のサンプル
+
+地理的範囲と固有名クラスごとの優先度をもつ「コンテキスト情報」を
+利用するカスタムクラスの実装例です。
+
+Usage: python context.py
+
+以下のクラスを実装し、サンプルテキストを解析した結果を表示します。
+
+- コンテキスト情報の範囲内かつ優先度０以上の固有名クラスを持つ
+  地名語だけを残す ContextFilter
+- 固有名クラスに応じてスコアを乗じる ContextScoringClass
+- ContextScoringClass を利用する ContextEvaluator
+- ContextFilter, ContextEvaluator を利用する ContextWorkflow
 """
 
 from logging import getLogger
@@ -88,20 +101,20 @@ class Context(object):
 
         if has_suffix:
             # suffix を含む場合の ne_class の優先度を取得
-            for ne_class, prob in self.priorities_with_suffix.items():
+            for ne_class, priority in self.priorities_with_suffix.items():
                 if re_ne_class.match(ne_class):
-                    return prob
+                    return priority
 
         if has_prefix:
             # prefix を含む場合の ne_class の優先度を取得
-            for ne_class, prob in self.priorities_with_prefix.items():
+            for ne_class, priority in self.priorities_with_prefix.items():
                 if re_ne_class.match(ne_class):
-                    return prob
+                    return priority
 
         # prefix, suffix を含まない場合の ne_class の優先度を取得
-        for ne_class, prob in self.priorities.items():
+        for ne_class, priority in self.priorities.items():
             if re_ne_class.match(ne_class):
-                return prob
+                return priority
 
         # 設定されていない場合は 0.5
         return 0.5
@@ -152,7 +165,7 @@ class ContextFilter(Filter):
 
     def apply_filter(self, candidates, **kwargs):
         """
-        Filter.apply_filter() をオーバーロード
+        Filter.apply_filter() をオーバーライド
 
         ラティス表現の1つの形態素に対する候補ノード集合
         candidates のうち、コンテキストの空間範囲に含まれ、
@@ -264,20 +277,6 @@ class ContextWorkflow(Workflow):
         self.filters = [ContextFilter(context)]
         self.evaluator = ContextEvaluator(context, self.max_results)
 
-    def set_filters(self, lattice):
-        """
-        利用するフィルタ集合を返します
-
-        Notes
-        -----
-        デフォルトの Workflow は解析するテキストに含まれる
-        地名語のクラスごとの出現頻度に応じて利用する
-        フィルタを追加する処理を実行します。
-        ContextWorkflow ではその処理を実行せず、
-        ContextFilter だけを利用します。
-        """
-        return self.filters
-
 
 if __name__ == '__main__':
     import logging
@@ -285,7 +284,9 @@ if __name__ == '__main__':
     from pygeonlp.api.devtool import pp_geojson
 
     logging.basicConfig(level=logging.WARNING)
-    with open('nihonkai_engan.geojson', 'r') as f:
+    with open(os.path.join(
+            os.path.dirname(__file__),
+            'nihonkai_engan.geojson'), 'r') as f:
         geojson = f.read()
 
     context_heavy_snowfall_20220113 = Context()
@@ -321,12 +322,5 @@ https://www3.nhk.or.jp/sapporo-news/20220113/7000042131.html
 １３日、これまでに運休が決まっている特急は、札幌と釧路を結ぶ「おおぞら」や稚内と旭川を結ぶ「サロベツ」など合わせて１７本に上っています。
 このほか在来線では▼函館・千歳線が札幌と新千歳空港を結ぶ快速エアポート３５本などあわせて６３本、▼函館線で３８本、▼根室線で２０本、▼室蘭線で１２本、▼釧網線で９本、▼宗谷線で９本、▼石北線で８本、▼石勝線で８本、▼学園都市線で７本が運休となっています。
 ＪＲ北海道は、今後の天候によってはさらに運休が増えるおそれもあるとしてホームページで最新の情報を確認するよう呼びかけています。
-"""
-    pp_geojson(workflow.geoparse(article))
-
-    article = """内房線1月13日 16時43分更新
-[!]運転状況
-
-    強風の影響などで、現在も木更津～安房鴨川駅間の一部列車に遅れや運休が出ています。（1月13日 15時5分掲載）
 """
     pp_geojson(workflow.geoparse(article))

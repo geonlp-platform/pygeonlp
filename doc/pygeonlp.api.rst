@@ -10,6 +10,7 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
+   pygeonlp.api.dict_manager
    pygeonlp.api.dictionary
    pygeonlp.api.filter
    pygeonlp.api.linker
@@ -20,6 +21,7 @@ Submodules
    pygeonlp.api.service
    pygeonlp.api.spatial_filter
    pygeonlp.api.temporal_filter
+   pygeonlp.api.workflow
    pygeonlp.api.devtool
 
 Module contents
