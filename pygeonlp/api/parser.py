@@ -77,6 +77,38 @@ class Parser(object):
         else:
             self.address_regex = re.compile(address_regex)
 
+    def set_jageocoder(self, jageocoder):
+        """
+        この Parser が利用する jageocoder を変更します。
+
+        Parameters
+        ----------
+        jageocoder : jageocoder.tree.AddressTree, optional
+            利用する住所ジオコーダーを指定します。省略した場合、
+            jageocoder モジュールのデフォルトオブジェクトを利用します。
+            False を指定した場合、ジオコーディング機能を利用しません。
+        """
+        from jageocoder.tree import AddressTree
+
+        if jageocoder is False:
+            self.jageocoder_tree = None
+            return
+
+        if isinstance(jageocoder, AddressTree):
+            self.jageocoder_tree = jageocoder
+            return
+
+        # jageocoder 辞書が初期化されていなければ初期化
+        if not _jageocoder.is_initialized():
+            db_dir = _jageocoder.get_db_dir(mode='r')
+            if db_dir is None:
+                raise ParseError(
+                    'jageocoder 用住所辞書が見つかりません。')
+
+            _jageocoder.init(mode='r')
+
+        self.jageocoder_tree = _jageocoder.get_module_tree()
+
     def check_word(self, word, filter):
         """
         Word の形態素情報が filter に含まれる全ての key, value と

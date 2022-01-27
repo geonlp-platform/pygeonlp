@@ -48,15 +48,14 @@ class DictManager(object):
         self.db_dir = db_dir
 
         # データベースディレクトリの存在チェック
-        if not os.path.exists(db_dir):
-            raise RuntimeError(
-                ("データベースディレクトリ {} がありません。".format(db_dir),
-                 "setup_basic_database() で作成してください。"))
+        if os.path.exists(db_dir):
+            self.init_capi_ma()
 
-        # capi.ma 用のオプションを構築
-        capi_options = {'data_dir': str(db_dir)}
-
-        self.capi_ma = capi.MA(capi_options)
+    def init_capi_ma(self):
+        # capi_ma オブジェクトを作成
+        if self.capi_ma is None:
+            capi_options = {'data_dir': str(self.db_dir)}
+            self.capi_ma = capi.MA(capi_options)
 
     def getDictionary(self, id_or_identifier):
         """
@@ -376,7 +375,8 @@ class DictManager(object):
         import subprocess
         import pygeonlp.api
 
-        show_args = [sys.executable, '-m', 'pip', 'show', '--files', 'pygeonlp']
+        show_args = [sys.executable, '-m',
+                     'pip', 'show', '--files', 'pygeonlp']
         result = subprocess.check_output(show_args).decode('utf-8')
         lines = result.split("\n")
         files = None
@@ -440,6 +440,8 @@ class DictManager(object):
             raise RuntimeError("地名解析辞書がインストールされたディレクトリが見つかりません。")
 
         os.makedirs(self.db_dir, 0o755, exist_ok=True)
+        self.init_capi_ma()
+
         updated = False
         if self.getDictionary('geonlp:geoshape-city') is None:
             self.addDictionaryFromFile(

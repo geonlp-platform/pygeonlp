@@ -481,6 +481,10 @@ class InputBasedFilter(Filter):
     """
 
     def __init__(self, **kwargs):
+        """
+        フィルタを初期化します。
+        このクラスには指定するパラメータはありません。
+        """
         super().__init__(**kwargs)
 
     def apply(self, lattice, **kwargs):
@@ -501,8 +505,7 @@ class InputBasedFilter(Filter):
         ----
         時刻表や地震速報など、特定の地名語クラスを持つ地名が
         高い密度で出現する文字列を解析する場合、候補となるクラスを
-        絞り込むことで解析処理時間を短縮し、精度を向上させることが
-        できます。
+        絞り込んで解析処理時間を短縮し、精度を向上させます。
         """
         filters = []
 

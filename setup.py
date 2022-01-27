@@ -133,7 +133,7 @@ setup(
     python_requires='>=3.6.8',
     install_requires=['requests>=2.21.0', 'chardet>=4.0.0', 'docopt',
                       'lxml>=4.6.2', 'python-dateutil>=2.8.1', 'deprecated',
-                      'jageocoder>=0.2.0', 'geographiclib>=1.52'],
+                      'jageocoder>=1.1.0', 'geographiclib>=1.52'],
     data_files=[('pygeonlp_basedata', DATA_FILES)],
     license=LICENSE,
 )
