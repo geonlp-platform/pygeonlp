@@ -64,12 +64,18 @@ class Parser(object):
             if not _jageocoder.is_initialized():
                 db_dir = _jageocoder.get_db_dir(mode='r')
                 if db_dir is None:
-                    raise ParseError(
-                        'jageocoder 用住所辞書が見つかりません。')
+                    if jageocoder is None:
+                        logger.info(
+                            'jageocoder 用住所辞書が見つかりません。')
+                        self.jageocoder_tree = None
+                    else:
+                        raise ParseError(
+                            'jageocoder 用住所辞書が見つかりません。')
+                else:
+                    _jageocoder.init(mode='r')
 
-                _jageocoder.init(mode='r')
-
-            self.jageocoder_tree = _jageocoder.get_module_tree()
+            if _jageocoder.is_initialized():
+                self.jageocoder_tree = _jageocoder.get_module_tree()
 
         if address_regex is None:
             self.address_regex = re.compile(

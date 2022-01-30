@@ -323,4 +323,10 @@ https://www3.nhk.or.jp/sapporo-news/20220113/7000042131.html
 このほか在来線では▼函館・千歳線が札幌と新千歳空港を結ぶ快速エアポート３５本などあわせて６３本、▼函館線で３８本、▼根室線で２０本、▼室蘭線で１２本、▼釧網線で９本、▼宗谷線で９本、▼石北線で８本、▼石勝線で８本、▼学園都市線で７本が運休となっています。
 ＪＲ北海道は、今後の天候によってはさらに運休が増えるおそれもあるとしてホームページで最新の情報を確認するよう呼びかけています。
 """
+    # 結果の GeoJSON を pp_geojson() で簡易表示します
     pp_geojson(workflow.geoparse(article))
+    # GeoJSON で出力するには json.dumps() を利用します
+    # import json
+    # print(json.dumps(
+    #     workflow.geoparse(article),
+    #     indent=2, ensure_ascii=False))
