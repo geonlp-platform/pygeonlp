@@ -7,7 +7,7 @@ scoring モジュールは、一通りのジオパージング処理を行なう
 
 from logging import getLogger
 
-from pygeonlp.api.linker import RankedResults
+from pygeonlp.api.linker import Evaluator
 from pygeonlp.api.node import Node
 
 logger = getLogger(__name__)
@@ -56,8 +56,8 @@ class ScoringClass(object):
             与えられたパスを評価したスコアを返します。
             値が大きいパスほど geoparse() の結果で上位候補として返されます。
 
-        Notes
-        -----
+        Note
+        ----
         次のように得点を計算しています。
 
         - 地名語・住所を候補として全く含まない形態素が存在する場合
@@ -88,8 +88,8 @@ class ScoringClass(object):
                 "オプションパラメータは整数値で指定してください。")
 
         score = 0
-        geowords = RankedResults.collect_geowords(path)
-        addresses = RankedResults.collect_addresses(path)
+        geowords = Evaluator.collect_geowords(path)
+        addresses = Evaluator.collect_addresses(path)
         geonodes = geowords + addresses
         score += len(path) - len(geonodes)  # 住所・地名語以外は +1
 
@@ -147,8 +147,8 @@ class ScoringClass(object):
         ...   api.analyze('永田町')[0][0])
         20
 
-        Notes
-        -----
+        Note
+        ----
         スコアは以下のように計算しています。
 
         - どちらかのノードが地名語でも住所でもない（NORMAL）場合

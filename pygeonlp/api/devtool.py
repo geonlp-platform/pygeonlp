@@ -23,7 +23,7 @@ def pp_geojson(geojson_list, indent=2, file=None):
     >>> from pygeonlp.api.devtool import pp_geojson
     >>> api.init()
     >>> pp_geojson(api.geoparse('アメリカ大使館：港区赤坂'))
-    アメリカ大使館 ： ≪港区|市区町村['東京都']≫ ≪赤坂|鉄道施設/鉄道駅['東京地下鉄', '9号線千代田線']≫ EOS
+    アメリカ大使館 ： 【港区赤坂:['東京都', '港区', '赤坂']】 EOS
     <BLANKLINE>
     """
     def simple(geojson):
@@ -158,7 +158,7 @@ def pp_path(path, indent=2, file=None):
     >>> import pygeonlp.api as api
     >>> from pygeonlp.api.linker import LinkedResults
     >>> from pygeonlp.api.devtool import pp_path
-    >>> api.init()
+    >>> api.init(jageocoder=False)
     >>> lattice = api.analyze('アメリカ大使館：港区赤坂1-10-5')
     >>> for path in LinkedResults(lattice):
     ...   pp_path(path)

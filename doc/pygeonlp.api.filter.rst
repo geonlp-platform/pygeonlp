@@ -23,6 +23,12 @@ pygeonlp.api.filter module
    :undoc-members:
    :show-inheritance:
 
+.. autoclass:: pygeonlp.api.filter.InputBasedFilter
+   :members:
+   :special-members: __init__
+   :undoc-members:
+   :show-inheritance:
+
 .. autoclass:: pygeonlp.api.filter.FilterError
    :members:
    :show-inheritance:

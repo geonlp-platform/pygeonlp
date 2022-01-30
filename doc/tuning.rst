@@ -62,7 +62,7 @@
 地名語抽出ルールの変更
 ----------------------
 
-地名語抽出ルールは `init() <pygeonlp.api.html#pygeonlp.api.init>`_ 
+地名語抽出ルールは `init() <pygeonlp.api.html#pygeonlp.api.init>`_
 実行時のオプションパラメータの一つで、形態素解析レベルの処理ルールを
 細かく設定します。一度設定したルールは再び init() を呼ぶまで変更できません。
 地名語抽出ルールについては init() のメモの欄を参照してください。
@@ -130,7 +130,7 @@
 - パスに対するスコアを計算する関数 ``path_score()``
 - ノード間の関係によるスコアを計算する関数 ``node_relation_score()``
 
-を持つスコアリングクラス 
+を持つスコアリングクラス
 `pygeonlp.api.scoring.ScoringClass <pygeonlp.api.scoring.html#pygeonlp.api.scoring.ScoringClass>`_
 からサブクラスを派生し、
 `geoparse() <pygeonlp.api.html#pygeonlp.api.geoparse>`_ の
@@ -149,9 +149,15 @@
 定義し、そのスコアリングクラスを利用して geoparse の結果を表示するコードを示します。
 
 .. code-block:: python
+  """
+  スコアリング方法のカスタマイズ
+  サンプルコード
 
+  このコードをテストするには以下のコマンドを実行してください。
+  python sample_myscore.py
+  """
   import pygeonlp.api as api
-  from pygeonlp.api.linker import RankedResults
+  from pygeonlp.api.linker import Evaluator
   from pygeonlp.api.scoring import ScoringClass
 
   api.init()
@@ -182,7 +188,7 @@
 
           target_class = self.options
           score = 0
-          geowords = RankedResults.collect_geowords(path)
+          geowords = Evaluator.collect_geowords(path)
           for geoword in geowords:
               if geoword.prop['ne_class'].startswith(target_class):
                   score += 1
@@ -192,13 +198,11 @@
 
   if __name__ == '__main__':
       print("'鉄道施設' が多い候補を優先した場合。")
-      print(api.geoparse(
-          '和歌山市は晴れ。',
-          scoring_class=MyScoringClass, scoring_options='鉄道施設', ))
+      api.init(scoring_class=MyScoringClass, scoring_options='鉄道施設')
+      print(api.geoparse('和歌山市は晴れ。'))
       print("'市区町村' が多い候補を優先した場合。")
-      print(api.geoparse(
-          '和歌山市は晴れ。',
-          scoring_class=MyScoringClass, scoring_options='市区町村'))
+      api.init(scoring_class=MyScoringClass, scoring_options='市区町村')
+      print(api.geoparse('和歌山市は晴れ。'))
 
 実行結果は次のようになります。 ::
 

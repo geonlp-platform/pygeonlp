@@ -44,9 +44,7 @@ pygeonlp モジュールには基本的な地名解析辞書が付属してい�
 初回実行時に次の処理を実行して、付属の地名解析辞書から
 データベースを作成してください。 ::
 
-  $ python
-  >>> import pygeonlp.api as api
-  >>> api.setup_basic_database()
+  $ python -m pygeonlp.api setup
 
 データベースは :ref:`pygeonlp_terms_db_dir` に作成されます。
 このディレクトリの場所を指定する方法については :ref:`pygeonlp_terms_db_dir`
@@ -67,8 +65,7 @@ pygeonlp モジュールには基本的な地名解析辞書が付属してい�
 発生する場合があります。
 
 その場合は以下の手順でディレクトリを見つけ、
-`setup_basic_database() <pygeonlp.api.html#pygeonlp.api.setup_basic_database>`_
-の ``src_dir`` パラメータで指定してください。
+``setup`` のパラメータで指定してください。
 
 - pip uninstall を実行してパッケージに含まれるファイルリストを確認します。
   ``Proceed (y/n)?`` には n と答えてください。 ::
@@ -84,12 +81,32 @@ pygeonlp モジュールには基本的な地名解析辞書が付属してい�
 - ``geoshape-pref.csv`` などが含まれているディレクトリをメモします。
   上の例では ``/opt/homebrew/pygeonlp_basedata/`` です。
 
-- ``setup_basic_database()`` でこのディレクトリを指定します。 ::
+- ``setup`` のパラメータとしてこのディレクトリを指定します。 ::
 
-    $ python
-    >>> import pygeonlp.api as api
-    >>> api.setup_basic_database(src_dir='/opt/homebrew/pygeonlp_basedata/')
+    $ python -m pygeonlp.api setup /opt/homebrew/pygeonlp_basedata
 
+.. _dict_management_pygeonlp:
+
+**住所ジオコーダ用辞書の更新**
+
+pygeonlp をバージョンアップすると、住所ジオコーダのバージョンも
+自動的に必要なバージョンに更新されます。その場合は
+:ref:`link_jageocoder` の手順に従って、住所ジオコーダ用辞書も
+更新してください。
+
+
+地名解析辞書の管理
+------------------
+
+インストールされている地名解析辞書の一覧表示や、ウェブから新しい
+地名解析辞書をダウンロードしてインストールする手順など、
+地名解析辞書の管理方法については、 ::
+
+  $ python -m pygeonlp.api -h
+
+を実行して表示されるヘルプを参照してください。
+
+.. _uninstall_pygeonlp:
 
 pygeonlp のアンインストール
 ---------------------------
@@ -102,6 +119,7 @@ GDAL も不要な場合にはアンインストールしてください。 ::
 
   $ pip uninstall gdal
 
+.. _purge_database_pygeonlp:
 
 データベースの完全削除
 ----------------------

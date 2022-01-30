@@ -6,7 +6,7 @@
 python sample_myscore.py
 """
 import pygeonlp.api as api
-from pygeonlp.api.linker import RankedResults
+from pygeonlp.api.linker import Evaluator
 from pygeonlp.api.scoring import ScoringClass
 
 api.init()
@@ -37,7 +37,7 @@ class MyScoringClass(ScoringClass):
 
         target_class = self.options
         score = 0
-        geowords = RankedResults.collect_geowords(path)
+        geowords = Evaluator.collect_geowords(path)
         for geoword in geowords:
             if geoword.prop['ne_class'].startswith(target_class):
                 score += 1
@@ -47,10 +47,8 @@ class MyScoringClass(ScoringClass):
 
 if __name__ == '__main__':
     print("'鉄道施設' が多い候補を優先した場合。")
-    print(api.geoparse(
-        '和歌山市は晴れ。',
-        scoring_class=MyScoringClass, scoring_options='鉄道施設', ))
+    api.init(scoring_class=MyScoringClass, scoring_options='鉄道施設')
+    print(api.geoparse('和歌山市は晴れ。'))
     print("'市区町村' が多い候補を優先した場合。")
-    print(api.geoparse(
-        '和歌山市は晴れ。',
-        scoring_class=MyScoringClass, scoring_options='市区町村'))
+    api.init(scoring_class=MyScoringClass, scoring_options='市区町村')
+    print(api.geoparse('和歌山市は晴れ。'))

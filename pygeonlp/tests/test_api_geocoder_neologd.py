@@ -1,4 +1,3 @@
-import json
 import logging
 import os
 import unittest
@@ -172,15 +171,6 @@ class TestModuleMethods(unittest.TestCase):
         self.assertEqual(nodes[1]['subclass2'], '地名語')
         self.assertEqual(nodes[2]['surface'], '内')
         self.assertEqual(nodes[2]['subclass1'], '接尾')
-
-    def test_geoparse_combined_address_oneword(self):
-        """
-        「鹿児島県枕崎市」が一語として解析され、住所表記がそこで完了していても
-        住所として解析できることを確認する。
-        """
-        result = self.parser.geoparse('鹿児島県枕崎市')
-        self.assertEqual(result[0]['properties']['surface'], '鹿児島県枕崎市')
-        self.assertEqual(result[0]['properties']['node_type'], 'ADDRESS')
 
     def test_geoparse_originalform_address(self):
         """

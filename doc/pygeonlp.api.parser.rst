@@ -9,11 +9,6 @@ pygeonlp.api.parser module
    :undoc-members:
    :show-inheritance:
 
-.. autoclass:: pygeonlp.api.parser.Statistics
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 .. autoclass:: pygeonlp.api.parser.ParseError
    :members:
    :undoc-members:

@@ -1,9 +1,12 @@
 import doctest
+import logging
 import os
 import shutil
 import unittest
 
 import pygeonlp.api as api
+
+logger = logging.getLogger(__name__)
 
 """
 doc_string に書かれているサンプルコードを doctest で検証するテスト。
@@ -48,11 +51,12 @@ def load_tests(loader, tests, ignore):
 
     from pygeonlp.api import devtool, temporal_filter
     modules = [
-        api, api.service, api.metadata, api.dictionary, api.node,
+        api,
+        api.service, api.metadata, api.dictionary, api.node,
         api.parser, api.linker, devtool,
         api.filter, temporal_filter,
     ]
-    
+
     try:
         from pygeonlp.api import spatial_filter
         spatial_filter.SpatialFilter.get_geometry_from_geojson(
@@ -72,4 +76,7 @@ def load_tests(loader, tests, ignore):
 
 
 if __name__ == "__main__":
+    # logging.basicConfig(
+    #     level=logging.DEBUG,
+    #     format="%(asctime)s:%(levelname)s:%(filename)s:%(lineno)d:%(message)s")
     unittest.main(failfast=True)
