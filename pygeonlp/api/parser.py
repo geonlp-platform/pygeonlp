@@ -700,7 +700,7 @@ class Parser(object):
                 住所とみなされた形態素ノードの次のインデックス。
         """
         surfaces = self.get_surfaces(lattice, pos, 50)
-        geocoding_result = self.jageocoder_tree.search(''.join(surfaces))
+        geocoding_result = self.jageocoder_tree.searchNode(''.join(surfaces))
         if len(geocoding_result) == 0:
             return {"address": None, "pos": pos}
 

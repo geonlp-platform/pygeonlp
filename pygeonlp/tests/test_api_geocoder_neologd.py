@@ -5,6 +5,7 @@ import unittest
 import jageocoder
 
 import pygeonlp.api as api
+from pygeonlp.api.workflow import Workflow
 from pygeonlp.api.node import Node
 
 
@@ -34,22 +35,27 @@ class TestModuleMethods(unittest.TestCase):
         testdir = os.path.abspath(os.path.join(os.getcwd(), 'apitest'))
         os.environ['GEONLP_DB_DIR'] = testdir
         os.makedirs(testdir, 0o755, exist_ok=True)
-        api.setup_basic_database(db_dir=testdir)
-        api.init(db_dir=testdir, system_dic_dir=cls.neologd_dic_dir)
+        dict_manager = api.dict_manager.DictManager(db_dir=testdir)
+        dict_manager.setupBasicDatabase()
+        api.init()
 
         # Initialize jageocoder
         jageocoder_db_dir = jageocoder.get_db_dir(mode='r')
         if jageocoder_db_dir:
-            cls.parser = api.parser.Parser(jageocoder=True)
+            cls.workflow = Workflow(
+                db_dir=testdir,
+                system_dic_dir=cls.neologd_dic_dir,
+                jageocoder=jageocoder.get_module_tree(),
+            )
+            cls.parser = cls.workflow.parser
         else:
-            cls.parser = None
+            cls.workflow = None
 
     def setUp(self):
         if self.neologd_dic_dir is None:
             self.skipTest('環境変数 NEOLOGD_DIC_DIR が設定されていません。')
 
-        self.parser = self.__class__.parser
-        if self.parser is None:
+        if self.workflow is None:
             self.skipTest('住所辞書がインストールされていません。')
 
     def test_geoparse_with_address(self):
@@ -137,7 +143,7 @@ class TestModuleMethods(unittest.TestCase):
             {"surface": "ます", "node_type": "NORMAL"},
             {"surface": "。", "node_type": "NORMAL"},
         ]
-        result = self.parser.geoparse('NIIは千代田区一ツ橋2-1-2にあります。')
+        result = self.workflow.geoparse('NIIは千代田区一ツ橋2-1-2にあります。')
         for i, feature in enumerate(result):
             prop = feature['properties']
             self.assertEqual(prop['surface'], answer[i]['surface'])
@@ -148,7 +154,7 @@ class TestModuleMethods(unittest.TestCase):
         「多摩市落合1-15」の「多摩市落合」が一語として解析されるため
         地名語として抽出できない場合も住所として解析できることを確認する。
         """
-        result = self.parser.geoparse('多摩市落合1-15-2')
+        result = self.workflow.geoparse('多摩市落合1-15-2')
         self.assertEqual(result[0]['properties']['surface'], '多摩市落合1-15')
         self.assertEqual(result[0]['properties']['node_type'], 'ADDRESS')
 
@@ -157,7 +163,7 @@ class TestModuleMethods(unittest.TestCase):
         「鹿児島県枕崎市」が一語として解析され、住所表記がそこで完了していても
         住所として解析できることを確認する。
         """
-        result = self.parser.geoparse('鹿児島県枕崎市')
+        result = self.workflow.geoparse('鹿児島県枕崎市')
         self.assertEqual(result[0]['properties']['surface'], '鹿児島県枕崎市')
         self.assertEqual(result[0]['properties']['node_type'], 'ADDRESS')
 
@@ -166,7 +172,7 @@ class TestModuleMethods(unittest.TestCase):
         「世田谷区内」のように1語として解析される語に対しても
         suffix（内）を除去した「世田谷区」が抽出できることを確認する。
         """
-        nodes = api.ma_parseNode('世田谷区内の')
+        nodes = self.parser.service.ma_parseNode('世田谷区内の')
         self.assertEqual(nodes[1]['surface'], '世田谷区')
         self.assertEqual(nodes[1]['subclass2'], '地名語')
         self.assertEqual(nodes[2]['surface'], '内')
@@ -177,7 +183,7 @@ class TestModuleMethods(unittest.TestCase):
         「東京・世田谷区」の original_form 「東京都世田谷区」を利用して
         住所として解析できることを確認する。
         """
-        result = self.parser.geoparse('東京・世田谷区')
+        result = self.workflow.geoparse('東京・世田谷区')
         self.assertEqual(result[0]['properties']['surface'], '東京・世田谷区')
         self.assertEqual(result[0]['properties']['node_type'], 'ADDRESS')
         self.assertEqual(

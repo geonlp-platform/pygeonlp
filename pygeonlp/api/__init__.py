@@ -450,7 +450,10 @@ def updateIndex():
 
 @deprecated(
     version='1.2.0',
-    reason='This is a low level API. Call class methods of "pygeonlp.api.dict_manager.DictManager" directly.')
+    reason=(
+        'This is a low level API. Call class methods of '
+        '"pygeonlp.api.dict_manager.DictManager.setupBasicDatabase" directly.'
+    ))
 def setup_basic_database(db_dir=None, src_dir=None):
     """
     基本的な地名解析辞書を登録したデータベースを作成します。

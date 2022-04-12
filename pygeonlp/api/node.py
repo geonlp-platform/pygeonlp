@@ -80,7 +80,7 @@ class Node(object):
         >>> api.init()
         >>> node = api.analyze('千代田区一ツ橋2-1-2', jageocoder=True)[0][0]
         >>> node.get_lonlat()
-        {'lat': 35.694003, 'lon': 139.753634}
+        {'lat': 35.69..., 'lon': 139.75...}
         """
         if self.node_type == self.__class__.GEOWORD:
             return {

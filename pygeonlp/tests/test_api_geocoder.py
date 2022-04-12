@@ -6,6 +6,7 @@ import jageocoder
 
 import pygeonlp.api as api
 from pygeonlp.api.node import Node
+from pygeonlp.api.workflow import Workflow
 
 
 logger = logging.getLogger(__name__)
@@ -27,18 +28,18 @@ class TestModuleMethods(unittest.TestCase):
         testdir = os.path.abspath(os.path.join(os.getcwd(), 'apitest'))
         os.environ['GEONLP_DB_DIR'] = testdir
         os.makedirs(testdir, 0o755, exist_ok=True)
-        api.setup_basic_database(db_dir=testdir)
-        api.init(db_dir=testdir)
+        dict_manager = api.dict_manager.DictManager(db_dir=testdir)
+        dict_manager.setupBasicDatabase()
 
         # Initialize jageocoder
         jageocoder_db_dir = jageocoder.get_db_dir(mode='r')
         if jageocoder_db_dir:
-            cls.parser = api.parser.Parser(jageocoder=True)
+            cls.workflow = Workflow(db_dir=testdir, jageocoder=True)
+            cls.parser = cls.workflow.parser
         else:
-            cls.parser = None
+            cls.workflow = None
 
     def setUp(self):
-        self.parser = self.__class__.parser
         if self.parser is None:
             self.skipTest('住所辞書がインストールされていません。')
 
@@ -131,7 +132,7 @@ class TestModuleMethods(unittest.TestCase):
             {"surface": "ます", "node_type": "NORMAL"},
             {"surface": "。", "node_type": "NORMAL"},
         ]
-        result = self.parser.geoparse('NIIは千代田区一ツ橋2-1-2にあります。')
+        result = self.workflow.geoparse('NIIは千代田区一ツ橋2-1-2にあります。')
         for i, feature in enumerate(result):
             prop = feature['properties']
             self.assertEqual(prop['surface'], answer[i]['surface'])
