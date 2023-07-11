@@ -6,13 +6,9 @@ verify_ssl = true
 [dev-packages]
 autopep8 = "*"
 flake8 = "*"
-epc = "*"
-jedi = "*"
-flask-jsonrpc = "*"
-numpy = "*"
-gdal = "~=2.4.2"
 pytest = "*"
 twine = "*"
+flask-jsonrpc = "*"
 
 [packages]
 pipenv = "~=2021.5.29"
@@ -20,9 +16,10 @@ python-dateutil = "~=2.8.1"
 requests = "*"
 pygeonlp = {editable = true, path = "."}
 geographiclib = "*"
-jageocoder = ">=1.1.3"
+jageocoder = ">=2.0.0"
 
 [requires]
+python_version = ">= 3.7, < 3.11"
 
 [scripts]
 format = "autopep8 -ivr --ignore E226,E24,W50,W690,E501 ."
