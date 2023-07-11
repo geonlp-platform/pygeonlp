@@ -220,7 +220,7 @@ $ rm -r mydic/
 
 ## Acknowledgements
 
-This software is supported by DIAS (Data Integration and Analysis System) and
-ROIS-DS CODH (Center for Open Data in the Humanities).
+This software is supported by [DIAS (Data Integration and Analysis System)](https://dias.ex.nii.ac.jp/) and
+[ROIS-DS CODH (Center for Open Data in the Humanities)](http://codh.rois.ac.jp/).
 
 It was also supported by JST (Japan Science and Technology Agency) PRESTO program.

@@ -14,9 +14,9 @@ flask-jsonrpc = "*"
 pipenv = "~=2021.5.29"
 python-dateutil = "~=2.8.1"
 requests = "*"
-pygeonlp = {editable = true, path = "."}
 geographiclib = "*"
 jageocoder = ">=2.0.0"
+setuptools = "<58.0.0"
 
 [requires]
 python_version = ">= 3.7, < 3.11"
