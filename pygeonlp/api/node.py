@@ -165,7 +165,7 @@ class Node(object):
         -------
         dict
             JSON 出力可能な dict オブジェクト。
-        """
+        """  # noqa: E501
         if isinstance(self.morphemes, list):
             morphemes = [x.as_dict() for x in self.morphemes]
         else:
@@ -195,7 +195,7 @@ class Node(object):
         -------
         dict
             GeoJSON Feature 形式に変換可能な dict オブジェクト。
-        """
+        """  # noqa: E501
         if isinstance(self.morphemes, list):
             # 住所の場合、ネストしている内部の Node も GeoJSON dict に展開する
             morphemes = [x.as_geojson() for x in self.morphemes]

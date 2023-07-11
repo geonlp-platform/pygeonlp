@@ -757,7 +757,7 @@ class Parser(object):
         ----
         ラティス表現では全ての地名語の候補を列挙して返します。
         ``analyze_sentence()`` に住所ジオコーディングの結果も追加します。
-        """
+        """  # noqa: E501
         varray = self.analyze_sentence(sentence, **kwargs)
 
         if self.jageocoder_tree:
