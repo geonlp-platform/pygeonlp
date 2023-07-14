@@ -1,5 +1,6 @@
 import json
 from logging import getLogger
+import math
 
 from geographiclib.geodesic import Geodesic
 
@@ -328,5 +329,11 @@ class Node(object):
 
         geod = Geodesic.WGS84
         g = geod.Inverse(p0['lat'], p0['lon'], p1['lat'], p1['lon'])
+        dist = g['s12']
 
-        return g['s12']
+        if math.isnan(dist):
+            raise RuntimeError(
+                "距離が計算できません（経緯度が不正な値）。")
+
+        return dist
+

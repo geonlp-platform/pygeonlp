@@ -21,9 +21,9 @@ class TestModuleMethods(unittest.TestCase):
 
     def setUp(self):
         testdir = os.path.abspath(os.path.join(os.getcwd(), 'apitest'))
-        os.environ['GEONLP_DB_DIR'] = testdir
         os.makedirs(testdir, 0o755, exist_ok=True)
-        api.setup_basic_database(db_dir=testdir)
+        self.dictmanager = api.dict_manager.DictManager(db_dir=testdir)
+        self.dictmanager.setupBasicDatabase()
         api.init(db_dir=testdir)
 
     def test_search_word(self):

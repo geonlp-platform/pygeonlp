@@ -12,6 +12,8 @@ logger = getLogger(__name__)
 _default_workflow = None
 _default_manager = None
 
+__version__ = '1.2.1rc1'
+
 
 def get_db_dir():
     """
@@ -98,7 +100,7 @@ def init(db_dir=None, **options):
 
     異なるパラメータで初期化した Workflow オブジェクトを生成し、
     直接そのメンバ関数を呼びだすことも可能です。
-    """
+    """  # noqa: E501
     global _default_workflow, _default_manager
     if _default_workflow:
         del _default_workflow
@@ -112,7 +114,10 @@ def init(db_dir=None, **options):
 
 @deprecated(
     version='1.2.0',
-    reason='This is a low level API. Call class methods of "pygeonlp.api.service.Service" directly.')
+    reason=(
+        'This is a low level API. Call class methods of'
+        ' "pygeonlp.api.service.Service" directly.')
+)
 def ma_parse(sentence):
     """
     センテンスを形態素解析した結果を MeCab 互換の文字列として返します。
@@ -144,14 +149,18 @@ def ma_parse(sentence):
     。      記号,句点,*,*,*,*,。,。,。
     EOS
     <BLANKLINE>
-    """
+    """  # noqa: E501
     _check_initialized()
     return _default_workflow.parser.service.ma_parse(sentence)
 
 
 @deprecated(
     version='1.2.0',
-    reason='This is a low level API. Call class methods of "pygeonlp.api.service.Service" directly.')
+    reason=(
+        'This is a low level API. Call class methods of '
+        '"pygeonlp.api.service.Service" directly.'
+    )
+)
 def ma_parseNode(sentence):
     """
     センテンスを形態素解析した結果を MeCab 互換のノード配列として返します。
@@ -174,14 +183,18 @@ def ma_parseNode(sentence):
     >>> api.ma_parseNode('今日は国会議事堂前まで歩きました。')
     [{'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '*', 'pos': 'BOS/EOS', 'prononciation': '*', 'subclass1': '*', 'subclass2': '*', 'subclass3': '*', 'surface': '', 'yomi': '*'}, {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '今日', 'pos': '名詞', 'prononciation': 'キョー', 'subclass1': '副詞可能', 'subclass2': '*', 'subclass3': '*', 'surface': '今日', 'yomi': 'キョウ'}, {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': 'は', 'pos': '助詞', 'prononciation': 'ワ', 'subclass1': '係助詞', 'subclass2': '*', 'subclass3': '*', 'surface': 'は', 'yomi': 'ハ'}, {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '国会議事堂前', 'pos': '名詞', 'prononciation': '', 'subclass1': '固有名詞', 'subclass2': '地名語', 'subclass3': 'Bn4q6d:国会議事堂前駅/cE8W4w:国会議事堂前駅', 'surface': '国会議事堂前', 'yomi': ''}, {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': 'まで', 'pos': '助詞', 'prononciation': 'マデ', 'subclass1': '副助詞', 'subclass2': '*', 'subclass3': '*', 'surface': 'まで', 'yomi': 'マデ'}, {'conjugated_form': '五段・カ行イ音便', 'conjugation_type': '連用形', 'original_form': '歩く', 'pos': '動詞', 'prononciation': 'アルキ', 'subclass1': '自立', 'subclass2': '*', 'subclass3': '*', 'surface': '歩き', 'yomi': 'アルキ'}, {'conjugated_form': '特殊・マス', 'conjugation_type': '連用形', 'original_form': 'ます', 'pos': '助動詞', 'prononciation': 'マシ', 'subclass1': '*', 'subclass2': '*', 'subclass3': '*', 'surface': 'まし', 'yomi': 'マシ'}, {'conjugated_form': '特殊・タ', 'conjugation_type': '基本形', 'original_form': 'た', 'pos': '助動詞', 'prononciation': 'タ', 'subclass1': '*', 'subclass2': '*', 'subclass3': '*', 'surface': 'た', 'yomi': 'タ'}, {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '。', 'pos': '記号', 'prononciation': '。', 'subclass1': '句点', 'subclass2': '*', 'subclass3': '*', 'surface': '。', 'yomi': '。'}, {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '*', 'pos': 'BOS/EOS', 'prononciation': '*', 'subclass1': '*', 'subclass2': '*', 'subclass3': '*', 'surface': '', 'yomi': '*'}]
 
-    """
+    """  # noqa: E501
     _check_initialized()
     return _default_workflow.parser.service.ma_parseNode(sentence)
 
 
 @deprecated(
     version='1.2.0',
-    reason='This is a low level API. Call class methods of "pygeonlp.api.service.Service" directly.')
+    reason=(
+        'This is a low level API. Call class methods of '
+        '"pygeonlp.api.service.Service" directly.'
+    )
+)
 def getWordInfo(geolod_id):
     """
     指定した geolod_id を持つ語の情報を返します。
@@ -204,14 +217,18 @@ def getWordInfo(geolod_id):
     >>> api.init()
     >>> api.getWordInfo('Bn4q6d')
     {'body': '国会議事堂前', 'dictionary_id': 3, 'entry_id': 'LrGGxY', 'geolod_id': 'Bn4q6d', 'hypernym': ['東京地下鉄', '4号線丸ノ内線'], 'institution_type': '民営鉄道', 'latitude': '35.674845', 'longitude': '139.74534166666666', 'ne_class': '鉄道施設/鉄道駅', 'railway_class': '普通鉄道', 'suffix': ['駅', ''], 'dictionary_identifier': 'geonlp:ksj-station-N02'}
-    """
+    """  # noqa: E501
     _check_initialized()
     return _default_workflow.parser.service.getWordInfo(geolod_id)
 
 
 @deprecated(
     version='1.2.0',
-    reason='This is a low level API. Call class methods of "pygeonlp.api.service.Service" directly.')
+    reason=(
+        'This is a low level API. Call class methods of '
+        '"pygeonlp.api.service.Service" directly.'
+    )
+)
 def searchWord(key):
     """
     指定した表記または読みを持つ語の情報を返します。
@@ -234,14 +251,18 @@ def searchWord(key):
     >>> api.init()
     >>> api.searchWord('国会議事堂前')
     {'Bn4q6d': {'body': '国会議事堂前', 'dictionary_id': 3, 'entry_id': 'LrGGxY', 'geolod_id': 'Bn4q6d', 'hypernym': ['東京地下鉄', '4号線丸ノ内線'], 'institution_type': '民営鉄道', 'latitude': '35.674845', 'longitude': '139.74534166666666', 'ne_class': '鉄道施設/鉄道駅', 'railway_class': '普通鉄道', 'suffix': ['駅', ''], 'dictionary_identifier': 'geonlp:ksj-station-N02'}, 'cE8W4w': {'body': '国会議事堂前', 'dictionary_id': 3, 'entry_id': '4NFELa', 'geolod_id': 'cE8W4w', 'hypernym': ['東京地下鉄', '9号線千代田線'], 'institution_type': '民営鉄道', 'latitude': '35.673543333333335', 'longitude': '139.74305333333334', 'ne_class': '鉄道施設/鉄道駅', 'railway_class': '普通鉄道', 'suffix': ['駅', ''], 'dictionary_identifier': 'geonlp:ksj-station-N02'}}
-    """
+    """  # noqa: E501
     _check_initialized()
     return _default_workflow.parser.service.searchWord(key)
 
 
 @deprecated(
     version='1.2.0',
-    reason='This is a low level API. Call class methods of "pygeonlp.api.service.Service" directly.')
+    reason=(
+        'This is a low level API. Call class methods of '
+        '"pygeonlp.api.service.Service" directly.'
+    )
+)
 def getDictionary(id_or_identifier):
     """
     指定した id または identifier を持つ辞書のメタデータを返します。
@@ -264,14 +285,18 @@ def getDictionary(id_or_identifier):
     >>> api.init()
     >>> api.getDictionary('geonlp:ksj-station-N02')
     {"@context": "https://schema.org/", "@type": "Dataset", "alternateName": "", "creator": [{"@type": "Organization", "name": "株式会社情報試作室", "sameAs": "https://www.info-proto.com/"}], "dateModified": "2021-08-27T17:18:18+09:00", "description": "国土数値情報「鉄道データ（N02）」から作成した、日本の鉄道駅（地下鉄を含む）の辞書です。hypernym には運営者名と路線名を記載しています。「都営」ではなく「東京都」のようになっていますので注意してください。自由フィールドとして、railway_classに「鉄道区分」、institution_typeに「事業者種別」を含みます。", "distribution": [{"@type": "DataDownload", "contentUrl": "https://www.info-proto.com/static/ksj-station-N02.csv", "encodingFormat": "text/csv"}], "identifier": ["geonlp:ksj-station-N02"], "isBasedOn": {"@type": "CreativeWork", "name": "国土数値情報 鉄道データ", "url": "https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N02-v2_2.html"}, "keywords": ["GeoNLP", "地名辞書"], "license": "https://creativecommons.org/licenses/by/4.0/", "name": "国土数値情報 鉄道データ（駅）", "size": "10191", "spatialCoverage": {"@type": "Place", "geo": {"@type": "GeoShape", "box": "26.193265 127.652285 45.41616333333333 145.59723"}}, "temporalCoverage": "../..", "url": "https://www.info-proto.com/static/ksj-station-N02.html"}
-    """
+    """  # noqa: E501
     _check_initialized()
     return _default_manager.getDictionary(id_or_identifier)
 
 
 @deprecated(
     version='1.2.0',
-    reason='This is a low level API. Call class methods of "pygeonlp.api.dict_manager.DictManager" directly.')
+    reason=(
+        'This is a low level API. Call class methods of '
+        '"pygeonlp.api.dict_manager.DictManager" directly.'
+    )
+)
 def getDictionaries():
     """
     インストール済み辞書のメタデータ一覧を返します。
@@ -294,7 +319,11 @@ def getDictionaries():
 
 @deprecated(
     version='1.2.0',
-    reason='This is a low level API. Call class methods of "pygeonlp.api.dict_manager.DictManager" directly.')
+    reason=(
+        'This is a low level API. Call class methods of '
+        '"pygeonlp.api.dict_manager.DictManager" directly.'
+    )
+)
 def clearDatabase():
     """
     地名語データベースに登録されている辞書をクリアします。
@@ -308,7 +337,11 @@ def clearDatabase():
 
 @deprecated(
     version='1.2.0',
-    reason='This is a low level API. Call class methods of "pygeonlp.api.dict_manager.DictManager" directly.')
+    reason=(
+        'This is a low level API. Call class methods of '
+        '"pygeonlp.api.dict_manager.DictManager" directly.'
+    )
+)
 def addDictionaryFromFile(jsonfile, csvfile):
     """
     指定したパスにある辞書メタデータ（JSONファイル）と
@@ -331,14 +364,18 @@ def addDictionaryFromFile(jsonfile, csvfile):
     -------
     bool
         常に True。登録に失敗した場合は例外が発生します。
-    """
+    """  # noqa: E501
     _check_initialized()
     return _default_manager.addDictionaryFromFile(jsonfile, csvfile)
 
 
 @deprecated(
     version='1.2.0',
-    reason='This is a low level API. Call class methods of "pygeonlp.api.dict_manager.DictManager" directly.')
+    reason=(
+        'This is a low level API. Call class methods of '
+        '"pygeonlp.api.dict_manager.DictManager" directly.'
+    )
+)
 def addDictionaryFromWeb(url, params=None, **kwargs):
     """
     指定した URL にあるページに含まれる辞書メタデータ（JSON-LD）を取得し、
@@ -364,14 +401,18 @@ def addDictionaryFromWeb(url, params=None, **kwargs):
     -------
     bool
         常に True。登録に失敗した場合は例外が発生します。
-    """
+    """  # noqa: E501
     _check_initialized()
     return _default_manager.addDictionaryFromWeb(url, params, **kwargs)
 
 
 @deprecated(
     version='1.2.0',
-    reason='This is a low level API. Call class methods of "pygeonlp.api.dict_manager.DictManager" directly.')
+    reason=(
+        'This is a low level API. Call class methods of '
+        '"pygeonlp.api.dict_manager.DictManager" directly.'
+    )
+)
 def saveDictionaryFromWeb(jsonfile, csvfile, url, params=None, **kwargs):
     """
     指定した URL にあるページに含まれる辞書メタデータ（JSON-LD）を取得し、
@@ -405,7 +446,7 @@ def saveDictionaryFromWeb(jsonfile, csvfile, url, params=None, **kwargs):
     >>> import os
     >>> os.remove('geoshape.json')
     >>> os.remove('geoshape.csv')
-    """
+    """  # noqa: E501
     _check_initialized()
     return _default_manager.saveDictionaryFromWeb(jsonfile, csvfile, url,
                                                   params, **kwargs)
@@ -413,7 +454,11 @@ def saveDictionaryFromWeb(jsonfile, csvfile, url, params=None, **kwargs):
 
 @deprecated(
     version='1.2.0',
-    reason='This is a low level API. Call class methods of "pygeonlp.api.dict_manager.DictManager" directly.')
+    reason=(
+        'This is a low level API. Call class methods of '
+        '"pygeonlp.api.dict_manager.DictManager" directly.'
+    )
+)
 def removeDictionary(identifier):
     """
     identifier で指定した辞書をデータベースから削除します。
@@ -432,14 +477,18 @@ def removeDictionary(identifier):
     ------
     RuntimeError
         指定した辞書が登録されていない場合は RuntimeError が発生します。
-    """
+    """  # noqa: E501
     _check_initialized()
     return _default_manager.removeDictionary(identifier)
 
 
 @deprecated(
     version='1.2.0',
-    reason='This is a low level API. Call class methods of "pygeonlp.api.dict_manager.DictManager" directly.')
+    reason=(
+        'This is a low level API. Call class methods of '
+        '"pygeonlp.api.dict_manager.DictManager" directly.'
+    )
+)
 def updateIndex():
     """
     辞書のインデックスを更新して検索可能にします。
@@ -452,7 +501,8 @@ def updateIndex():
     version='1.2.0',
     reason=(
         'This is a low level API. Call class methods of '
-        '"pygeonlp.api.dict_manager.DictManager.setupBasicDatabase" directly.'
+        '"pygeonlp.api.dict_manager.DictManager.setupBasicDatabase" '
+        'directly.'
     ))
 def setup_basic_database(db_dir=None, src_dir=None):
     """
@@ -472,7 +522,7 @@ def setup_basic_database(db_dir=None, src_dir=None):
         ``pygeonlp_basedata`` がないか探します。
         見つからない場合は ``RuntimeError`` を送出しますので、
         ディレクトリを指定してください。
-    """
+    """  # noqa: E501
     manager = DictManager(db_dir=db_dir)
     manager.setupBasicDatabase(src_dir=src_dir)
     del manager
@@ -502,7 +552,7 @@ def analyze(sentence, **kwargs):
     Note
     ----
     ラティス表現では全ての地名語の候補を列挙して返します。
-    """
+    """  # noqa: E501
     _check_initialized()
     return _default_workflow.parser.analyze(sentence, **kwargs)
 
@@ -536,7 +586,7 @@ def geoparse(sentence):
     ----
     このメソッドは、文字列の解析、フィルタによる絞り込み、
     ランキングなどの一連の処理を行ないます。
-    """
+    """  # noqa: E501
     _check_initialized()
     return _default_workflow.geoparse(sentence)
 
@@ -747,3 +797,10 @@ def setActiveClasses(patterns=None):
     """
     _check_initialized()
     return _default_workflow.setActiveClasses(patterns)
+
+
+def get_version() -> str:
+    """
+    Return version string.
+    """
+    return __version__
