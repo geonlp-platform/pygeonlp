@@ -336,4 +336,3 @@ class Node(object):
                 "距離が計算できません（経緯度が不正な値）。")
 
         return dist
-
