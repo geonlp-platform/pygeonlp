@@ -35,14 +35,15 @@ def setup(test):
         'geonlp:ksj-station-N02',
     ]
 
+    dict_manager = api.dict_manager.DictManager(db_dir=testdir)
     installed_dictionaries = [
-        x.get_identifier() for x in api.getDictionaries()]
+        x.get_identifier() for x in dict_manager.getDictionaries()]
     for identifier in installed_dictionaries:
         if identifier not in default_dics:
-            api.clearDatabase()
+            dict_manager.clearDatabase()
             break
 
-    api.setup_basic_database(db_dir=testdir)
+    dict_manager.setupBasicDatabase()
     api.init(db_dir=testdir)
 
 

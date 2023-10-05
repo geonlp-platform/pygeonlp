@@ -532,9 +532,7 @@ class InputBasedFilter(Filter):
 
         if search_plan == "greedy":
             # 地震速報や時刻表など同種の地名語が多数出現する場合
-            filters.append(GreedySearchFilter(
-                scoring_class=self.evaluator.scoring_class,
-                scoring_options=self.evaluator.scoring_options))
+            filters.append(GreedySearchFilter())
 
         # 選択したフィルタを適用
         for f in filters:

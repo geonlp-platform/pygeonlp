@@ -1,5 +1,6 @@
 import json
 from logging import getLogger
+import math
 
 from geographiclib.geodesic import Geodesic
 
@@ -80,7 +81,7 @@ class Node(object):
         >>> api.init()
         >>> node = api.analyze('千代田区一ツ橋2-1-2', jageocoder=True)[0][0]
         >>> node.get_lonlat()
-        {'lat': 35.694003, 'lon': 139.753634}
+        {'lat': 35.69..., 'lon': 139.75...}
         """
         if self.node_type == self.__class__.GEOWORD:
             return {
@@ -165,7 +166,7 @@ class Node(object):
         -------
         dict
             JSON 出力可能な dict オブジェクト。
-        """
+        """  # noqa: E501
         if isinstance(self.morphemes, list):
             morphemes = [x.as_dict() for x in self.morphemes]
         else:
@@ -195,7 +196,7 @@ class Node(object):
         -------
         dict
             GeoJSON Feature 形式に変換可能な dict オブジェクト。
-        """
+        """  # noqa: E501
         if isinstance(self.morphemes, list):
             # 住所の場合、ネストしている内部の Node も GeoJSON dict に展開する
             morphemes = [x.as_geojson() for x in self.morphemes]
@@ -328,5 +329,10 @@ class Node(object):
 
         geod = Geodesic.WGS84
         g = geod.Inverse(p0['lat'], p0['lon'], p1['lat'], p1['lon'])
+        dist = g['s12']
 
-        return g['s12']
+        if math.isnan(dist):
+            raise RuntimeError(
+                "距離が計算できません（経緯度が不正な値）。")
+
+        return dist
