@@ -36,6 +36,19 @@ def get_libgeonlp():
 
     boost_libs = ['boost_regex', 'boost_system', 'boost_filesystem']
 
+    # Search boost dirs
+    boost_inc_dirs = None
+    boost_lib_dirs = None
+    extra_preargs = []
+    for prefix in ('/usr', '/usr/local', '/opt', '/opt/homebrew'):
+        if os.path.isdir(os.path.join(prefix, 'include/boost')):
+            boost_inc_dirs = [os.path.join(prefix, 'include')]
+            boost_lib_dirs = [os.path.join(prefix, 'lib')]
+            if 'brew' in prefix:  # MacOSX + Homebrew
+                os.environ["CFLAGS"] = '-std=c++14'
+
+            break
+
     # Write a temporary .c file to compile
     c_code = dedent("""
     #include <iostream>
@@ -68,8 +81,11 @@ def get_libgeonlp():
     assert isinstance(compiler, distutils.ccompiler.CCompiler)
     distutils.sysconfig.customize_compiler(compiler)
 
-    compiled = compiler.compile(sources=[file_name],
-                                output_dir='test_boost')
+    compiled = compiler.compile(
+        sources=[file_name],
+        include_dirs=boost_inc_dirs,
+        output_dir='test_boost'
+    )
 
     libraries = None
     if not libraries:
@@ -77,6 +93,7 @@ def get_libgeonlp():
             compiler.link_shared_lib(
                 compiled,
                 bin_file_name,
+                library_dirs=boost_lib_dirs,
                 libraries=boost_libs,
             )
         except LinkError:
@@ -90,6 +107,7 @@ def get_libgeonlp():
             compiler.link_shared_lib(
                 compiled,
                 bin_file_name,
+                library_dirs=boost_lib_dirs,
                 libraries=boost_mt_libs,
             )
         except LinkError:
@@ -104,13 +122,15 @@ def get_libgeonlp():
         raise RuntimeError("Boost libraries is not installed.")
 
     libgeonlp = Extension(
+        # see: https://setuptools.pypa.io/en/latest/deprecated/distutils/apiref.html#distutils.ccompiler.gen_preprocess_options  # noqa: E501
         'pygeonlp.capi',
         define_macros=[
             ('MAJOR_VERSION', '1'),
             ('MINOR_VERSION', '2'),
-            ('REVISION', '1')
+            ('REVISION', '2')
         ],
-        include_dirs=[LIBGEONLP_INCLUDE_DIR],
+        include_dirs=[LIBGEONLP_INCLUDE_DIR] + boost_inc_dirs,
+        library_dirs=[LIBGEONLP_SOURCE_DIR] + boost_lib_dirs,
         sources=LIBGEONLP_FILES + CPYGEONLP_FILES,
         libraries=['sqlite3', 'mecab'] + libraries,
     )
@@ -120,7 +140,7 @@ def get_libgeonlp():
 # Setup tools
 setup(
     name='pygeonlp',
-    version='1.2.1',
+    version='1.2.2rc1',
     description='A Python module for geotagging Japanese texts.',
     author='GeoNLP Project Team',
     author_email='geonlp@nii.ac.jp',
@@ -133,7 +153,7 @@ setup(
     python_requires='>=3.6.8',
     install_requires=['requests>=2.31.0', 'chardet>=5.2.0', 'docopt',
                       'lxml>=4.9.1', 'python-dateutil>=2.8.1', 'deprecated',
-                      'jageocoder>=1.1.3', 'geographiclib>=1.52'],
+                      'jageocoder>=2.1.0', 'geographiclib>=2.0'],
     data_files=[('pygeonlp_basedata', DATA_FILES)],
     license=LICENSE,
 )
