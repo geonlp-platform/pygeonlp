@@ -1,11 +1,12 @@
 from logging import getLogger
+import os
 
 from pygeonlp.api.node import Node
 
 logger = getLogger(__name__)
 
 
-MAX_COMBINATIONS = 256
+MAX_COMBINATIONS = int(os.environ.get("PYGEONLP_MAX_COMBINATIONS", "256"))
 
 
 class LinkerError(RuntimeError):

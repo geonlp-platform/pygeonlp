@@ -1,0 +1,7 @@
+version: "3.7"
+
+services:
+  pygeonlp:
+    build:
+      context: .
+      dockerfile: Dockerfile
