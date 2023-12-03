@@ -131,8 +131,7 @@ def setup_basic_database(db_dir=None, src_dir=None):
     if updated:
         manager.updateIndex()
 
-
-if __name__ == '__main__':
+def main():
     args = docopt(HELP)
 
     if args['--db-dir']:
@@ -183,3 +182,7 @@ if __name__ == '__main__':
         exit(0)
 
     raise RuntimeError('Unexpected args: {}'.format(args))
+
+
+if __name__ == '__main__':
+    main()

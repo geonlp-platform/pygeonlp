@@ -3,33 +3,43 @@
 インストール手順
 ================
 
-動作確認済みOSでの手順
-----------------------
+動作確認済み環境
+----------------
 
-動作確認済み OS の場合は対応する手順を参照してください。
+pygeonlp は以下の環境で動作確認済みです。
 
-- :ref:`install_pygeonlp_ubuntu`
-- :ref:`install_pygeonlp_centos`
-- :ref:`install_pygeonlp_macos`
+- x86_64 アーキテクチャ / Ubuntu 22.04.3 LTS
+- aarm64 アーキテクチャ / MacOS X Sonoma 14.1.1
+- Windows Subsystem for Linux / Ubuntu 20.04.6 LTS
+- x86_64, aarm64 アーキテクチャ / Docker desktop, Docker engine
 
-上記以外のOSでの手順
---------------------
+依存ライブラリ等
+----------------
 
-pygeonlp は日本語形態素解析に `MeCab <https://taku910.github.io/mecab/>`_ C++ ライブラリと UTF8 の辞書を利用します。
-また、 C++ 実装部分が `Boost C++ <https://www.boost.org/>`_ に依存します。
-この2つは必ずインストールする必要があります。
+以下の2つは必ずインストールしてください。
 
-オプションとして、 `GDAL <https://pypi.org/project/GDAL/>`_ を
-インストールすると、 :ref:`spatialfilter` を利用することができます。
+- 日本語形態素解析器 `MeCab <https://taku910.github.io/mecab/>`_ および UTF8 の辞書
+- `Boost C++ <https://www.boost.org/>`_ ライブラリ
+
+オプションとして、 :py:class:`SpatialFilter <pygeonlp.api.spatial_filter.SpatialFilter>` を利用するには
+`GDAL <https://pypi.org/project/GDAL/>`_ が必要です。
 
 それぞれの OS に合わせて、以下の順序でインストールしてください。
-なお、 Windows には対応していません。
+なお、 Windows には対応していないので `WSL を利用
+<https://learn.microsoft.com/ja-jp/windows/wsl/install>`_ してください。
 
 - Python 3.6.8 以降と pip をインストール
 - MeCab C++ ライブラリと IPA 辞書をインストール
 - Boost C++ ライブラリをインストール (1.76 で動作確認) 
 - pygeonlp を ``pip install pygeonlp`` でインストール
 - (オプション) `GDAL <https://pypi.org/project/GDAL/>`_ をインストール
+
+環境ごとの手順
+--------------
+
+- :ref:`install_pygeonlp_ubuntu`
+- :ref:`install_pygeonlp_macosx`
+- :ref:`install_pygeonlp_docker`
 
 .. _setup_pygeonlp:
 

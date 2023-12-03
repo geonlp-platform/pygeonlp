@@ -9,11 +9,6 @@ pygeonlp.api.workflow module
    :undoc-members:
    :show-inheritance:
 
-.. autoclass:: pygeonlp.api.workflow.Statistics
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 .. autoclass:: pygeonlp.api.workflow.WorkflowError
    :members:
    :undoc-members:

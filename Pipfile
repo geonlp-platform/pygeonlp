@@ -11,6 +11,9 @@ twine = "*"
 flask = ">=2.2.5"
 werkzeug = ">=3.0.1"
 flask-jsonrpc = "*"
+sphinx = ">=5.3.0, <6.0.0"
+sphinx-rtd-theme = ">=1.1.1"
+sphinx-toolbox = "*"
 
 [packages]
 pipenv = ">=2022.1.8"

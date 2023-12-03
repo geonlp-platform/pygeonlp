@@ -4,11 +4,20 @@ pygeonlp.api package
 pygeonlp.api パッケージを構成するサブモジュール、
 およびメソッドのリファレンス。
 
-Submodules
-----------
+APIモジュール
+-------------
+
+.. automodule:: pygeonlp.api
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+サブモジュール
+--------------
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 3
 
    pygeonlp.api.dict_manager
    pygeonlp.api.dictionary
@@ -23,11 +32,3 @@ Submodules
    pygeonlp.api.temporal_filter
    pygeonlp.api.workflow
    pygeonlp.api.devtool
-
-Module contents
----------------
-
-.. automodule:: pygeonlp.api
-   :members:
-   :undoc-members:
-   :show-inheritance:

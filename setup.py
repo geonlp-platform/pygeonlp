@@ -149,6 +149,11 @@ setup(
     long_description_content_type='text/markdown',
     ext_modules=[get_libgeonlp()],
     packages=['pygeonlp.api', 'pygeonlp.tests'],
+    entry_points={
+        'console_scripts': [
+            'pygeonlp = pygeonlp.api.__main__:main'
+        ]
+    },
     test_suite='pygeonlp.tests',
     python_requires='>=3.6.8',
     install_requires=['requests>=2.31.0', 'chardet>=5.2.0', 'docopt',

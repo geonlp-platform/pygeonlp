@@ -350,4 +350,4 @@ GIS アプリケーションで開けば、地図上にプロットすること�
 
 - より高度な解析を行うモジュールを開発したい
 
-  - :ref:`advanced_developers ` へ
+  - :ref:`advanced_developers` へ
