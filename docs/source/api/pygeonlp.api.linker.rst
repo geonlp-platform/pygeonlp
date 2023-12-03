@@ -8,7 +8,7 @@ pygeonlp.api.linker module
    :undoc-members:
    :show-inheritance:
 
-.. autoclass:: pygeonlp.api.linker.RankedResults
+.. autoclass:: pygeonlp.api.linker.Evaluator
    :members:
    :special-members: __init__
    :undoc-members:

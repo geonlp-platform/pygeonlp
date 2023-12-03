@@ -17,4 +17,4 @@ API リファレンス
 .. toctree::
    :maxdepth: 4
 
-   pygeonlp.api
+   api/pygeonlp.api

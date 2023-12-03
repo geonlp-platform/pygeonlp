@@ -18,6 +18,9 @@ __pycache__/
 /libgeonlp/.libs
 /build
 
+# Sphinx compiled documents
+/docs/build
+
 # Dicitonaries
 *.drt
 *.dic
