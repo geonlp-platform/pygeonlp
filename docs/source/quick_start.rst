@@ -3,7 +3,7 @@
 Quickstart
 ==========
 
-ここでは pygeonlp の簡単な使い方を紹介します。
+ここでは pygeonlp を Python から操作する簡単な例を紹介します。
 まだ pygeonlp をインストールしていない場合は、
 :ref:`install_pygeonlp` に従ってインストールしてください。
 
@@ -333,16 +333,12 @@ GIS アプリケーションで開けば、地図上にプロットすること�
 
 - 基本辞書セット以外の辞書を追加インストールしたい
 
-  - :ref:`dict_management_pygeonlp` へ
+  - :ref:`cli_add_dictionary` へ
 
 - `NEologd <https://github.com/neologd/mecab-ipadic-neologd/>`_
   と連携して固有表現の抽出精度を上げたい
 
   - :ref:`link_neologd` へ
-
-- 抽出したい地名が辞書に載っていないので、独自の地名解析辞書を作りたい
-
-  - :ref:`dic_developers_index` へ
 
 - 住所文字列を住所として解析したい
 
@@ -355,3 +351,7 @@ GIS アプリケーションで開けば、地図上にプロットすること�
 - より高度な解析を行うモジュールを開発したい
 
   - :ref:`advanced_developers` へ
+
+- 抽出したい地名が辞書に載っていないので、独自の地名解析辞書を作りたい
+
+  - `辞書制作者向け資料 <https://geonlp.ex.nii.ac.jp/doc/dic_developers/index.html>`_ へ

@@ -1,3 +1,5 @@
+:orphan:
+
 .. _install_pygeonlp_ubuntu:
 
 インストール手順 (Ubuntu)

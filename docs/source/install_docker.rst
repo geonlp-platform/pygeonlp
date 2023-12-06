@@ -1,3 +1,5 @@
+:orphan:
+
 .. _install_pygeonlp_docker:
 
 インストール手順 (Docker)

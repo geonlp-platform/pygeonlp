@@ -1,11 +1,12 @@
-.. _json:
+.. _json_representation:
 
 JSON表現
 ========
 
-pygeonlp では、 `JSON-RPC <http://json-rpc.org/>`_ を利用して
-:ref:`geonlp_terms_geoword` や :ref:`geonlp_terms_dictionary` 、
-:ref:`geonlp_terms_address` の情報を表現します。
+pygeonlp では、 `JSON <https://www.json.org/>`_ を利用して
+`地名語 <https://geonlp.ex.nii.ac.jp/doc/documents/terms.html#geonlp-terms-geoword>`_ や
+`住所 <https://geonlp.ex.nii.ac.jp/doc/documents/terms.html#geonlp-terms-address>`_
+の情報を表現します。
 
 ここではこれらの情報の JSON 表現について説明します。
 
