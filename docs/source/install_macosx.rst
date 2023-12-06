@@ -1,3 +1,5 @@
+:orphan:
+
 .. _install_pygeonlp_macosx:
 
 インストール手順 (MacOS X)

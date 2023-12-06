@@ -33,7 +33,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 #     rm /opt/gaiku_all_v21.zip
 
 # Install neologd
-# ENV PYGEONLP_MECAB_DIC_DIR=/neologd
+# ENV GEONLP_MECAB_DIC_DIR=/neologd
 # RUN apt-get install -y git mecab
 # RUN cd /tmp \
 #     && git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git \

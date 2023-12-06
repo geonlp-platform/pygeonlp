@@ -74,7 +74,7 @@ class Service(object):
             しかし特定の語を地名語として解析したくない場合は非地名語として
             定義してください。
             デフォルト値は ["本部","一部","月"] です。
-            環境変数 PYGEONLP_EXCLUDED_WORD でデフォルト値を設定できます。
+            環境変数 GEONLP_EXCLUDED_WORD でデフォルト値を設定できます。
 
 
         その他の解析オプションは以下の通りです。
@@ -85,12 +85,12 @@ class Service(object):
             住所として解析したい（市区町村から始まる場合は無視したい）場合は
             r"^都道府県" を指定します。
             デフォルト値は r"^(都道府県|市区町村|行政地域|居住地名)(/.+|)" です。
-            環境変数 PYGEONLP_ADDRESS_CLASS でデフォルト値を設定できます。
+            環境変数 GEONLP_DRESS_CLASS でデフォルト値を設定できます。
 
         system_dic_dir : str
             MeCab システム辞書のディレクトリを指定します。
             省略した場合はデフォルトシステム辞書を利用します。
-            環境変数 PYGEONLP_MECAB_DIC_DIR でデフォルト値を設定できます。
+            環境変数 GEONLP_MECAB_DIC_DIR でデフォルト値を設定できます。
         """
         self._dict_cache = {}
         self.options = options
@@ -122,9 +122,8 @@ class Service(object):
 
         excluded_word = geoword_rules.get(
             "excluded_word",
-            os.environ.get("PYGEONLP_EXCLUDED_WORD", None)
+            os.environ.get("GEONLP_EXCLUDED_WORD", None)
         )
-        logger.warning(f"excluded_word: {excluded_word}")
         if isinstance(excluded_word, str):
             capi_options['non_geoword'] = excluded_word
         elif isinstance(excluded_word, Iterable):
@@ -137,7 +136,7 @@ class Service(object):
         address_class = self.options.get(
             "address_class",
             os.environ.get(
-                "PYGEONLP_ADDRESS_CLASS",
+                "GEONLP_ADDRESS_CLASS",
                 r'^(都道府県|市区町村|行政地域|居住地名)(\/.+|)'
             )
         )
@@ -152,7 +151,7 @@ class Service(object):
 
         system_dic_dir = self.options.get(
             "system_dic_dir",
-            os.environ.get("PYGEONLP_MECAB_DIC_DIR", None)
+            os.environ.get("GEONLP_MECAB_DIC_DIR", None)
         )
         if system_dic_dir is None:
             pass

@@ -23,12 +23,13 @@ geotagger や geoparser と呼ばれるツールの一つです。
 ----
 
 .. toctree::
+    :numbered:
     :maxdepth: 2
 
     overview.rst
     install.rst
+    cli.rst
     quick_start.rst
-    dict_management.rst
     link_neologd.rst
     link_jageocoder.rst
     tuning.rst

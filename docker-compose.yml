@@ -9,4 +9,3 @@ services:
       - type: bind
         source: ./pygeonlp/api
         target: /develop/pygeonlp/api
-

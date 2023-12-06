@@ -196,6 +196,106 @@ def pp_path(path, indent=2, file=None):
     print("]", file=file)
 
 
+def _mecabline(geojson):
+    """
+    geoparse() の結果（GeoJSON表現）の一語分を mecab 類似書式用の
+    リストに変換します。
+
+    Parameters
+    ----------
+    geojson : dict
+        geoparse() 結果の GeoJSON 互換 dict。
+
+    Examples
+    --------
+    >>> import pygeonlp.api as api
+    >>> from pygeonlp.api.devtool import _mecabline as mecabline
+    >>> mecabline(api.geoparse('目黒駅')[0])
+    ('目黒駅', ('名詞', '固有名詞', '地名語', 'Y2uuN3:目黒駅', '*', '*', '目黒駅', '', ''), ('鉄道施設/鉄道駅', 'Y2uuN3', '目黒駅', '139.71566', '35.632485'))
+    """
+    # Common properties
+    properties = geojson["properties"]
+    morphemes = properties["morphemes"]
+    node_type = properties["node_type"]
+
+    if node_type in ("NORMAL", "GEOWORD"):
+        common = (
+            morphemes["pos"],
+            morphemes["subclass1"],
+            morphemes["subclass2"],
+            morphemes["subclass3"],
+            morphemes["conjugation_type"],
+            morphemes["conjugated_form"],
+            morphemes["original_form"],
+            morphemes["yomi"],
+            morphemes["prononciation"],
+        )
+
+    if node_type == "NORMAL":
+        geo = tuple()
+    elif node_type == "GEOWORD":
+        geoword_properties = geojson["properties"]["geoword_properties"]
+        prefix = ""
+        if "prefix" in geoword_properties:
+            for k in geoword_properties["prefix"]:
+                if len(k) > len(prefix):
+                    prefix = k
+
+        suffix = ""
+        if "suffix" in geoword_properties:
+            for k in geoword_properties["suffix"]:
+                if len(k) > len(suffix):
+                    suffix = k
+
+        geo = (
+            geoword_properties["ne_class"],
+            geoword_properties["geolod_id"],
+            prefix + geoword_properties["body"] + suffix,
+            geoword_properties["longitude"],
+            geoword_properties["latitude"],
+        )
+
+    else:  # ADDRESS
+        address_properties = properties["address_properties"]
+        levels = (
+            "不明",
+            "都道府県",
+            "郡",
+            "市町村・特別区",
+            "区",
+            "大字",
+            "字・小字",
+            "街区・地番",
+            "住居番号・枝番"
+        )
+        level = levels[address_properties["level"]]
+        original_form = "".join(address_properties["fullname"])
+        yomi = "".join(m["properties"]["morphemes"]["yomi"]
+                        for m in morphemes)
+        prononciation = "".join(m["properties"]["morphemes"]
+                        ["prononciation"] for m in morphemes)
+        common = (
+            "名詞",
+            "固有名詞",
+            "住所",
+            level,
+            "*",
+            "*",
+            original_form,
+            yomi,
+            prononciation,
+        )
+        geo = (
+            "住所",
+            "",
+            original_form,
+            str(address_properties["x"]),
+            str(address_properties["y"]),
+        )
+
+    return (properties["surface"], common, geo,)
+
+
 def pp_mecab(geojson_list, file=None):
     """
     geoparse() の結果（GeoJSON互換）を mecab 類似書式で出力します。
@@ -211,7 +311,6 @@ def pp_mecab(geojson_list, file=None):
     --------
     >>> import pygeonlp.api as api
     >>> from pygeonlp.api.devtool import pp_mecab
-    >>> api.init()
     >>> pp_mecab(api.geoparse('目黒駅は品川区にあります。'))
     目黒駅  名詞,固有名詞,地名語,Xy26iV:目黒駅,*,*,目黒駅,, 鉄道施設/鉄道駅,Xy26iV,目黒駅,139.71566,35.632485
     は      助詞,係助詞,*,*,*,*,は,ハ,ワ
@@ -223,121 +322,15 @@ def pp_mecab(geojson_list, file=None):
     EOS
     <BLANKLINE>
     """  # noqa: E501
-    def mecabline(geojson):
-        # Common properties
-        properties = geojson["properties"]
-        morphemes = properties["morphemes"]
-        node_type = properties["node_type"]
 
-        if node_type in ("NORMAL", "GEOWORD"):
-            common = (
-                "{pos},"
-                "{subclass1},"
-                "{subclass2},"
-                "{subclass3},"
-                "{conjugation_type},"
-                "{conjugated_form},"
-                "{original_form},"
-                "{yomi},"
-                "{prononciation}"
-            ).format(
-                pos=morphemes["pos"],
-                subclass1=morphemes["subclass1"],
-                subclass2=morphemes["subclass2"],
-                subclass3=morphemes["subclass3"],
-                conjugation_type=morphemes["conjugation_type"],
-                conjugated_form=morphemes["conjugated_form"],
-                original_form=morphemes["original_form"],
-                yomi=morphemes["yomi"],
-                prononciation=morphemes["prononciation"],
-            )
-
-        if node_type == "NORMAL":
-            geo = ""
-        elif node_type == "GEOWORD":
-            geoword_properties = geojson["properties"]["geoword_properties"]
-            prefix = ""
-            if "prefix" in geoword_properties:
-                for k in geoword_properties["prefix"]:
-                    if len(k) > len(prefix):
-                        prefix = k
-
-            suffix = ""
-            if "suffix" in geoword_properties:
-                for k in geoword_properties["suffix"]:
-                    if len(k) > len(suffix):
-                        suffix = k
-
-            props = {
-                "ne_class": geoword_properties["ne_class"],
-                "geolod_id": geoword_properties["geolod_id"],
-                "normalized_form":
-                    prefix + geoword_properties["body"] + suffix,
-                "longitude": geoword_properties["longitude"],
-                "latitude": geoword_properties["latitude"],
-            }
-            geo = (
-                "{ne_class},"
-                "{geolod_id},"
-                "{normalized_form},"
-                "{longitude},"
-                "{latitude}"
-            ).format(**props)
-
-        else:  # ADDRESS
-            address_properties = properties["address_properties"]
-            levels = [
-                "不明",
-                "都道府県",
-                "郡",
-                "市町村・特別区",
-                "区",
-                "大字",
-                "字・小字",
-                "街区・地番",
-                "住居番号・枝番"
-            ]
-            level = levels[address_properties["level"]]
-            original_form = "".join(address_properties["fullname"])
-            yomi = "".join(m["properties"]["morphemes"]["yomi"]
-                           for m in morphemes)
-            pron = "".join(m["properties"]["morphemes"]
-                           ["prononciation"] for m in morphemes)
-            common = (
-                "名詞,固有名詞,住所,{level},"
-                "*,*,{original_form},{yomi},{prononciation}"
-            ).format(
-                level=level,
-                original_form=original_form,
-                yomi=yomi,
-                prononciation=pron,
-            )
-
-            props = {
-                "ne_class": "住所",
-                "geolod_id": "",
-                "normalized_form": original_form,
-                "longitude": address_properties["x"],
-                "latitude": address_properties["y"],
-            }
-            geo = (
-                "{ne_class},"
-                "{geolod_id},"
-                "{normalized_form},"
-                "{longitude},"
-                "{latitude}"
-            ).format(**props)
-
-        line = "\t".join([
-            properties["surface"],
-            common,
-            geo
-        ])
-
-        return line
-
-    for pos, geojson in enumerate(geojson_list):
+    for geojson in geojson_list:
         if geojson is not None:
-            print("{}".format(mecabline(geojson)), end="\n", file=file)
+            line = _mecabline(geojson)
+            print("\t".join((
+                    line[0],
+                    ",".join(line[1]),
+                    ",".join(line[2]),
+                )), end="\n", file=file
+            )
 
     print("EOS", file=file)
