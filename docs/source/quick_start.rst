@@ -1,5 +1,5 @@
 Quickstart
-================
+==========
 
 ここでは pygeonlp の簡単な使い方を紹介します。
 まだ pygeonlp をインストールしていない場合は、
@@ -14,14 +14,12 @@ pygeonlp を使って自然文テキストから地名を抽出する最小コ�
 .. code-block:: python3
 
   import pygeonlp.api
-  pygeonlp.api.init()
   print(pygeonlp.api.geoparse("NIIは神保町駅から徒歩7分です。"))
 
 このコードは次の処理を行ないます。
 
 1. `pygeonlp.api パッケージ <pygeonlp.api.html>`_ を読み込みます。
-2. `init() <pygeonlp.api.html#pygeonlp.api.init>`_ を呼んで API が利用可能な状態に初期化します。
-3. `geoparse() <pygeonlp.api.html#pygeonlp.api.geoparse>`_ メソッドを呼んで、テキストを解析します。
+2. `geoparse() <pygeonlp.api.html#pygeonlp.api.geoparse>`_ メソッドを呼んで、テキストを解析します。
 
 実行結果
 --------
@@ -38,7 +36,6 @@ pygeonlp を使って自然文テキストから地名を抽出する最小コ�
 
   import json
   import pygeonlp.api
-  pygeonlp.api.init()
   parsed = pygeonlp.api.geoparse("NIIは神保町駅から徒歩7分です。")
   print(json.dumps(parsed, indent=2, ensure_ascii=False))
 
@@ -324,12 +321,17 @@ GIS アプリケーションで開けば、地図上にプロットすること�
 コピーした GeoJSON を貼り付ければ、神保町駅にマーカーが
 プロットされることを確認できます。
 
+
 より高度な使い方
 ----------------
 
 基本的な pygeonlp の使い方は以上です。
 
 より進んだ使い方を知りたい方は、関連する説明へお進みください。
+
+- 基本辞書セット以外の辞書を追加インストールしたい
+
+  - :ref:`dict_management_pygeonlp` へ
 
 - `NEologd <https://github.com/neologd/mecab-ipadic-neologd/>`_
   と連携して固有表現の抽出精度を上げたい

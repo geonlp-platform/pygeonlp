@@ -80,7 +80,7 @@ def init(db_dir=None, **options):
     ----------
     db_dir : PathLike, optional
         データベースディレクトリ。
-        省略した場合は ``api.init.get_db_dir()`` が返す値を利用します。
+        省略した場合は ``api.get_db_dir()`` が返す値を利用します。
 
     Examples
     --------
@@ -614,14 +614,10 @@ def _check_initialized():
 
     この関数は API メソッド内でチェックのために呼びだすものなので、
     ユーザが呼びだす必要は基本的にありません。
-
-    Raises
-    ------
-    ServiceError
-        init() を呼ぶ前に API メソッドを利用しようとすると発生します。
     """
     if _default_workflow is None:
-        raise WorkflowError("APIが初期化されていません。")
+        init()
+        # raise WorkflowError("APIが初期化されていません。")
 
 
 def getActiveDictionaries():

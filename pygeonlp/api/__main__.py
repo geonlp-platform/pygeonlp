@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import site
@@ -6,6 +7,7 @@ import sys
 from docopt import docopt
 import pygeonlp.api
 from pygeonlp.api.dict_manager import DictManager
+from pygeonlp.api.devtool import pp_mecab
 
 logger = logging.getLogger(__name__)
 
@@ -16,40 +18,49 @@ HELP = """
 
 Usage:
   {p} -h
+  {p} geoparse [--db-dir=<dir>] [--json] [<file>]
   {p} list-dictionaries [--db-dir=<dir>]
   {p} show-dictionary [--db-dir=<dir>] <id>
-  {p} clear-database [--db-dir=<dir>]
+  {p} clear-dictionaries [--db-dir=<dir>]
   {p} add-dictionary [--db-dir=<dir>] (<json-path> <csv-path> | <url>)
   {p} remove-dictionary [--db-dir=<dir>] <id>
   {p} download-dictionary [--db-dir=<dir>] <url> <json-path> <csv-path>
   {p} setup [--db-dir=<dir>] [<dict-src-dir>]
 
 Options:
-  -h --help           Show this help.
-  --db-dir=<dir>      Specify the database directory.
+  -h --help           このヘルプを表示します。
+  --json              JSON で出力します。
+  --db-dir=<dir>      データベースディレクトリを指定します。
 
 Examples:
+- "test.txt" のテキストをジオパーズした結果を出力します
+  {p} geoparse test.txt    
 
 - パッケージに同梱されている辞書ファイルから初期データベースを設定します
-  python -m {p} setup
+  {p} setup
 
 - インストールされている辞書情報一覧を表示します
-  python -m {p} list-dictionaries
+  {p} list-dictionaries
 
-- Identifire で指定した辞書の情報を表示します
-  python -m {p} show-dictionary geonlp:geoshape-city
+- 指定した辞書の情報を表示します（辞書の識別子で指定）
+  {p} show-dictionary geonlp:geoshape-city
 
 - インストールされている辞書をクリア（全て削除）します
-  python -m {p} clear-database
-
-- JSONおよびCSVファイルから辞書をインストールします
-  python -m {p} add-dictionary base_data/geoshape-city.json base_data/geoshape-city.csv
+  {p} clear-dictionaries
 
 - ウェブから辞書をインストールします
-  python -m {p} add-dictionary https://geonlp.ex.nii.ac.jp/dictionary/geoshape-city/
+  {p} add-dictionary https://geonlp.ex.nii.ac.jp/dictionary/ksj-post-office/
+
+- 指定した辞書をアンインストールします
+
+  {p} remove-dictionary geonlp:post-office
 
 - ウェブから辞書をダウンロードし、JSONおよびCSVファイルに保存します
-  python -m {p} download-dictionary https://geonlp.ex.nii.ac.jp/dictionary/geoshape-city/ geoshape.json geoshape.csv
+  {p} download-dictionary https://geonlp.ex.nii.ac.jp/dictionary/geoshape-city/ geoshape.json geoshape.csv
+
+- JSONおよびCSVファイルから辞書をインストールします
+  {p} add-dictionary base_data/geoshape-city.json base_data/geoshape-city.csv
+
 """.format(p='pygeonlp.api')
 
 
@@ -131,6 +142,7 @@ def setup_basic_database(db_dir=None, src_dir=None):
     if updated:
         manager.updateIndex()
 
+
 def main():
     args = docopt(HELP)
 
@@ -140,16 +152,71 @@ def main():
         db_dir = pygeonlp.api.get_db_dir()
 
     manager = pygeonlp.api.dict_manager.DictManager(db_dir)
+    if manager.capi_ma is None and args['setup'] is False:
+        while True:
+            r = input(
+                f"{db_dir} に基本辞書セットをインストールしますか? (y/n):"
+            )
+            if r[0].lower() == 'y':
+                manager.setupBasicDatabase()
+                print("完了しました。")
+                break
+            else:
+                print((
+                    "pygeonlp setup コマンドを実行して"
+                    "辞書をインストールしてください。"
+                ))
+                exit(1)
+
+    if args['geoparse']:
+        pygeonlp.api.init(db_dir=db_dir)
+        if args['<file>']:
+            with open(args['<file>'], "r") as f:
+                for line in f:
+                    line = line.rstrip()
+                    if line == "":
+                        continue
+
+                    geojson = pygeonlp.api.geoparse(line)
+                    if args['--json']:
+                        print(json.dumps(geojson, ensure_ascii=False))
+                    else:
+                        print(pp_mecab(geojson))
+
+        else:
+            for line in sys.stdin:
+                line = line.rstrip()
+                if line != "":
+                    geojson = pygeonlp.api.geoparse(line)
+                    if args['--json']:
+                        print(json.dumps(geojson, ensure_ascii=False))
+                    else:
+                        pp_mecab(geojson)
+
+        exit(0)
 
     if args['list-dictionaries']:
-        print(manager.getDictionaries())
+        for metadata in manager.getDictionaries():
+            dic = json.loads(metadata.jsonld)
+            print("{} : {}\n- {}\n{}\n".format(
+                metadata.get_identifier(),
+                metadata.get_name(),
+                dic["url"],
+                dic["description"]))
+
         exit(0)
 
     if args['show-dictionary']:
-        print(manager.getDictionary(args['<id>']))
+        print(
+            json.dumps(
+                json.loads(manager.getDictionary(args['<id>']).jsonld),
+                indent=2,
+                ensure_ascii=False
+            )
+        )
         exit(0)
 
-    if args['clear-database']:
+    if args['clear-dictionaries']:
         manager.clearDatabase()
         manager.updateIndex()
         exit(0)
@@ -165,8 +232,22 @@ def main():
         exit(0)
 
     if args['remove-dictionary']:
-        manager.removeDictionary(args['<id>'])
-        manager.updateIndex()
+        metadata = manager.getDictionary(args['<id>'])
+        if metadata is not None:
+            manager.removeDictionary(args['<id>'])
+            manager.updateIndex()
+        else:  # Supports cases specified by URLs.
+            for metadata in manager.getDictionaries():
+                dic = json.loads(metadata.jsonld)
+                if dic["url"] == args["<id>"]:
+                    identifier = metadata.get_identifier()
+                    manager.removeDictionary(identifier)
+                    manager.updateIndex()
+                    break
+
+            else:  # Call the method to raise error.
+                manager.removeDictionary(args['<id>'])
+
         exit(0)
 
     if args['download-dictionary']:
@@ -174,6 +255,7 @@ def main():
             jsonfile=args['<json-path>'],
             csvfile=args['<csv-path>'],
             url=args['<url>'])
+
         exit(0)
 
     if args['setup']:
