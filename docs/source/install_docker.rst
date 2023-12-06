@@ -49,7 +49,7 @@ Docker イメージを作成
 
 作成した Dockerfile があるフォルダでイメージを作成します。 ::
 
-    % docker build -t pygeonlp .
+    % docker build -t pygeonlp_image .
 
 
 コンテナを生成して実行
@@ -57,23 +57,64 @@ Docker イメージを作成
 
 作成したイメージからコンテナを作成して bash コマンドを実行します。 ::
 
-    % docker run -it pygeonlp bash
+    % docker run --name pygeonlp -i -t pygeonlp_image bash
     root@75243c7b8ddd:/#
 
-python3 を対話モードで起動し、 pygeonlp が動作することを確認してください。 ::
+動作確認のため ``pygeonlp geoparse`` を実行し、
+地名を含む日本語テキストを入力します。 ::
 
-    % python3
-    Python 3.10.12 (main, Nov 20 2023, 15:14:05) [GCC 11.4.0] on linux
-    Type "help", "copyright", "credits" or "license" for more information.
-    >>> import pygeonlp.api
-    >>> pygeonlp.api.init()
-    >>> pygeonlp.api.geoparse('目黒駅は品川区')
-    [{'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [139.71566, 35.632485]}, 'properties': {'surface': '目黒駅', 'node_type': 'GEOWORD', 'morphemes': {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '目黒駅', 'pos': '名詞', 'prononciation': '', 'subclass1': '固有名詞', 'subclass2': '地名語', 'subclass3': 'Xy26iV:目黒駅', 'surface': '目黒駅', 'yomi': ''}, 'geoword_properties': {'body': '目黒', 'dictionary_id': 3, 'entry_id': 'GvksxA', 'geolod_id': 'Xy26iV', 'hypernym': ['東京都', '6号線三田線'], 'institution_type': '公営鉄 道', 'latitude': '35.632485', 'longitude': '139.71566', 'ne_class': '鉄道施設/鉄道駅', 'railway_class': '普通鉄道', 'suffix': ['駅', ''], 'dictionary_identifier': 'geonlp:ksj-station-N02'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': 'は', 'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': 'は', 'pos': '助詞', 'prononciation': 'ワ', 'subclass1': '係助詞', 'subclass2': '*', 'subclass3': '*', 'surface': 'は', 'yomi': 'ハ'}}}, {'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [139.73025, 35.609066]}, 'properties': {'surface': '品川区', 'node_type': 'GEOWORD', 'morphemes': {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '品川区', 'pos': '名詞', 'prononciation': '', 'subclass1': '固有名詞', 'subclass2': '地名語', 'subclass3': 'kEAYBl:品川区', 'surface': '品川区', 'yomi': ''}, 'geoword_properties': {'address': '東京都品川区', 'body': '品川', 'body_variants': '品川', 'code': {}, 'countyname': '', 'countyname_variants': '', 'dictionary_id': 1, 'entry_id': '13109A1968', 'geolod_id': 'kEAYBl', 'hypernym': ['東京都'], 'latitude': '35.60906600', 'longitude': '139.73025000', 'ne_class': '市区町村', 'prefname': '東京都', 'prefname_variants': '東京都', 'source': '1/品 川区役所/品川区広町2-1-36/P34-14_13.xml', 'suffix': ['区'], 'valid_from': '', 'valid_to': '', 'dictionary_identifier': 'geonlp:geoshape-city'}}}]
+    root@75243c7b8ddd:/# pygeonlp geoparse
+    渋谷じゃなくて新宿に行こう。
+    渋谷    名詞,固有名詞,地名語,RCU4nF:渋谷駅,*,,渋谷,,    鉄道施設/鉄道駅,RCU4nF,渋谷駅,139.70258433333333,35.659098666666665
+    じゃ    助詞,副助詞,*,*,*,*,じゃ,ジャ,ジャ
+    なく    助動詞,*,*,*,連用テ接続,特殊・ナイ,ない,ナク,ナク
+    て      助詞,接続助詞,*,*,*,*,て,テ,テ
+    新宿    名詞,固有名詞,地名語,8A8y00:新宿駅,*,,新宿,,    鉄道施設/鉄道駅,8A8y00,新宿駅,139.70059,35.69244
+    に      助詞,格助詞,一般,*,*,*,に,ニ,ニ
+    行こ    動詞,自立,*,*,未然ウ接続,五段・カ行促音便,行く,イコ,イコ
+    う      助動詞,*,*,*,基本形,不変化型,う,ウ,ウ
+    。      記号,句点,*,*,*,*,。,。,。
+    EOS
 
-osgeo/gdal イメージを拡張しているので、
-:py:class:`SpatialFilter <pygeonlp.api.spatial_filter.SpatialFilter>`
-も利用できます。
+``Ctrl+D`` を押して EOF を送信するとシェルプロンプトに戻ります。
+``exit`` でコンテナを終了します。 ::
 
-|
+    root@75243c7b8ddd:/# exit
+
+もう一度このコンテナを実行したい場合は ``docker start`` で起動します。 ::
+
+    % docker start -a -i pygeonlp
+    root@75243c7b8ddd:/#
 
 以上でインストール完了です。
+
+
+コンテナとイメージの削除
+------------------------
+
+コンテナが不要になった場合は ``docker rm`` コマンドで削除します。 ::
+
+    % docker rm pygeonlp
+
+イメージが不要になった場合は ``docker rmi`` コマンドで削除します。 ::
+
+    % docker rmi pygeonlp_image
+
+
+パイプ処理
+----------
+
+pygeonlp コンテナをパイプとして利用したい場合、次のように
+``docker run`` に ``--rm`` オプションを付けて実行し、
+処理が終わったあとにコンテナを自動的に削除するようにします。 ::
+
+    % echo "目黒駅は品川区にあります。" | docker run --rm -i pygeonlp_image pygeonlp geoparse > result.txt
+    % cat result.txt
+    目黒駅  名詞,固有名詞,地名語,Xy26iV:目黒駅,*,*,目黒駅,, 鉄道施設/鉄道駅,Xy26iV,目黒駅,139.71566,35.632485
+    は      助詞,係助詞,*,*,*,*,は,ハ,ワ
+    品川区  名詞,固有名詞,地名語,kEAYBl:品川区,*,*,品川区,, 市区町村,kEAYBl,品川区,139.73025000,35.60906600
+    に      助詞,格助詞,一般,*,*,*,に,ニ,ニ
+    あり    動詞,自立,*,*,連用形,五段・ラ行,ある,アリ,アリ
+    ます    助動詞,*,*,*,基本形,特殊・マス,ます,マス,マス
+    。      記号,句点,*,*,*,*,。,。,。
+    EOS

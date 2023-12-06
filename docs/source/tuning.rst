@@ -11,26 +11,54 @@
 （＝地名解決処理が失敗している）場合の二通りがあります。
 
 地名語がデータベースに登録されていない場合は、その地名語が含まれている
-地名解析辞書を作成するかウェブから取得し、
-`addDictionaryFromFile() <pygeonlp.api.html#pygeonlp.api.addDictionaryFromFile>`_
-および
-`addDictionaryFromWeb() <pygeonlp.api.html#pygeonlp.api.addDictionaryFromWeb>`_
-を使ってデータベースに登録してください。
+:ref:`install_dictionary` してください。
 
 ここでは地名解決処理が失敗してしまう場合に、処理精度を改善する方法を説明します。
+
+特定の語を抽出しない
+--------------------
+
+環境変数 ``PYGEONLP_EXCLUDED_WORD`` に指定した語は地名語として
+解析されなくなり、MeCab の解析結果がそのまま出力されます。 ::
+
+  $ export PYGEONLP_EXCLUDED_WORD=甲子園
+  $ echo "甲子園に行こう。" | pygeonlp geoparse
+  甲子園  名詞,固有名詞,地域,一般,*,*,甲子園,コウシエン,コーシエン
+  に      助詞,格助詞,一般,*,*,*,に,ニ,ニ
+  行こ    動詞,自立,*,*,未然ウ接続,五段・カ行促音便,行く,イコ,イコ
+  う      助動詞,*,*,*,基本形,不変化型,う,ウ,ウ
+  。      記号,句点,*,*,*,*,。,。,。
+  EOS
+
+複数の語を指定したい場合は ``|`` を区切りとして列挙してください。 ::
+
+  $ export PYGEONLP_EXCLUDED_WORD='神戸|広島'
+  $ echo "今年のJ1は神戸と広島が強い。" | pygeonlp geoparse
+  今年    名詞,副詞可能,*,*,*,*,今年,コトシ,コトシ
+  の      助詞,連体化,*,*,*,*,の,ノ,ノ
+  J       名詞,一般,*,*,*,*,*,,
+  1       名詞,数,*,*,*,*,*,,
+  は      助詞,係助詞,*,*,*,*,は,ハ,ワ
+  神戸    名詞,固有名詞,地域,一般,*,*,神戸,コウベ,コーベ
+  と      助詞,並立助詞,*,*,*,*,と,ト,ト
+  広島    名詞,固有名詞,組織,*,*,*,広島,ヒロシマ,ヒロシマ
+  が      助詞,格助詞,一般,*,*,*,が,ガ,ガ
+  強い    形容詞,自立,*,*,基本形,形容詞・アウオ段,強い,ツヨイ,ツヨイ
+  。      記号,句点,*,*,*,*,。,。,。
+  EOS
+
 
 解析対象とする地名解析辞書・固有名クラスの指定
 ----------------------------------------------
 
 市区町村名だけを抽出したいのに駅名が抽出されてしまうといった場合、
-`disactivateDictionaries() <pygeonlp.api.html#pygeonlp.api.disactivateDictionaries>`_
+:py:meth:`~pygeonlp.api.disactivateDictionaries`
 を実行することで、一時的に特定の地名解析辞書を利用しないように
 設定することができます。
 
 例：「和歌山市」のつもりが「和歌山市駅」が抽出されてしまう。 ::
 
   >>> import pygeonlp.api as api
-  >>> api.init()
   >>> api.geoparse('和歌山市は晴れ')
   [{'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [135.16538500000001, 34.23604]}, 'properties': {'surface': '和歌山市', 'node_type': 'GEOWORD', 'morphemes': {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '和歌山市', 'pos': '名詞', 'prononciation': '', 'subclass1': '固有名詞', 'subclass2': '地名語', 'subclass3': 'OciY0C:和歌山市駅', 'surface': '和歌山市', 'yomi': ''}, 'geoword_properties': {'body': '和歌山市', 'dictionary_id': 3, 'entry_id': 'adeb575da6e2879b67c9b76d269333e6', 'geolod_id': 'OciY0C', 'hypernym': ['南海電気鉄道', '和歌山港線'], 'institution_type': '民営鉄道', 'latitude': '34.23604', 'longitude': '135.16538500000001', 'ne_class': '鉄道施設/鉄道駅', 'railway_class': '普通鉄道', 'suffix': ['駅', ''], 'dictionary_identifier': 'geonlp:ksj-station-N02-2019'}}}, ... ]
 
@@ -39,13 +67,12 @@
 その結果 ``geonlp:ksj-station-N02-2019`` が利用できなくなるので、和歌山市駅が候補から除外されます。
 
   >>> import pygeonlp.api as api
-  >>> api.init()
   >>> api.disactivateDictionaries(pattern=r'station')
   >>> api.geoparse('和歌山市は晴れ。')
   [{'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [135.170808, 34.230514]}, 'properties': {'surface': '和歌山市', 'node_type': 'GEOWORD', 'morphemes': {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '和歌山市', 'pos': '名詞', 'prononciation': '', 'subclass1': '固有名詞', 'subclass2': '地名語', 'subclass3': 'lQccqK:和歌山市', 'surface': '和歌山市', 'yomi': ''}, 'geoword_properties': {'address': '和歌山県和歌山市', 'body': '和歌山', 'body_variants': '和歌山', 'code': {}, 'countyname': '', 'countyname_variants': '', 'dictionary_id': 1, 'entry_id': '30201A1968', 'geolod_id': 'lQccqK', 'hypernym': ['和歌山県'], 'latitude': '34.23051400', 'longitude': '135.17080800', 'ne_class': '市区町村', 'prefname': '和歌山県', 'prefname_variants': '和歌山県', 'source': '1/和歌山市役所/和歌山市七番丁23/P34-14_30.xml', 'suffix': ['市'], 'valid_from': '1889-04-01', 'valid_to': '', 'dictionary_identifier': 'geonlp:geoshape-city'}}}, ... ]
 
 辞書ごと対象から除外する代わりに、
-`setActiveClasses() <pygeonlp.api.html#pygeonlp.api.setActiveClasses>`_
+:py:meth:~pygeonlp.api.setActiveClasses`
 で対象とする固有名クラスを指定することで、クラス単位で抽出対象を
 限定することもできます。
 
@@ -53,7 +80,6 @@
 クラスを抽出対象にすることで、和歌山市駅を候補から除外します。 ::
 
   >>> import pygeonlp.api as api
-  >>> api.init()
   >>> api.setActiveClasses(patterns=[r'.*', r'-鉄道施設/.*'])
   >>> api.geoparse('和歌山市は晴れ。')
   [{'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [135.170808, 34.230514]}, 'properties': {'surface': '和歌山市', 'node_type': 'GEOWORD', 'morphemes': {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': '和歌山市', 'pos': '名詞', 'prononciation': '', 'subclass1': '固有名詞', 'subclass2': '地名語', 'subclass3': 'lQccqK:和歌山市', 'surface': '和歌山市', 'yomi': ''}, 'geoword_properties': {'address': '和歌山県和歌山市', 'body': '和歌山', 'body_variants': '和歌山', 'code': {}, 'countyname': '', 'countyname_variants': '', 'dictionary_id': 1, 'entry_id': '30201A1968', 'geolod_id': 'lQccqK', 'hypernym': ['和歌山県'], 'latitude': '34.23051400', 'longitude': '135.17080800', 'ne_class': '市区町村', 'prefname': '和歌山県', 'prefname_variants': '和歌山県', 'source': '1/和歌山市役所/和歌山市七番丁23/P34-14_30.xml', 'suffix': ['市'], 'valid_from': '1889-04-01', 'valid_to': '', 'dictionary_identifier': 'geonlp:geoshape-city'}}}, ... ]
@@ -62,7 +88,7 @@
 地名語抽出ルールの変更
 ----------------------
 
-地名語抽出ルールは `init() <pygeonlp.api.html#pygeonlp.api.init>`_
+地名語抽出ルールは :py:meth:pygeonlp.api.init`
 実行時のオプションパラメータの一つで、形態素解析レベルの処理ルールを
 細かく設定します。一度設定したルールは再び init() を呼ぶまで変更できません。
 地名語抽出ルールについては init() のメモの欄を参照してください。
@@ -92,24 +118,22 @@
 
 対象としているテキストの時間的範囲や空間的範囲が限定されている場合
 （たとえば東京都内であることが分かっている場合など）は、抽出された地名語候補に
-`フィルタ <pygeonlp.api.filter.html#module-pygeonlp.api.filter>`_
-を適用して範囲外の候補を除去することができます。
+フィルタ (:py:class:`pygeonlp.api.filter.Filter` のサブクラス) を適用して
+範囲外の候補を除去することができます。
 
 例：東京の「府中駅」のつもりが京都府の天橋立近くの「府中駅」になってしまう。 ::
 
   >>> import pygeonlp.api as api
-  >>> api.init()
   >>> api.geoparse('府中に行きます')
   [{'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [135.195275, 35.583365]}, 'properties': {'surface': '府中', 'node_type': 'GEOWORD', 'morphemes': {'conjugated_form': '', 'conjugation_type': '*', 'original_form': '府中', 'pos': '名詞', 'prononciation': '', 'subclass1': '固有名詞', 'subclass2': '地名語', 'subclass3': 'Auq8Kv:府中駅', 'surface': '府中', 'yomi': ''}, 'geoword_properties': {'body': '府中', 'dictionary_id': 3, 'entry_id': 'ecabefc60f23d0442029793c6eab81d0', 'geolod_id': 'Auq8Kv', 'hypernym': ['丹後海陸交通', '天橋立鋼索鉄道'], 'institution_type': '民営鉄道', 'latitude': '35.583365', 'longitude': '135.195275', 'ne_class': '鉄道施設/鉄道駅', 'railway_class': '鋼索鉄道', 'suffix': ['駅', ''], 'dictionary_identifier': 'geonlp:ksj-station-N02-2019'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': 'に', 'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': 'に', 'pos': '助詞', 'prononciation': 'ニ', 'subclass1': '格助詞', 'subclass2': '一般', 'subclass3': '*', 'surface': 'に', 'yomi': 'ニ'}}}, ... ]
 
 次のコードでは、東京都付近の四角形内に空間範囲を限定する
-`GeoContainsFilter <pygeonlp.api.spatial_filter.html#pygeonlp.api.spatial_filter.GeoContainsFilter>`_
+:py:class:`~pygeonlp.api.spatial_filter.GeoContainsFilter`
 を適用することで、その外側にある京都府の府中駅を候補から除外し、
 東京都の府中駅を抽出します。 ::
 
   >>> import pygeonlp.api as api
   >>> from pygeonlp.api.spatial_filter import GeoContainsFilter
-  >>> api.init()
   >>> gcfilter = GeoContainsFilter({"type":"Polygon","coordinates":[[[139.43,35.54],[139.91,35.54],[139.91,35.83],[139.43,35.83],[139.43,35.54]]]})
   >>> api.geoparse('府中に行きます', filters=[gcfilter])
   [{'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [139.4801, 35.67219]}, 'properties': {'surface': '府中', 'node_type': 'GEOWORD', 'morphemes': {'conjugated_form': '', 'conjugation_type': '*', 'original_form': '府中', 'pos': '名詞', 'prononciation': '', 'subclass1': '固有名詞', 'subclass2': '地名語', 'subclass3': 'JQSUIi:府中駅', 'surface': '府中', 'yomi': ''}, 'geoword_properties': {'body': '府中', 'dictionary_id': 3, 'entry_id': 'd7596c3444b3632f5236ae9e3168bab9', 'geolod_id': 'JQSUIi', 'hypernym': ['京王電鉄', '京王線'], 'institution_type': '民営鉄道', 'latitude': '35.67219', 'longitude': '139.4801', 'ne_class': '鉄道施設/鉄道駅', 'railway_class': '普通鉄道', 'suffix': ['駅', ''], 'dictionary_identifier': 'geonlp:ksj-station-N02-2019'}}}, {'type': 'Feature', 'geometry': None, 'properties': {'surface': 'に', 'node_type': 'NORMAL', 'morphemes': {'conjugated_form': '*', 'conjugation_type': '*', 'original_form': 'に', 'pos': '助詞', 'prononciation': 'ニ', 'subclass1': '格助詞', 'subclass2': '一般', 'subclass3': '*', 'surface': 'に', 'yomi': 'ニ'}}}, ... ]
@@ -131,18 +155,20 @@
 - ノード間の関係によるスコアを計算する関数 ``node_relation_score()``
 
 を持つスコアリングクラス
-`pygeonlp.api.scoring.ScoringClass <pygeonlp.api.scoring.html#pygeonlp.api.scoring.ScoringClass>`_
-からサブクラスを派生し、
-`geoparse() <pygeonlp.api.html#pygeonlp.api.geoparse>`_ の
-オプションパラメータ ``scoring_class`` でクラス名を指定してください。
-スコアリングクラスの実装については ``pygeonlp.api.scoring.ScoringClass`` が
+:py:class:`pygeonlp.api.scoring.ScoringClass` からサブクラスを派生し、
+:py:meth:`~pygeonlp.api.geoparse` のオプションパラメータ
+``scoring_class`` でクラス名を指定してください。
+スコアリングクラスの実装については
+:py:class:`~pygeonlp.api.scoring.ScoringClass` が
 サンプル実装となっていますので参考にしてください。
 
 スコアを計算する関数に拡張パラメータを渡したい場合は、 ``geoparse()`` の
 オプションパラメータ ``scoring_options`` に任意の型の値を指定します。
 この値はスコアリングクラスのメンバ変数 ``options`` に格納されますので、
-ノード間のスコアを計算する関数 `node_relation_score() <pygeonlp.api.scoring.html#pygeonlp.api.scoring.ScoringClass.node_relation_score>`_
-およびパスのスコアを計算する関数 `path_score() <pygeonlp.api.scoring.html#pygeonlp.api.scoring.ScoringClass.path_score>`_
+ノード間のスコアを計算する関数
+:py:meth:`~pygeonlp.api.scoring.ScoringClass.node_relation_score`
+およびパスのスコアを計算する関数
+:py:meth:`~pygeonlp.api.scoring.ScoringClass.path_score`
 の中で ``self.options`` を参照して利用してください。
 
 一例として、指定した固有名クラスの数をスコアとして返す単純なスコアリングクラスを

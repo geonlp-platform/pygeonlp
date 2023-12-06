@@ -14,6 +14,7 @@ flask-jsonrpc = "*"
 sphinx = ">=5.3.0, <6.0.0"
 sphinx-rtd-theme = ">=1.1.1"
 sphinx-toolbox = "*"
+pygeonlp = {file = ".", editable = true}
 
 [packages]
 pipenv = ">=2022.1.8"
@@ -26,7 +27,6 @@ chardet = "*"
 lxml = ">=4.9.1"
 certifi = ">=2023.7.22"
 urllib3 = ">=2.0.7"
-pygeonlp = {file = ".", editable = true}
 deprecated = "*"
 
 [requires]
