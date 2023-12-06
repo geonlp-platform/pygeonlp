@@ -20,7 +20,7 @@ jageocoder 用辞書データのダウンロードとインストールを行な
   pygeonlp v1.1 までは ``jageocoder`` オプションは `geoparse()` の
   パラメータでしたが、 v1.2 で `init()` のパラメータに変更になりました。
 
-.. code-block :: plaintext
+.. code-block :: text
 
   >>> import pygeonlp.api as api
   >>> api.init(jageocoder=False)

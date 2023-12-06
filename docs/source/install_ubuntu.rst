@@ -40,7 +40,11 @@ pip や setuptools が古いとエラーが発生する場合があります。
 
 .. collapse:: (オプション)GDAL のインストール
 
+
     この項目はオプションです。
+
+    :py:class:`SpatialFilter <pygeonlp.api.spatial_filter.SpatialFilter>`
+    を利用するには `GDAL <https://gdal.org/index.html>`_ が必要です。
 
     まず以下のコマンドでインストールされている libgdal-dev のバージョンを確認します。 ::
 
@@ -48,12 +52,19 @@ pip や setuptools が古いとエラーが発生する場合があります。
         libgdal-dev/jammy,now 3.4.1+dfsg-1build4 amd64 [installed]
             Geospatial Data Abstraction Library - Development files
 
-    上のように表示された場合は libgdal-dev 3.4.1 がインストールされています。
+    上のように表示された場合は libgdal-dev 3.4.1 です。
+    また、``[installed]`` と表示されている場合はインストール済みです。
+    まだインストールされていない場合は apt でインストールしてください。
 
-    次に、 libgdal-dev と同じバージョンの Python GDAL パッケージをインストールします。 ::
+        $ sudo apt install libgdal-dev
+
+    次に、 libgdal-dev と同じバージョンの
+    `GDAL Python パッケージ <https://pypi.org/project/GDAL/>`_
+    をインストールします。 ::
 
         $ pip3 install gdal==3.4.1
 
+    `==` の後には libgdal-dev のバージョン番号を指定してください。
     GDAL が有効になっているかどうかは次の手順で確認してください。 ::
 
         $ python3

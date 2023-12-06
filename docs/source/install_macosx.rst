@@ -79,6 +79,9 @@ pip や setuptools が古いとエラーが発生する場合があります。
 
     この項目はオプションです。
 
+    :py:class:`SpatialFilter <pygeonlp.api.spatial_filter.SpatialFilter>`
+    を利用するには `GDAL <https://gdal.org/index.html>`_ が必要です。
+
     まず以下のコマンドでインストールされている GDAL のバージョンを確認します。 ::
 
         % brew info gdal
@@ -94,11 +97,14 @@ pip や setuptools が古いとエラーが発生する場合があります。
         ...
 
     1行目にバージョンが、7行目にインストール状況が表示されます。
-    上の例では 3.8.1 が Not installed なのでインストールします。
+    上の例ではバージョンは 3.8.1 で、インストール状況は `Not installed` ですので
+    brew コマンドでインストールします。
 
         % brew install gdal
 
-    次に、 gdal と同じバージョンの Python GDAL パッケージをインストールします。 ::
+    次に、 gdal と同じバージョンの
+    `GDAL Python パッケージ <https://pypi.org/project/GDAL/>`_
+    をインストールします。 ::
     
         % pip3 install gdal==3.8.1
 
