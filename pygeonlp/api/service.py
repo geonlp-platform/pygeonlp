@@ -74,6 +74,7 @@ class Service(object):
             しかし特定の語を地名語として解析したくない場合は非地名語として
             定義してください。
             デフォルト値は ["本部","一部","月"] です。
+            環境変数 PYGEONLP_EXCLUDED_WORD でデフォルト値を設定できます。
 
 
         その他の解析オプションは以下の通りです。
@@ -84,11 +85,12 @@ class Service(object):
             住所として解析したい（市区町村から始まる場合は無視したい）場合は
             r"^都道府県" を指定します。
             デフォルト値は r"^(都道府県|市区町村|行政地域|居住地名)(/.+|)" です。
+            環境変数 PYGEONLP_ADDRESS_CLASS でデフォルト値を設定できます。
 
         system_dic_dir : str
             MeCab システム辞書のディレクトリを指定します。
-            省略した場合はデフォルトのシステム辞書を利用します。
-
+            省略した場合はデフォルトシステム辞書を利用します。
+            環境変数 PYGEONLP_MECAB_DIC_DIR でデフォルト値を設定できます。
         """
         self._dict_cache = {}
         self.options = options
@@ -106,53 +108,59 @@ class Service(object):
                 ("データベースディレクトリ {} がありません。".format(db_dir),
                  "setup_basic_database() で作成してください。"))
 
-        # デフォルト値を設定
-        if 'address_class' not in self.options:
-            self.options['address_class'] \
-                = r'^(都道府県|市区町村|行政地域|居住地名)(\/.+|)'
-        elif self.options['address_class'] is None or \
-                self.options['address_class'] == '':
-            self.options['address_class'] = '^$'
-
         # capi.ma 用のオプションを構築
         capi_options = {'data_dir': str(db_dir)}
         if 'suffix' in geoword_rules:
-            if isinstance(geoword_rules['suffix'], str):
-                capi_options['suffix'] = geoword_rules['suffix']
+            suffix = geoword_rules["suffix"]
+            if isinstance(suffix, str):
+                capi_options['suffix'] = suffix
             elif isinstance(geoword_rules['suffix'], Iterable):
-                capi_options['suffix'] = '|'.join(
-                    list(geoword_rules['suffix']))
+                capi_options['suffix'] = '|'.join(list(suffix))
             else:
                 raise TypeError(
                     "'suffix' は文字列またはリストで指定してください。")
 
-        if 'excluded_word' in geoword_rules:
-            if isinstance(geoword_rules['excluded_word'], str):
-                capi_options['non_geoword'] = geoword_rules['excluded_word']
-            elif isinstance(geoword_rules['excluded_word'], Iterable):
-                capi_options['non_geoword'] = '|'.join(
-                    list(geoword_rules['excluded_word']))
-            else:
-                raise TypeError(
-                    "'excluded_word' は文字列またはリストで指定してください。")
+        excluded_word = geoword_rules.get(
+            "excluded_word",
+            os.environ.get("PYGEONLP_EXCLUDED_WORD", None)
+        )
+        logger.warning(f"excluded_word: {excluded_word}")
+        if isinstance(excluded_word, str):
+            capi_options['non_geoword'] = excluded_word
+        elif isinstance(excluded_word, Iterable):
+            capi_options['non_geoword'] = '|'.join(list(excluded_word))
+        elif excluded_word is not None:
+            raise TypeError(
+                "'excluded_word' は文字列またはリストで指定してください。")
 
         # その他の解析オプション
-        if 'address_class' in self.options:
-            if isinstance(self.options['address_class'], str):
-                capi_options['address_regex'] = self.options['address_class']
-            else:
-                raise TypeError(
-                    "'address_class' は正規表現文字列で指定してください。")
+        address_class = self.options.get(
+            "address_class",
+            os.environ.get(
+                "PYGEONLP_ADDRESS_CLASS",
+                r'^(都道府県|市区町村|行政地域|居住地名)(\/.+|)'
+            )
+        )
+        if isinstance(address_class, str):
+            if address_class == "":
+                address_class = "^$"
 
-        if 'system_dic_dir' in self.options:
-            system_dic_dir = self.options['system_dic_dir']
-            if system_dic_dir is None:
-                pass
-            elif isinstance(self.options['system_dic_dir'], str):
-                capi_options['system_dic_dir'] = self.options['system_dic_dir']
-            else:
-                raise TypeError(
-                    "'system_dic_dir' は文字列で指定してください。")
+            capi_options['address_regex'] = address_class
+        else:
+            raise TypeError(
+                "'address_class' は正規表現文字列で指定してください。")
+
+        system_dic_dir = self.options.get(
+            "system_dic_dir",
+            os.environ.get("PYGEONLP_MECAB_DIC_DIR", None)
+        )
+        if system_dic_dir is None:
+            pass
+        elif isinstance(system_dic_dir, str):
+            capi_options['system_dic_dir'] = system_dic_dir
+        else:
+            raise TypeError(
+                "'system_dic_dir' は文字列で指定してください。")
 
         self.capi_ma = capi.MA(capi_options)
 

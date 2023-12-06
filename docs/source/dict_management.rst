@@ -80,6 +80,8 @@
     }
 
 
+.. _install_dictionary:
+
 追加辞書をインストール
 ----------------------
 
@@ -97,6 +99,8 @@ URL を指定します。 ::
 
     $ pygeonlp add-dictionary https://geonlp.ex.nii.ac.jp/dictionary/ksj-post-office/
 
+
+.. _uninstall_dictionary:
 
 辞書をアンインストール
 ----------------------

@@ -4,4 +4,9 @@ services:
   pygeonlp:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-dev
+    volumes:
+      - type: bind
+        source: ./pygeonlp/api
+        target: /develop/pygeonlp/api
+
