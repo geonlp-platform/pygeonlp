@@ -15,7 +15,8 @@ C++ の開発環境と MeCab および Boost を apt でインストールしま
 
     $ sudo apt install build-essential libmecab-dev mecab-ipadic-utf8 libboost-all-dev
 
-:ref:`spatialfilter` を利用したい場合は libgdal-dev もインストールします。 ::
+:py:class:`~pygeonlp.api.spatial_filter.SpatialFilter` を利用したい場合は
+libgdal-dev もインストールします。 ::
 
     $ sudo apt install libgdal-dev
 
@@ -54,8 +55,8 @@ pip や setuptools が古いとエラーが発生する場合があります。
         libgdal-dev/jammy,now 3.4.1+dfsg-1build4 amd64 [installed]
             Geospatial Data Abstraction Library - Development files
 
-    上のように表示された場合は libgdal-dev 3.4.1 です。
-    また、``[installed]`` と表示されている場合はインストール済みです。
+    上のように表示された場合は 3.4.1 です。
+    また、**[installed]** と表示されている場合はインストール済みです。
     まだインストールされていない場合は apt でインストールしてください。
 
         $ sudo apt install libgdal-dev
@@ -66,7 +67,7 @@ pip や setuptools が古いとエラーが発生する場合があります。
 
         $ pip3 install gdal==3.4.1
 
-    `==` の後には libgdal-dev のバージョン番号を指定してください。
+    ``==`` の後には libgdal-dev のバージョン番号を指定してください。
     GDAL が有効になっているかどうかは次の手順で確認してください。 ::
 
         $ python3

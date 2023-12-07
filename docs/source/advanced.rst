@@ -9,20 +9,25 @@
 デフォルトの解析フローをカスタマイズ
 ------------------------------------
 
-テキストを解析する ``api.geoparse(text)`` は、実際には
-``api.default_workflow()`` が返すデフォルトの Workflow インスタンスを取得し、
-そのクラスメソッドである ``workflow.geoparse(text)`` を呼び出すショートカットです。
-そのため解析フローをカスタマイズするには、 Workflow クラスの動作を
+テキストを解析する :py:meth:`pygeonlp.api.geoparse` は、実際には
+:py:meth:`pygeonlp.api.default_workflow` が返すデフォルトの
+:py:class:`~pygeonlp.workflow.Workflow` インスタンスを取得し、
+そのクラスメソッドである :py:meth:`~pygeonlp.workflow.Workflow.geoparse`
+を呼び出すショートカットです。
+そのため解析フローをカスタマイズするには、Workflow クラスの動作を
 理解する必要があります。
 
-デフォルトの Workflow の ``geoparse()`` が実行する解析手順は次の通りです。
+デフォルトの Workflow の **geoparse()** が実行する解析手順は次の通りです。
 
-- Parser を利用して、テキストから :ref:`pygeonlp_terms_lattice_format` を作成
+- :py:class:`~pygeonlp.api.parser.Parser` を利用して、テキストから
+  :ref:`pygeonlp_terms_lattice_format` を作成
 
-- Filter を適用して、 :ref:`pygeonlp_terms_lattice_format` に含まれる
+- :py:class:`~pygeonlp.api.filter.Filter` を適用して、
+  :ref:`pygeonlp_terms_lattice_format` に含まれる
   候補を絞り込み、より限定された :ref:`pygeonlp_terms_lattice_format` を作成
 
-- Evaluator を利用して、 :ref:`pygeonlp_terms_lattice_format` から
+- :py:class:`~pygeonlp.api.linker.Evaluator` を利用して、
+  :ref:`pygeonlp_terms_lattice_format` から最もスコアの高い
   :ref:`pygeonlp_terms_path_format` を作成
 
 - :ref:`pygeonlp_terms_path_format` を GeoJSON 形式に変換
@@ -57,7 +62,7 @@ EntityClassFilter をセットするコードは以下のようになります�
 デフォルト Workflow のメンバを書き換えるとその後の処理にも影響するため、
 想定しない副作用を生じる可能性があります。
 そのため、 Workflow クラスから派生した独自のワークフロークラス
-MyWorkflow を定義し、その ``geoparse()`` を呼び出す方が安全です。 ::
+MyWorkflow を定義し、その **geoparse()** を呼び出す方が安全です。 ::
 
   from pygeonlp.api.workflow import Workflow
 
@@ -71,12 +76,12 @@ MyWorkflow を定義し、その ``geoparse()`` を呼び出す方が安全で�
   results = myworkflow.geoparse(text)
 
 もし parser, filters, evaluator を置き換えるだけでは実現できない
-ロジックを実装したい場合、 ``Workflow.geoparse()`` を参考にして
-独自ワークフロークラスの ``geoparse()`` メソッドを再定義してください。
+ロジックを実装したい場合、 **Workflow.geoparse()** を参考にして
+独自ワークフロークラスの **geoparse()** メソッドを再定義してください。
 
 実装サンプル
 ------------
 
 Filter, Evaluator, Workflow の拡張実装例が
 `GitHub <https://github.com/geonlp-platform/pygeonlp/blob/main/pygeonlp/samples/context.py>`_
-にありますので、参照してください。
+にありますので、参考にしてください。

@@ -29,7 +29,7 @@ RUN python3 -m pip install pygeonlp && pygeonlp setup
 #     rm /opt/gaiku_all_v21.zip
 
 # NEologd を辞書として利用したい場合は以下のコメントを外してください。
-# ENV PYGEONLP_MECAB_DIC_DIR=/neologd
+# ENV GEONLP_MECAB_DIC_DIR=/neologd
 # RUN apt-get install -y git mecab
 # RUN cd /tmp \
 #     && git clone --depth 1 https://github.com/neologd/mecab-ipadic-neologd.git \
@@ -37,4 +37,3 @@ RUN python3 -m pip install pygeonlp && pygeonlp setup
 #     && ./bin/install-mecab-ipadic-neologd --prefix /neologd -n -a -u -y \
 #     && cd / \
 #     && rm -r /tmp/mecab-ipadic-neologd
-

@@ -3,7 +3,7 @@
 Quickstart
 ==========
 
-ここでは pygeonlp を Python から操作する簡単な例を紹介します。
+ここでは pygeonlp を Python API を利用して操作する簡単な例を紹介します。
 まだ pygeonlp をインストールしていない場合は、
 :ref:`install_pygeonlp` に従ってインストールしてください。
 
@@ -20,8 +20,8 @@ pygeonlp を使って自然文テキストから地名を抽出する最小コ�
 
 このコードは次の処理を行ないます。
 
-1. `pygeonlp.api パッケージ <pygeonlp.api.html>`_ を読み込みます。
-2. `geoparse() <pygeonlp.api.html#pygeonlp.api.geoparse>`_ メソッドを呼んで、テキストを解析します。
+1. :py:mod:`pygeonlp.api` モジュールを読み込みます。
+2. :py:meth:`~pygeonlp.api.geoparse` メソッドを呼んで、テキストを解析します。
 
 実行結果
 --------
@@ -315,11 +315,12 @@ pygeonlp を使って自然文テキストから地名を抽出する最小コ�
     }
   }
 
-この地名語部分は `GeoJSON <https://geojson.org/>`_ の Feature 形式に
-なっていますので、この出力結果をテキストファイルに保存して
+この地名語部分は `GeoJSON <https://geojson.org/>`_ の
+`Feature 形式 <https://datatracker.ietf.org/doc/html/rfc7946#section-3.2>`_
+になっていますので、この出力結果をテキストファイルに保存して
 GIS アプリケーションで開けば、地図上にプロットすることができます。
 
-簡単にテストしたければ `GeoJSONLint <https://geojsonlint.com/>`_ に
+簡単にテストしたければ `geojson.io <http://geojson.io/>`_ に
 コピーした GeoJSON を貼り付ければ、神保町駅にマーカーが
 プロットされることを確認できます。
 
@@ -330,10 +331,6 @@ GIS アプリケーションで開けば、地図上にプロットすること�
 基本的な pygeonlp の使い方は以上です。
 
 より進んだ使い方を知りたい方は、関連する説明へお進みください。
-
-- 基本辞書セット以外の辞書を追加インストールしたい
-
-  - :ref:`cli_add_dictionary` へ
 
 - `NEologd <https://github.com/neologd/mecab-ipadic-neologd/>`_
   と連携して固有表現の抽出精度を上げたい

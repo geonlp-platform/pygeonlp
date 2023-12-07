@@ -27,7 +27,7 @@ pygeonlp は以下の環境で動作確認済みです。
 --------
 
 インストールが完了したら動作確認を行います。
-``pygeonlp geoparse`` コマンドを実行してください。 ::
+**pygeonlp geoparse** コマンドを実行してください。 ::
 
     $ pygeonlp geoparse
     /home/foo/geonlp/db に基本辞書セットをインストールしますか? (y/n):
@@ -39,21 +39,21 @@ pygeonlp は以下の環境で動作確認済みです。
 
     標準でインストールされる基本辞書は以下の3種類です。
 
-    - 日本の都道府県 (``geonlp:geoshape-pref``)
-    - 歴史的行政区域データセットβ版地名辞書 (``geonlp:geoshape-city``)
-    - 日本の鉄道駅（2019年） (``geonlp:ksj-station-N02-2019``)
+    - 日本の都道府県 (**geonlp:geoshape-pref**)
+    - 歴史的行政区域データセットβ版地名辞書 (**geonlp:geoshape-city**)
+    - 日本の鉄道駅（2019年） (**geonlp:ksj-station-N02-2019**)
 
 
 .. collapse:: インストール先を変更したい場合
 
-    pygeonlp はデフォルトで環境変数 `HOME` の下の `geonlp/db` に
+    pygeonlp はデフォルトで環境変数 **HOME** の下の **geonlp/db** に
     辞書をインストールしたデータベースを作成します。
     インストール先を変更したい場合は setup のパラメータに
     インストール先ディレクトリを指定してください。  ::
 
         $ pygeonlp setup --db-dir=/home/foo/share/geonlp/db
 
-    または、環境変数 `GEONLP_DB_DIR` をセットしておくと、
+    または、環境変数 **GEONLP_DB_DIR** をセットしておくと、
     そのディレクトリを参照します。
 
         $ export GEONLP_DB_DIR=/home/foo/share/geonlp/db
@@ -67,10 +67,10 @@ pygeonlp は以下の環境で動作確認済みです。
     発生する場合があります。
 
     その場合は以下の手順でディレクトリを見つけ、
-    ``setup`` のパラメータで指定してください。
+    **setup** のパラメータで指定してください。
 
     - pip uninstall を実行してパッケージに含まれるファイルリストを確認します。
-      ``Proceed (y/n)?`` には n と答えてください。 ::
+      **Proceed (y/n)?** には n と答えてください。 ::
 
         % pip uninstall pygeonlp
         Uninstalling pygeonlp-1.0.0:
@@ -80,10 +80,10 @@ pygeonlp は以下の環境で動作確認済みです。
         ...
         Proceed (y/n)? n
 
-    - ``geoshape-pref.csv`` などが含まれているディレクトリをメモします。
-      上の例では ``/opt/homebrew/pygeonlp_basedata/`` です。
+    - **geoshape-pref.csv** などが含まれているディレクトリをメモします。
+      上の例では **/opt/homebrew/pygeonlp_basedata/** です。
 
-    - ``setup`` のパラメータとしてこのディレクトリを指定します。 ::
+    - **setup** のパラメータとしてこのディレクトリを指定します。 ::
 
         $ pygeonlp setup /opt/homebrew/pygeonlp_basedata
 

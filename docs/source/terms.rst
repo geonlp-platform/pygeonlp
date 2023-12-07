@@ -38,28 +38,24 @@ pygeonlp では、地名解析辞書は CSV 形式のファイルとして扱い
 pygeonlp では地名抽出を効率よく行なうため、地名語をデータベースに
 登録して管理しています。データベースには以下のファイルが含まれています。
 
-- ``geodic.sq3``
+- **geodic.sq3**
 
   地名解析辞書から読み込んだ地名語のリストを格納する SQLite3 
   データベースファイルです。
 
-- ``wordlist.sq3``
+- **wordlist.sq3**
 
   地名語のリストから作成した、語の表記と
   `geolod_id <https://geonlp.ex.nii.ac.jp/doc/documents/terms.html#geolod-id>`_
   の関係を記録した SQLite3 データベースファイルです。
 
-- ``geo_name_fullname.drt``
+- **geo_name_fullname.drt**
 
   テキスト中の地名語を効率よく抽出するには Common Prefix Search 処理を
   高速に行なう必要があります。 pygeonlp では
   `Darts <http://chasen.org/~taku/software/darts/>`_ を利用しており、
   登録されている全ての地名語表記から作成した Darts 辞書ファイルを
-  ``geo_name_fullname.drt`` というファイル名で保存しています。
-
-:py:meth:`pygeonlp.api.updateIndex` API は
-``geodic.sq3`` から ``wordlist.sq3`` と ``geo_name_fullname.drt`` を作り
-検索を高速化します。
+  **geo_name_fullname.drt** というファイル名で保存しています。
 
 
 .. _pygeonlp_terms_db_dir:
@@ -75,33 +71,31 @@ pygeonlp では地名抽出を効率よく行なうため、地名語をデー�
 
 データベースディレクトリは次の順序で決定されます。
 
-- API の ``db_dir`` パラメータで指定されたディレクトリ
-- 環境変数 ``GEONLP_DB_DIR`` がセットされている場合はその値
-- 環境変数 ``HOME`` がセットされている場合は ``$HOME/geonlp/db/``
+- API の **db_dir** パラメータで指定されたディレクトリ
+- 環境変数 **GEONLP_DB_DIR** がセットされている場合はその値
+- 環境変数 **HOME** がセットされている場合は **$HOME/geonlp/db/**
 
-上記のいずれも当てはまらない場合は ``RuntimeError`` になります。
+上記のいずれも当てはまらない場合は **RuntimeError** になります。
 
 Docker や仮想環境で、コードを変更せずにデータベースディレクトリを
-変更したい場合には、環境変数 ``HOME`` または ``GEONLP_DB_DIR`` を
+変更したい場合には、環境変数 **HOME** または **GEONLP_DB_DIR** を
 セットするのが便利です。
 
-一つの環境の中で、処理によって利用するデータベースを切り替えたいという場合には、
-``db_dir`` パラメータにデータベースディレクトリを指定して
+一連の処理の中で、タスクによって利用するデータベースを切り替えたい
+という場合には、 **db_dir** パラメータにデータベースディレクトリを指定して
 :py:meth:`~pygeonlp.api.init` を呼んでください。 ::
 
   python
   >>> import pygeonlp.api as api
   >>> api.init(db_dir='/usr/local/share/lib/geonlp/db')
-  >>> ... (共通データベースを利用した処理) ...
+  >>> ... (共通データベースを利用したタスク) ...
   >>> api.init(db_dir='/home/me/geonlp/testdb')
-  >>> ... (テスト用データベースを利用した処理) ...
+  >>> ... (テスト用データベースを利用したタスク) ...
 
-``db_dir`` を指定して使用するデータベースを指定するには、 
-:py:meth:`~pygeonlp.api.init` を呼んでデフォルトワークフローが利用する
-データベースを切り替えるか、
 クラス :py:class:`pygeonlp.api.workflow.Workflow` または
-:py:class:`pygeonlp.api.service.Service` のコンストラクタで個別に
-データベースを選択します。
+:py:class:`pygeonlp.api.service.Service` のコンストラクタで
+**db_dir** を指定することで、使用するデータベースを個別に指定することも
+できます。
 
 
 .. _pygeonlp_terms_lattice_format:
@@ -134,10 +128,10 @@ Docker や仮想環境で、コードを変更せずにデータベースディ�
 解析結果は 9 個の形態素からなり、3 番目の「港区」の形態素には
 3 個の候補 Node が、4 番目の「赤坂」の形態素には 4 個の候補 Node があります。
 
-.. collapse:: **簡易表示**
+.. collapse:: 簡易表示
 
   ラティス表現は :py:meth:`~pygeonlp.api.devtool.pp_lattice` を利用して
-  簡易表示することができます。以降の例ではこの簡易表示を利用します。 ::
+  簡易表示することができます。 ::
 
     >>> import pygeonlp.api as api
     >>> from pygeonlp.api.devtool import pp_lattice
@@ -168,7 +162,7 @@ Docker や仮想環境で、コードを変更せずにデータベースディ�
       5(NORMAL)
 
 
-.. collapse:: **住所を含む場合**
+.. collapse:: 住所を含む場合
 
   住所解析を行なうと、住所候補を構成する形態素に含まれる
   「住所以外の候補」は削除され、住所ノードに統合されます。
@@ -184,7 +178,7 @@ Docker や仮想環境で、コードを変更せずにデータベースディ�
     #3:'5'
       5(NORMAL)
 
-  住所以外の候補も残したい場合は ``keep_nodes=True`` を指定します。
+  住所以外の候補も残したい場合は **keep_nodes=True** を指定します。
   この場合、住所に該当する先頭の形態素に住所ノードが追加されます。
 
   例： api.analyze("アメリカ大使館：港区赤坂1-10-5", jageocoder=True, keep_nodes=True) ::
@@ -220,8 +214,8 @@ Docker や仮想環境で、コードを変更せずにデータベースディ�
 パス表現
 --------
 
-パス表現は、地名解析処理で、最後のスコアリングと結果の出力の際に利用する
-内部データ表現です。
+パス表現は、一連の地名解析処理のうち、最後のスコアリングと
+結果の出力の際に利用する内部データ表現です。
 
 テキストを形態素に分解し、それぞれの形態素に対する候補から
 1つずつ選択した :py:class:`~pygeonlp.api.node.Node` 
@@ -249,7 +243,7 @@ Docker や仮想環境で、コードを変更せずにデータベースディ�
 このセンテンスを解析すると「港区」の候補が 3 個、「赤坂」の候補が
 4 個存在するため、 3 × 4 = 12 個のパス表現が得られます。
 
-.. collapse:: **簡易表示**
+.. collapse:: 簡易表示
 
   パス表現は :py:meth:`~pygeonlp.api.devtool.pp_path` を利用して
   簡易表示することができます。以降の例ではこの簡易表示を利用します。 ::
@@ -272,7 +266,7 @@ Docker や仮想環境で、コードを変更せずにデータベースディ�
       #8:5(NORMAL)
     ]
 
-.. collapse:: **住所を含む場合**
+.. collapse:: 住所を含む場合
 
   住所ノードを含むラティス表現からパス表現を生成する場合、
   住所ノードが複数の形態素にまたがるため、次のノードを正しく

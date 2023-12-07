@@ -21,14 +21,14 @@ jageocoder の住所辞書はサイズが大きいため、 pygeonlp をイン�
 
 - 住所辞書をインストールする
 
-  ``jageocoder install-dictionary`` コマンドでダウンロードした辞書データを
+  **jageocoder install-dictionary** コマンドでダウンロードした辞書データを
   インストールします。 ::
 
     $ jageocoder install-dictionary <ダウンロードしたzipファイルのパス>
 
 - 動作確認する
 
-  ``pygeonlp geoparse`` で住所を含むテキストを解析し、住所部分が
+  **pygeonlp geoparse** で住所を含むテキストを解析し、住所部分が
   抽出されることを確認します。 ::
 
     $ echo "東京都庁は新宿区西新宿２－８にあります。" | pygeonlp geoparse
@@ -47,9 +47,9 @@ jageocoder の住所辞書はサイズが大きいため、 pygeonlp をイン�
 ------------------------
 
 辞書データがインストールされていれば、住所ジオコーダーは自動的に利用されます。
-何らかの理由で住所を解析したくない時は、環境変数 ``JAGEOCODER_DB2_DIR`` に
-``false`` など **住所辞書をインストールしたディレクトリ名以外**
-をセットしてください。 ::
+何らかの理由で住所を解析したくない時は、環境変数 **JAGEOCODER_DB2_DIR** に
+**false** など **住所辞書をインストールしたディレクトリ名以外**
+をセットしてください。住所辞書が見つからなくなるので、住所を解析しません。 ::
 
   $ export JAGEOCODER_DB2_DIR=false
   $ echo "東京都庁は新宿区西新宿２－８にあります。" | pygeonlp geoparse
@@ -68,7 +68,7 @@ jageocoder の住所辞書はサイズが大きいため、 pygeonlp をイン�
   EOS
 
 環境変数を使わずに Python API で実行時に住所辞書を使わないよう指定するには、
-:py:meth:`pygeonlp.api.init` を呼びだす時に ``jageocoder`` オプションに
+:py:meth:`pygeonlp.api.init` を呼びだす時に **jageocoder** オプションに
 False をセットしてください。
 
 .. code-block:: python
@@ -84,19 +84,19 @@ False をセットしてください。
 2. :py:meth:`pygeonlp.api.init` を呼んでデフォルトワークフローを初期化します。
 3. :py:meth:`pygeonlp.api.geoparse` を実行します。
 
-住所ノードは ``node_type`` が ADDRESS になります。
+住所ノードは **node_type** が ADDRESS になります。
 また、住所ノードは地名語ノードと同じように、 JSON エンコードすれば
 GeoJSON Feature オブジェクトになります。
 
-住所辞書がインストールされていない時に ``jageocoder=True`` を指定すると、
+住所辞書がインストールされていない時に **jageocoder=True** を指定すると、
 ParseError 例外が発生します。住所解析が必須の場合には True を、
-どちらでも構わない場合は ``jageocoder`` パラメータを省略してください。
+どちらでも構わない場合は **jageocoder** パラメータを省略してください。
 
 処理中に切り替えたい場合
 ------------------------
 
 処理中にジオコーダーの利用をオン・オフしたい場合は、
-次のように :py:class:`pygeonlp.api.parser.Parser` クラスの
+次のように :py:class:`~pygeonlp.api.parser.Parser` クラスの
 :py:meth:`~pygeonlp.api.parser.Parser.set_jageocoder`
 を直接呼び出して明示的に切り替えることもできます。
 

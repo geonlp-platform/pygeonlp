@@ -61,7 +61,7 @@ Examples:
 - JSONおよびCSVファイルから辞書をインストールします
   {p} add-dictionary base_data/geoshape-city.json base_data/geoshape-city.csv
 
-""".format(p='pygeonlp.api')
+""".format(p='pygeonlp')
 
 
 def setup_basic_database(db_dir=None, src_dir=None):
