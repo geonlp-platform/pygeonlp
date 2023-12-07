@@ -4,8 +4,9 @@
 ============================
 
 Pygeonlp の機能をコマンドラインから利用する方法を説明します。
-Pygeonlp コマンドは ``pygeonlp`` の後ろに実行したい機能を指定し、
-さらにパラメータが続きます。
+pygeonlp のコマンドは全て **pygeonlp** の後ろに実行したい機能を指定し、
+さらにパラメータが続きます。 **pygeonlp --help** でオンライン
+ヘルプを表示します。
 
 コマンドラインではジオパーズ処理の他、地名解析辞書の管理を行うことができます。
 
@@ -15,7 +16,8 @@ Pygeonlp コマンドは ``pygeonlp`` の後ろに実行したい機能を指定
 ジオパーズ処理
 --------------
 
-対話的に一行ずつテキストを入力し、ジオパーズした結果を出力します。 ::
+**pygeonlp geoparse** を実行すると、対話的に一行ずつテキストを入力し、
+ジオパーズした結果を出力します。 ::
 
     $ pygeonlp geoparse
     NIIは神保町にあります。
@@ -28,7 +30,7 @@ Pygeonlp コマンドは ``pygeonlp`` の後ろに実行したい機能を指定
     。      記号,句点,*,*,*,*,。,。,。
     EOS
 
-終了するには ``Ctrl+D`` を押して EOF を送信してください。
+終了するには **Ctrl+D** を押して EOF を送信してください。
 
 ファイルからパイプで接続して実行することもできます。 ::
 
@@ -43,7 +45,7 @@ Pygeonlp コマンドは ``pygeonlp`` の後ろに実行したい機能を指定
 表層形と形態素情報は MeCab の標準出力フォーマットと同じです。
 地名語または住所を抽出した場合、GeoNLP 固有の属性である地理的情報が付与されます。
 
-``--json`` オプションを指定すると、 Python API と同じ、より詳細な情報を
+**--json** オプションを指定すると、 Python API と同じ、より詳細な情報を
 含む GeoJSON のリスト形式で出力します。 ::
 
     $ echo "NIIは神保町にあります。" | pygeonlp geoparse --json
@@ -55,7 +57,7 @@ Pygeonlp コマンドは ``pygeonlp`` の後ろに実行したい機能を指定
 基本辞書セットをインストール
 ----------------------------
 
-``pygeonlp setup`` で pygeonlp に同梱されている基本辞書セットを
+**pygeonlp setup** で pygeonlp に同梱されている基本辞書セットを
 インストールします。 ::
 
     $ pygeonlp setup
@@ -68,7 +70,7 @@ Pygeonlp コマンドは ``pygeonlp`` の後ろに実行したい機能を指定
 全ての辞書をアンインストール
 ----------------------------
 
-``pygeonlp clear-dictionaries`` を実行すると、インストールされている
+**pygeonlp clear-dictionaries** を実行すると、インストールされている
 全ての辞書をアンインストールします。 ::
 
     $ pygeonlp clear-dictionaries
@@ -79,7 +81,7 @@ Pygeonlp コマンドは ``pygeonlp`` の後ろに実行したい機能を指定
 インストール済み辞書を一覧表示
 ------------------------------
 
-``pygeonlp list-dictionaries`` でインストール済みの地名解析辞書の一覧を表示します。 ::
+**pygeonlp list-dictionaries** でインストール済みの地名解析辞書の一覧を表示します。 ::
 
     $ pygeonlp list-dictionaries
     geonlp:geoshape-city : 歴史的行政区域データセットβ版地名辞書
@@ -87,7 +89,7 @@ Pygeonlp コマンドは ``pygeonlp`` の後ろに実行したい機能を指定
     歴史的行政区域データセットβ版で構築した地名辞書です。1920年から2020年までの国土 数値情報「行政区域データ」に出現する市区町村をリスト化し、独自の固有IDを付与して公開しています。データセット構築の詳しい手法については、「歴史的行政区域データセットβ版」のウェブサイトをご覧ください。
     ...
 
-先頭の ``geonlp:geoshape-city`` がこの辞書の識別子です。
+先頭の **geonlp:geoshape-city** がこの辞書の識別子です。
 その後ろの「歴史的行政区域データセットβ版地名辞書」が辞書の名称です。
 2行目の URL で辞書が公開されています。
 3行目が辞書の概要説明です。
@@ -98,7 +100,7 @@ Pygeonlp コマンドは ``pygeonlp`` の後ろに実行したい機能を指定
 --------------------
 
 一覧には概要しか表示されませんので、ライセンスや更新日時などを
-確認したい場合には ``pygeonlp show-dictionary`` で個別に辞書の
+確認したい場合には **pygeonlp show-dictionary** で個別に辞書の
 詳細情報を表示してください。 ::
 
     $ pygeonlp show-dictionary geonlp:geoshape-city
@@ -151,19 +153,19 @@ Pygeonlp コマンドは ``pygeonlp`` の後ろに実行したい機能を指定
 
 .. _cli_add_dictionary:
 
-追加辞書をインストール
+拡張辞書をインストール
 ----------------------
 
 基本辞書セット以外の地名解析辞書をインストールしたい場合、
 まず辞書が公開されているページの URL が必要です。
 
 `Google Dataset Search <https://datasetsearch.research.google.com/>`_
-でキーワードに **geonlp** を指定すると簡単に見つけることができます。
-たとえば「geonlp 郵便局」で検索すると
+でキーワードに **geonlp** を指定すると、利用可能な辞書を簡単に
+見つけることができます。たとえば「geonlp 郵便局」で検索すると
 `国土数値情報：郵便局データ <https://geonlp.ex.nii.ac.jp/dictionary/ksj-post-office/>`_
 が見つかると思います。
 
-この辞書をインストールするには ``pygeonlp add-dictionary`` に
+この辞書をインストールするには **pygeonlp add-dictionary** に
 URL を指定します。 ::
 
     $ pygeonlp add-dictionary https://geonlp.ex.nii.ac.jp/dictionary/ksj-post-office/
@@ -174,7 +176,7 @@ URL を指定します。 ::
 辞書をアンインストール
 ----------------------
 
-インストール済みの地名解析辞書は、 ``pygeonlp remove-dictionary`` に
+インストール済みの地名解析辞書は、 **pygeonlp remove-dictionary** に
 辞書の識別子を指定すると個別にアンインストールできます。 ::
 
     $ pygeonlp remove-dictionary geonlp:post-office

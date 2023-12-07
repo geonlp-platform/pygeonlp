@@ -17,18 +17,18 @@ NEologd のインストール手順は
   $ cd mecab-ipadic-neologd
   $ ./bin/install-mecab-ipadic-neologd --prefix ~/neologd -n -a
 
-上の例では ``~/github/mecab-ipadic-neologd/`` に GitHub リポジトリを
-clone し、 ``~/neologd/`` に全部入り (-a) の最新辞書 (-n) を
+上の例では **~/github/mecab-ipadic-neologd/** に GitHub リポジトリを
+clone し、 **~/neologd/** に全部入り (-a) の最新辞書 (-n) を
 インストールします。
 
 pygeonlp から NEologd を利用する
 --------------------------------
 
 pygeonlp で mecab-ipadic-NEologd を MeCab システム辞書として利用するには、
-環境変数 ``PYGEONLP_MECAB_DIC_DIR`` に neologd をインストールした
+環境変数 **GEONLP_MECAB_DIC_DIR** に neologd をインストールした
 ディレクトリを指定してください。 ::
 
-  $ export PYGEONLP_MECAB_DIC_DIR=~/neologd
+  $ export GEONLP_MECAB_DIC_DIR=~/neologd
   $ echo "国立情報学研究所は千代田区にあります。" | pygeonlp geoparse
   国立情報学研究所        名詞,固有名詞,組織,*,*,*,国立情報学研究所,コクリツジョウホウガクケンキュウジョ,コクリツジョーホーガクケンキュージョ
   は      助詞,係助詞,*,*,*,*,は,ハ,ワ
@@ -43,8 +43,11 @@ pygeonlp で mecab-ipadic-NEologd を MeCab システム辞書として利用す
 
 .. collapse:: (参考) デフォルトシステム辞書の場合
 
-  ``system_dic_dir`` を指定しない場合、デフォルトのシステム辞書を利用します。 ::
+  **GEONLP_MECAB_DIC_DIR** を指定しない場合は
+  デフォルトのシステム辞書を利用します。 ::
 
+    $ unset GEONLP_MECAB_DIC_DIR
+    $ echo "国立情報学研究所は千代田区にあります。" | pygeonlp geoparse
     国立    名詞,一般,*,*,*,*,国立,コクリツ,コクリツ
     情報    名詞,一般,*,*,*,*,情報,ジョウホウ,ジョーホー
     学      名詞,接尾,一般,*,*,*,学,ガク,ガク
@@ -58,7 +61,7 @@ pygeonlp で mecab-ipadic-NEologd を MeCab システム辞書として利用す
     EOS
 
 環境変数を使わずに Python API で実行時に MeCab システム辞書を指定するには、
-:py:meth:`pygeonlp.api.init` の解析オプション ``system_dic_dir`` で
+:py:meth:`pygeonlp.api.init` の解析オプション **system_dic_dir** で
 NEologd のカスタムシステム辞書のパスを指定してください。 ::
 
   $ python

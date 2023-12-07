@@ -12,11 +12,13 @@
 --------
 
 C++ の開発環境を用意します。 MacOS X の場合には
-Command line tools for Xcode および `Homebrew <https://brew.sh/ja/>`_ を利用します。
+**Command line tools for Xcode** と
+`Homebrew <https://brew.sh/ja/>`_ を利用します。
 
 Command line tools は
 `Apple のデベロッパーサイト <https://developer.apple.com/jp/xcode/resources/>`_
-の「その他のダウンロード」リンクの先からダウンロードできます。
+の「その他のダウンロード」リンクの先からダウンロードできます
+(ユーザ登録が必要です)。
 
 .. collapse:: Homebrew のインストール手順
 
@@ -26,13 +28,13 @@ Command line tools は
 
         % /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-    画面に ``Next steps: Add Homebrew to your PATH...`` と表示されるので、
+    画面に **Next steps: Add Homebrew to your PATH...** と表示されるので、
     表示されたとおりに実行します。
 
     .. code-block :: sh
 
-    echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
-    eval "$(/opt/homebrew/bin/brew shellenv)"
+        echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+        eval "$(/opt/homebrew/bin/brew shellenv)"
 
     これで brew を利用する準備が完了しました。
 
@@ -99,8 +101,8 @@ pip や setuptools が古いとエラーが発生する場合があります。
         ...
 
     1行目にバージョンが、7行目にインストール状況が表示されます。
-    上の例ではバージョンは 3.8.1 で、インストール状況は `Not installed` ですので
-    brew コマンドでインストールします。
+    上の例ではバージョンは 3.8.1 で、インストール状況は
+    **Not installed** ですので brew コマンドでインストールします。
 
         % brew install gdal
 

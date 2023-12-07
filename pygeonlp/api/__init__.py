@@ -31,7 +31,7 @@ def get_db_dir():
     str
         ディレクトリの絶対パス。
     """
-    # 環境変数 GEONLP_DIR をチェック
+    # 環境変数 GEONLP_DB_DIR をチェック
     db_dir = os.environ.get('GEONLP_DB_DIR')
     if db_dir:
         db_dir = os.path.abspath(db_dir)

@@ -49,7 +49,10 @@ Dockerfile を作成
 Docker イメージを作成
 ---------------------
 
-作成した Dockerfile があるフォルダでイメージを作成します。 ::
+作成した Dockerfile があるフォルダで
+`docker build <https://docs.docker.jp/engine/reference/commandline/build.html>`_
+を実行し、イメージを作成します。 **-t** は作成したイメージに
+名前タグを付けるオプションです。 ::
 
     % docker build -t pygeonlp_image .
 
@@ -57,13 +60,16 @@ Docker イメージを作成
 コンテナを生成して実行
 ----------------------
 
-作成したイメージからコンテナを作成して bash コマンドを実行します。 ::
+`docker run <https://docs.docker.jp/engine/reference/run.html>`_
+を実行し、作成したイメージからコンテナを作成して bash を実行します。
+**--name** は作成したコンテナに名前を付けるオプションです。
+**-it** はコンテナに仮想端末を割り当てます。 ::
 
-    % docker run --name pygeonlp -i -t pygeonlp_image bash
+    % docker run --name pygeonlp -it pygeonlp_image bash
     root@75243c7b8ddd:/#
 
-動作確認のため ``pygeonlp geoparse`` を実行し、
-地名を含む日本語テキストを入力します。 ::
+動作確認のため **pygeonlp geoparse** を実行し、
+地名を含む日本語テキストを入力してみてください。 ::
 
     root@75243c7b8ddd:/# pygeonlp geoparse
     渋谷じゃなくて新宿に行こう。
@@ -78,12 +84,14 @@ Docker イメージを作成
     。      記号,句点,*,*,*,*,。,。,。
     EOS
 
-``Ctrl+D`` を押して EOF を送信するとシェルプロンプトに戻ります。
-``exit`` でコンテナを終了します。 ::
+**Ctrl+D** を押して EOF を送信するとシェルプロンプトに戻ります。
+**exit** でコンテナを終了します。 ::
 
     root@75243c7b8ddd:/# exit
 
-もう一度このコンテナを実行したい場合は ``docker start`` で起動します。 ::
+もう一度このコンテナを実行したい場合は
+`docker start <https://docs.docker.jp/engine/reference/commandline/start.html>`_
+で起動します。 ::
 
     % docker start -a -i pygeonlp
     root@75243c7b8ddd:/#
@@ -94,11 +102,15 @@ Docker イメージを作成
 コンテナとイメージの削除
 ------------------------
 
-コンテナが不要になった場合は ``docker rm`` コマンドで削除します。 ::
+コンテナが不要になった場合は
+`docker rm <https://docs.docker.jp/engine/reference/commandline/rm.html>`_
+コマンドで削除します。 ::
 
     % docker rm pygeonlp
 
-イメージが不要になった場合は ``docker rmi`` コマンドで削除します。 ::
+イメージが不要になった場合は
+`docker rmi <https://docs.docker.jp/engine/reference/commandline/rmi.html>`_
+コマンドで削除します。 ::
 
     % docker rmi pygeonlp_image
 
@@ -106,9 +118,9 @@ Docker イメージを作成
 パイプ処理
 ----------
 
-pygeonlp コンテナをパイプとして利用したい場合、次のように
-``docker run`` に ``--rm`` オプションを付けて実行し、
-処理が終わったあとにコンテナを自動的に削除するようにします。 ::
+pygeonlp コンテナをパイプとして利用したい場合は、次のように
+**docker run** に **--rm** オプションを付けて実行し、
+処理が終わったコンテナを自動的に削除するようにします。 ::
 
     % echo "目黒駅は品川区にあります。" | docker run --rm -i pygeonlp_image pygeonlp geoparse > result.txt
     % cat result.txt
@@ -120,3 +132,18 @@ pygeonlp コンテナをパイプとして利用したい場合、次のよう�
     ます    助動詞,*,*,*,基本形,特殊・マス,ます,マス,マス
     。      記号,句点,*,*,*,*,。,。,。
     EOS
+
+
+拡張機能対応
+------------
+
+上記の Dockerfile は最小限の機能を持つイメージを作成します。
+実際に利用する際は追加の :ref:`cli_add_dictionary` したり、
+:ref:`link_jageocoder` や :ref:`link_neologd` が必要になる場合があります。
+
+これらの機能を含めたイメージを作成するための
+Dockerfile のサンプルを示しますので、必要に応じてカスタマイズして
+ご利用ください。
+
+.. literalinclude:: ../../Dockerfile
+    :language: docker

@@ -3,8 +3,12 @@
 PyGeoNLP リファレンス
 =====================
 
-PyGeoNLP は、普通の日本語テキスト（自然文）から、地名の部分を抽出する
-geotagger や geoparser と呼ばれるツールの一つです。
+PyGeoNLP は、普通の日本語テキスト(自然文)を解析し、地名部分を抽出する
+geotagger や geoparser と呼ばれるツールです。
+
+次の例のように、文中の地名(「目黒駅」「品川区」)を
+:ref:`pygeonlp_terms_geoword` として認識し、それぞれのクラス
+(「鉄道施設/鉄道駅」「市区町村」)や経緯度などを付与することができます。
 
 .. code-block:: bash
 
@@ -36,4 +40,5 @@ geotagger や geoparser と呼ばれるツールの一つです。
     advanced.rst
     terms.rst
     json/index.rst
+    envvars.rst
     api/pygeonlp.api.rst
