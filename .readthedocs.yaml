@@ -5,6 +5,11 @@ version: 2
 
 build:
   os: ubuntu-22.04
+  apt_packages:
+    - libmecab-dev
+    - mecab-ipadic-utf8
+    - libboost-all-dev
+    - libsqlite3-dev
   tools:
     python: "3.10"
   jobs:
