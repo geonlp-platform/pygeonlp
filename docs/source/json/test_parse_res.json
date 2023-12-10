@@ -1,0 +1,211 @@
+{
+  "features": [
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "*",
+          "pos": "名詞",
+          "prononciation": "",
+          "subclass1": "固有名詞",
+          "subclass2": "組織",
+          "subclass3": "*",
+          "surface": "NII",
+          "yomi": ""
+        },
+        "node_type": "NORMAL",
+        "surface": "NII"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "は",
+          "pos": "助詞",
+          "prononciation": "ワ",
+          "subclass1": "係助詞",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "は",
+          "yomi": "ハ"
+        },
+        "node_type": "NORMAL",
+        "surface": "は"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          139.757845,
+          35.6960275
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "geoword_properties": {
+          "body": "神保町",
+          "dictionary_id": 3,
+          "dictionary_identifier": "geonlp:ksj-station-N02",
+          "entry_id": "5WS6qh",
+          "geolod_id": "uN6ecI",
+          "hypernym": [
+            "東京都",
+            "10号線新宿線"
+          ],
+          "institution_type": "公営鉄道",
+          "latitude": "35.6960275",
+          "longitude": "139.757845",
+          "ne_class": "鉄道施設/鉄道駅",
+          "railway_class": "普通鉄道",
+          "suffix": [
+            "駅",
+            ""
+          ]
+        },
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "神保町駅",
+          "pos": "名詞",
+          "prononciation": "",
+          "subclass1": "固有名詞",
+          "subclass2": "地名語",
+          "subclass3": "uN6ecI:神保町駅",
+          "surface": "神保町駅",
+          "yomi": ""
+        },
+        "node_type": "GEOWORD",
+        "surface": "神保町駅"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "から",
+          "pos": "助詞",
+          "prononciation": "カラ",
+          "subclass1": "格助詞",
+          "subclass2": "一般",
+          "subclass3": "*",
+          "surface": "から",
+          "yomi": "カラ"
+        },
+        "node_type": "NORMAL",
+        "surface": "から"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "徒歩",
+          "pos": "名詞",
+          "prononciation": "トホ",
+          "subclass1": "一般",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "徒歩",
+          "yomi": "トホ"
+        },
+        "node_type": "NORMAL",
+        "surface": "徒歩"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "*",
+          "pos": "名詞",
+          "prononciation": "",
+          "subclass1": "数",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "7",
+          "yomi": ""
+        },
+        "node_type": "NORMAL",
+        "surface": "7"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "分",
+          "pos": "名詞",
+          "prononciation": "フン",
+          "subclass1": "接尾",
+          "subclass2": "助数詞",
+          "subclass3": "*",
+          "surface": "分",
+          "yomi": "フン"
+        },
+        "node_type": "NORMAL",
+        "surface": "分"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "特殊・デス",
+          "conjugation_type": "基本形",
+          "original_form": "です",
+          "pos": "助動詞",
+          "prononciation": "デス",
+          "subclass1": "*",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "です",
+          "yomi": "デス"
+        },
+        "node_type": "NORMAL",
+        "surface": "です"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "。",
+          "pos": "記号",
+          "prononciation": "。",
+          "subclass1": "句点",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "。",
+          "yomi": "。"
+        },
+        "node_type": "NORMAL",
+        "surface": "。"
+      },
+      "type": "Feature"
+    }
+  ],
+  "type": "FeatureCollection"
+}

@@ -1,0 +1,5 @@
+{
+  "method": "geonlp.getDictionaries",
+  "params": {},
+  "id": "test_getDictionaries"
+}

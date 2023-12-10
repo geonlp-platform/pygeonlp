@@ -18,7 +18,9 @@ HELP = """
 
 Usage:
   {p} -h
+  {p} --version
   {p} geoparse [--db-dir=<dir>] [--json] [<file>]
+  {p} search [--db-dir=<dir>] <word>
   {p} list-dictionaries [--db-dir=<dir>]
   {p} show-dictionary [--db-dir=<dir>] <id>
   {p} clear-dictionaries [--db-dir=<dir>]
@@ -34,7 +36,10 @@ Options:
 
 Examples:
 - "test.txt" のテキストをジオパーズした結果を出力します
-  {p} geoparse test.txt    
+  {p} geoparse test.txt
+
+- "神保町" をデータベースから検索します
+  {p} search 神保町
 
 - パッケージに同梱されている辞書ファイルから初期データベースを設定します
   {p} setup
@@ -146,6 +151,10 @@ def setup_basic_database(db_dir=None, src_dir=None):
 def main():
     args = docopt(HELP)
 
+    if args['--version']:
+        print(pygeonlp.api.__version__)
+        exit(0)
+
     if args['--db-dir']:
         db_dir = args['--db-dir']
     else:
@@ -193,6 +202,12 @@ def main():
                     else:
                         pp_mecab(geojson)
 
+        exit(0)
+
+    if args['search']:
+        pygeonlp.api.init(db_dir=db_dir)
+        word = pygeonlp.api.searchWord(args["<word>"])
+        print(json.dumps(word, ensure_ascii=False))
         exit(0)
 
     if args['list-dictionaries']:

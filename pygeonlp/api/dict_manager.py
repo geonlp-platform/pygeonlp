@@ -144,9 +144,6 @@ class DictManager(object):
         既に同じ identifier を持つ辞書データがデータベースに登録されている場合、
         削除してから新しい辞書データを登録します。
 
-        登録した辞書を利用可能にするには、 ``setActivateDictionaries()``
-        または ``activateDictionaires()`` で有効化する必要があります。
-
         Parameters
         ----------
         jsonfile : str
@@ -188,9 +185,6 @@ class DictManager(object):
 
         既に同じ identifier を持つ辞書データがデータベースに登録されている場合、
         削除してから新しい辞書データを登録します。
-
-        登録した辞書を利用可能にするには、 ``setActivateDictionaries()``
-        または ``activateDictionaires()`` で有効化する必要があります。
 
         Parameters
         ----------
@@ -234,9 +228,6 @@ class DictManager(object):
 
         既に同じ identifier を持つ辞書データがデータベースに登録されている場合、
         削除してから新しい辞書データを登録します。
-
-        登録した辞書を利用可能にするには、 ``setActivateDictionaries()``
-        または ``activateDictionaries()`` で有効化する必要があります。
 
         Parameters
         ----------

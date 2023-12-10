@@ -1,0 +1,13 @@
+{
+  "method": "geonlp.parse",
+  "params": {
+    "sentence": "和歌山市は晴れ。",
+    "options": {
+      "set-class": [
+        ".*",
+        "-鉄道施設/.*"
+      ]
+    }
+  },
+  "id": "test_parse_set_class"
+}

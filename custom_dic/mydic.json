@@ -1,0 +1,5 @@
+{
+    "name": "カスタム地名語辞書",
+    "description": "個人で利用する建物名の辞書",
+    "identifier": ["geonlp:my-buildings"]
+}

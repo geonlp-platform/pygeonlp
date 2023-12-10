@@ -1,0 +1,469 @@
+{
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          139.538159,
+          35.725499
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "geoword_properties": {
+          "address": "東京都田無市",
+          "body": "田無",
+          "body_variants": "田無",
+          "code": {},
+          "countyname": "",
+          "countyname_variants": "",
+          "dictionary_id": 1,
+          "dictionary_identifier": "geonlp:geoshape-city",
+          "entry_id": "13216A1968",
+          "geolod_id": "NGQsEB",
+          "hypernym": [
+            "東京都"
+          ],
+          "latitude": "35.72549900",
+          "longitude": "139.53815900",
+          "ne_class": "市区町村",
+          "prefname": "東京都",
+          "prefname_variants": "東京都",
+          "source": "1/西東京市役所/西東京市南町5-6-13/P34-14_13.xml/(20001001\\13\\13216A1968.wkt.txt)",
+          "suffix": [
+            "市"
+          ],
+          "valid_from": "",
+          "valid_to": "2001-01-21"
+        },
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "田無市",
+          "pos": "名詞",
+          "prononciation": "",
+          "subclass1": "固有名詞",
+          "subclass2": "地名語",
+          "subclass3": "NGQsEB:田無市",
+          "surface": "田無市",
+          "yomi": ""
+        },
+        "node_type": "GEOWORD",
+        "surface": "田無市"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "と",
+          "pos": "助詞",
+          "prononciation": "ト",
+          "subclass1": "並立助詞",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "と",
+          "yomi": "ト"
+        },
+        "node_type": "NORMAL",
+        "surface": "と"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          139.558901,
+          35.741527
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "geoword_properties": {
+          "address": "東京都保谷市",
+          "body": "保谷",
+          "body_variants": "保谷",
+          "code": {},
+          "countyname": "",
+          "countyname_variants": "",
+          "dictionary_id": 1,
+          "dictionary_identifier": "geonlp:geoshape-city",
+          "entry_id": "13217A1968",
+          "geolod_id": "PuWcAj",
+          "hypernym": [
+            "東京都"
+          ],
+          "latitude": "35.74152700",
+          "longitude": "139.55890100",
+          "ne_class": "市区町村",
+          "prefname": "東京都",
+          "prefname_variants": "東京都",
+          "source": "2/保谷庁舎/西東京市中町1-5-1/P34-14_13.xml/(20001001\\13\\13217A1968.wkt.txt)",
+          "suffix": [
+            "市"
+          ],
+          "valid_from": "",
+          "valid_to": "2001-01-21"
+        },
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "保谷市",
+          "pos": "名詞",
+          "prononciation": "",
+          "subclass1": "固有名詞",
+          "subclass2": "地名語",
+          "subclass3": "PuWcAj:保谷市",
+          "surface": "保谷市",
+          "yomi": ""
+        },
+        "node_type": "GEOWORD",
+        "surface": "保谷市"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "は",
+          "pos": "助詞",
+          "prononciation": "ワ",
+          "subclass1": "係助詞",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "は",
+          "yomi": "ハ"
+        },
+        "node_type": "NORMAL",
+        "surface": "は"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "*",
+          "pos": "名詞",
+          "prononciation": "",
+          "subclass1": "数",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "2001",
+          "yomi": ""
+        },
+        "node_type": "NORMAL",
+        "surface": "2001"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "年",
+          "pos": "名詞",
+          "prononciation": "ネン",
+          "subclass1": "接尾",
+          "subclass2": "助数詞",
+          "subclass3": "*",
+          "surface": "年",
+          "yomi": "ネン"
+        },
+        "node_type": "NORMAL",
+        "surface": "年"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "*",
+          "pos": "名詞",
+          "prononciation": "",
+          "subclass1": "数",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "1",
+          "yomi": ""
+        },
+        "node_type": "NORMAL",
+        "surface": "1"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "月",
+          "pos": "名詞",
+          "prononciation": "ツキ",
+          "subclass1": "一般",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "月",
+          "yomi": "ツキ"
+        },
+        "node_type": "NORMAL",
+        "surface": "月"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "*",
+          "pos": "名詞",
+          "prononciation": "",
+          "subclass1": "数",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "21",
+          "yomi": ""
+        },
+        "node_type": "NORMAL",
+        "surface": "21"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "日",
+          "pos": "名詞",
+          "prononciation": "ニチ",
+          "subclass1": "接尾",
+          "subclass2": "助数詞",
+          "subclass3": "*",
+          "surface": "日",
+          "yomi": "ニチ"
+        },
+        "node_type": "NORMAL",
+        "surface": "日"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "に",
+          "pos": "助詞",
+          "prononciation": "ニ",
+          "subclass1": "格助詞",
+          "subclass2": "一般",
+          "subclass3": "*",
+          "surface": "に",
+          "yomi": "ニ"
+        },
+        "node_type": "NORMAL",
+        "surface": "に"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "合併",
+          "pos": "名詞",
+          "prononciation": "ガッペイ",
+          "subclass1": "サ変接続",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "合併",
+          "yomi": "ガッペイ"
+        },
+        "node_type": "NORMAL",
+        "surface": "合併"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "サ変・スル",
+          "conjugation_type": "連用形",
+          "original_form": "する",
+          "pos": "動詞",
+          "prononciation": "シ",
+          "subclass1": "自立",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "し",
+          "yomi": "シ"
+        },
+        "node_type": "NORMAL",
+        "surface": "し"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "て",
+          "pos": "助詞",
+          "prononciation": "テ",
+          "subclass1": "接続助詞",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "て",
+          "yomi": "テ"
+        },
+        "node_type": "NORMAL",
+        "surface": "て"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "西東京市",
+          "pos": "名詞",
+          "prononciation": "",
+          "subclass1": "固有名詞",
+          "subclass2": "地域",
+          "subclass3": "一般",
+          "surface": "西東京市",
+          "yomi": ""
+        },
+        "node_type": "NORMAL",
+        "surface": "西東京市"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "に",
+          "pos": "助詞",
+          "prononciation": "ニ",
+          "subclass1": "格助詞",
+          "subclass2": "一般",
+          "subclass3": "*",
+          "surface": "に",
+          "yomi": "ニ"
+        },
+        "node_type": "NORMAL",
+        "surface": "に"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "五段・ラ行",
+          "conjugation_type": "連用形",
+          "original_form": "なる",
+          "pos": "動詞",
+          "prononciation": "ナリ",
+          "subclass1": "自立",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "なり",
+          "yomi": "ナリ"
+        },
+        "node_type": "NORMAL",
+        "surface": "なり"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "特殊・マス",
+          "conjugation_type": "連用形",
+          "original_form": "ます",
+          "pos": "助動詞",
+          "prononciation": "マシ",
+          "subclass1": "*",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "まし",
+          "yomi": "マシ"
+        },
+        "node_type": "NORMAL",
+        "surface": "まし"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "特殊・タ",
+          "conjugation_type": "基本形",
+          "original_form": "た",
+          "pos": "助動詞",
+          "prononciation": "タ",
+          "subclass1": "*",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "た",
+          "yomi": "タ"
+        },
+        "node_type": "NORMAL",
+        "surface": "た"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "。",
+          "pos": "記号",
+          "prononciation": "。",
+          "subclass1": "句点",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "。",
+          "yomi": "。"
+        },
+        "node_type": "NORMAL",
+        "surface": "。"
+      },
+      "type": "Feature"
+    }
+  ],
+  "type": "FeatureCollection"
+}

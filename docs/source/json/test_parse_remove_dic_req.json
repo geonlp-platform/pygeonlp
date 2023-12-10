@@ -1,0 +1,10 @@
+{
+  "method": "geonlp.parse",
+  "params": {
+    "sentence": "和歌山市は晴れ。",
+    "options": {
+      "remove-dic": "station"
+    }
+  },
+  "id": "test_parse_remove_dic"
+}

@@ -29,7 +29,7 @@ class TestModuleMethods(unittest.TestCase):
     def test_search_word(self):
         words = self.service.searchWord('神保町')
         self.assertIsInstance(words, dict)
-        self.assertIn('AGGwyc', words)  # 新宿線神保町駅
+        self.assertIn('uN6ecI', words)  # 新宿線神保町駅
 
     def test_set_dictionaries(self):
         # Set active dictionaries and check the results

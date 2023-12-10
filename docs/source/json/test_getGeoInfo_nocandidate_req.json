@@ -1,0 +1,9 @@
+{
+  "method": "geonlp.getGeoInfo",
+  "params": {
+    "idlist": [
+      "aaaaaa"
+    ]
+  },
+  "id": "test_getGeoInfo_nocandidate"
+}

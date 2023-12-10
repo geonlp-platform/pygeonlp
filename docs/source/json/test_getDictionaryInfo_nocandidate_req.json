@@ -1,0 +1,7 @@
+{
+  "method": "geonlp.getDictionaryInfo",
+  "params": {
+    "identifier": "geonlp:abcdef"
+  },
+  "id": "test_getDictionaryInfo_nocandidate"
+}

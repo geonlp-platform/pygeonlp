@@ -1,0 +1,36 @@
+{
+  "method": "geonlp.parse",
+  "params": {
+    "sentence": "府中に行きます。",
+    "options": {
+      "geo-contains": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              139.43,
+              35.54
+            ],
+            [
+              139.91,
+              35.54
+            ],
+            [
+              139.91,
+              35.83
+            ],
+            [
+              139.43,
+              35.83
+            ],
+            [
+              139.43,
+              35.54
+            ]
+          ]
+        ]
+      }
+    }
+  },
+  "id": "test_parse_geo_contains"
+}

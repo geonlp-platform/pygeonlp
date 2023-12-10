@@ -1,0 +1,11 @@
+{
+  "method": "geonlp.parseStructured",
+  "params": {
+    "sentence_list": [
+      "NIIは神保町駅から徒歩7分です。",
+      "千代田区一ツ橋2-1-2にあります。",
+      "竹橋駅も近いです。"
+    ]
+  },
+  "id": "test_parseStructured"
+}

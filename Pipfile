@@ -28,6 +28,7 @@ lxml = ">=4.9.1"
 certifi = ">=2023.7.22"
 urllib3 = ">=2.0.7"
 deprecated = "*"
+flask = "*"
 
 [requires]
 python_version = "3"
