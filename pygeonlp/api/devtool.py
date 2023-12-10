@@ -235,17 +235,10 @@ def _mecabline(geojson):
         geo = tuple()
     elif node_type == "GEOWORD":
         geoword_properties = geojson["properties"]["geoword_properties"]
-        prefix = ""
-        if "prefix" in geoword_properties:
-            for k in geoword_properties["prefix"]:
-                if len(k) > len(prefix):
-                    prefix = k
-
-        suffix = ""
-        if "suffix" in geoword_properties:
-            for k in geoword_properties["suffix"]:
-                if len(k) > len(suffix):
-                    suffix = k
+        prefix = geoword_properties["prefix"][0] \
+          if "prefix" in geoword_properties else ""
+        suffix = geoword_properties["suffix"][0] \
+          if "suffix" in geoword_properties else ""
 
         geo = (
             geoword_properties["ne_class"],
