@@ -3,7 +3,7 @@ import pytest
 import pygeonlp.api as geonlp_api
 from pygeonlp.api.dict_manager import DictManager
 from pygeonlp.webapi.app import app
-from pygeonlp.webapi.config.default import config
+from pygeonlp.webapi import config
 
 
 @pytest.fixture(scope="session", autouse=True)

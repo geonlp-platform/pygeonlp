@@ -9,7 +9,7 @@ from flask_jsonrpc.exceptions import MethodNotFoundError, InvalidParamsError
 
 import jageocoder
 import pygeonlp.api as geonlp_api
-from pygeonlp.webapi.config.default import config
+from pygeonlp.webapi import config
 
 dictConfig(config.LOGGING)
 app = Flask('pygeonlp_webapi')
