@@ -1,0 +1,131 @@
+{
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          139.4801,
+          35.67219
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "geoword_properties": {
+          "body": "府中",
+          "dictionary_id": 3,
+          "dictionary_identifier": "geonlp:ksj-station-N02",
+          "entry_id": "KajwsU",
+          "geolod_id": "8NE02H",
+          "hypernym": [
+            "京王電鉄",
+            "京王線"
+          ],
+          "institution_type": "民営鉄道",
+          "latitude": "35.67219",
+          "longitude": "139.4801",
+          "ne_class": "鉄道施設/鉄道駅",
+          "railway_class": "普通鉄道",
+          "suffix": [
+            "駅",
+            ""
+          ]
+        },
+        "morphemes": {
+          "conjugated_form": "",
+          "conjugation_type": "*",
+          "original_form": "府中",
+          "pos": "名詞",
+          "prononciation": "",
+          "subclass1": "固有名詞",
+          "subclass2": "地名語",
+          "subclass3": "8NE02H:府中駅",
+          "surface": "府中",
+          "yomi": ""
+        },
+        "node_type": "GEOWORD",
+        "surface": "府中"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "に",
+          "pos": "助詞",
+          "prononciation": "ニ",
+          "subclass1": "格助詞",
+          "subclass2": "一般",
+          "subclass3": "*",
+          "surface": "に",
+          "yomi": "ニ"
+        },
+        "node_type": "NORMAL",
+        "surface": "に"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "五段・カ行促音便",
+          "conjugation_type": "連用形",
+          "original_form": "行く",
+          "pos": "動詞",
+          "prononciation": "イキ",
+          "subclass1": "自立",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "行き",
+          "yomi": "イキ"
+        },
+        "node_type": "NORMAL",
+        "surface": "行き"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "特殊・マス",
+          "conjugation_type": "基本形",
+          "original_form": "ます",
+          "pos": "助動詞",
+          "prononciation": "マス",
+          "subclass1": "*",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "ます",
+          "yomi": "マス"
+        },
+        "node_type": "NORMAL",
+        "surface": "ます"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "。",
+          "pos": "記号",
+          "prononciation": "。",
+          "subclass1": "句点",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "。",
+          "yomi": "。"
+        },
+        "node_type": "NORMAL",
+        "surface": "。"
+      },
+      "type": "Feature"
+    }
+  ],
+  "type": "FeatureCollection"
+}

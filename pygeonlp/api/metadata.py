@@ -192,7 +192,7 @@ class Metadata(object):
 
         except (IndexError, TypeError):
             raise MetadataError(
-                ("json-ld から identifier を見つけられません。"
+                ("json-ldから 'geonlp:' で始まる identifier を見つけられません。"
                  "{}".format(self.jsonld)))
 
         raise MetadataError(

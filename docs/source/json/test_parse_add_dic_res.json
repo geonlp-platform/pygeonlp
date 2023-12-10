@@ -1,0 +1,117 @@
+{
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          135.170808,
+          34.230514
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "geoword_properties": {
+          "address": "和歌山県和歌山市",
+          "body": "和歌山",
+          "body_variants": "和歌山",
+          "code": {},
+          "countyname": "",
+          "countyname_variants": "",
+          "dictionary_id": 1,
+          "dictionary_identifier": "geonlp:geoshape-city",
+          "entry_id": "30201A1968",
+          "geolod_id": "lQccqK",
+          "hypernym": [
+            "和歌山県"
+          ],
+          "latitude": "34.23051400",
+          "longitude": "135.17080800",
+          "ne_class": "市区町村",
+          "prefname": "和歌山県",
+          "prefname_variants": "和歌山県",
+          "source": "1/和歌山市役所/和歌山市七番丁23/P34-14_30.xml",
+          "suffix": [
+            "市"
+          ],
+          "valid_from": "1889-04-01",
+          "valid_to": ""
+        },
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "和歌山市",
+          "pos": "名詞",
+          "prononciation": "",
+          "subclass1": "固有名詞",
+          "subclass2": "地名語",
+          "subclass3": "lQccqK:和歌山市",
+          "surface": "和歌山市",
+          "yomi": ""
+        },
+        "node_type": "GEOWORD",
+        "surface": "和歌山市"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "は",
+          "pos": "助詞",
+          "prononciation": "ワ",
+          "subclass1": "係助詞",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "は",
+          "yomi": "ハ"
+        },
+        "node_type": "NORMAL",
+        "surface": "は"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "晴れ",
+          "pos": "名詞",
+          "prononciation": "ハレ",
+          "subclass1": "一般",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "晴れ",
+          "yomi": "ハレ"
+        },
+        "node_type": "NORMAL",
+        "surface": "晴れ"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "。",
+          "pos": "記号",
+          "prononciation": "。",
+          "subclass1": "句点",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "。",
+          "yomi": "。"
+        },
+        "node_type": "NORMAL",
+        "surface": "。"
+      },
+      "type": "Feature"
+    }
+  ],
+  "type": "FeatureCollection"
+}

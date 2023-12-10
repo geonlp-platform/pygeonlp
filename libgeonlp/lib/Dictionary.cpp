@@ -23,7 +23,7 @@ namespace geonlp
   bool Dictionary::isValid(std::string& err) const {
     if (this->get_identifier().length() == 0) return false;
     if (this->get_name().length() == 0) return false;
-    if (this->get_content_url().length() == 0) return false;
+    // if (this->get_content_url().length() == 0) return false;
     return true;
   }
 
@@ -57,7 +57,8 @@ namespace geonlp
   const std::string Dictionary::get_content_url(void) const {
     picojson::value v = this->get_value("distribution");
     if (!v.is<picojson::array>()) {
-      throw std::runtime_error("'distribution' element must be an array.");
+      return "";  // No distribution url.
+      // throw std::runtime_error("'distribution' element must be an array.");
     }
     picojson::array dist_list = v.get<picojson::array>();
     for (picojson::array::iterator it = dist_list.begin(); it != dist_list.end(); it++) {

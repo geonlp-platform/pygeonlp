@@ -1,0 +1,5 @@
+{
+  "method": "geonlp.version",
+  "params": {},
+  "id": "test_version"
+}

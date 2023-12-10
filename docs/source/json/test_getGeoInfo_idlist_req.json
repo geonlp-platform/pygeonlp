@@ -1,0 +1,10 @@
+{
+  "method": "geonlp.getGeoInfo",
+  "params": {
+    "idlist": [
+      "Bn4q6d",
+      "cE8W4w"
+    ]
+  },
+  "id": "test_getGeoInfo_idlist"
+}

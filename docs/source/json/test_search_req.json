@@ -1,0 +1,7 @@
+{
+  "method": "geonlp.search",
+  "params": {
+    "key": "国会議事堂前"
+  },
+  "id": "test_search"
+}

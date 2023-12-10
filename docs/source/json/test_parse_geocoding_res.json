@@ -1,0 +1,329 @@
+{
+  "features": [
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "*",
+          "pos": "名詞",
+          "prononciation": "",
+          "subclass1": "固有名詞",
+          "subclass2": "組織",
+          "subclass3": "*",
+          "surface": "NII",
+          "yomi": ""
+        },
+        "node_type": "NORMAL",
+        "surface": "NII"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "は",
+          "pos": "助詞",
+          "prononciation": "ワ",
+          "subclass1": "係助詞",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "は",
+          "yomi": "ハ"
+        },
+        "node_type": "NORMAL",
+        "surface": "は"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          139.75814819335938,
+          35.69233322143555
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "address_properties": {
+          "fullname": [
+            "東京都",
+            "千代田区",
+            "一ツ橋",
+            "二丁目",
+            "1番"
+          ],
+          "id": 49244575,
+          "level": 7,
+          "name": "1番",
+          "note": "",
+          "priority": 3,
+          "x": 139.75814819335938,
+          "y": 35.69233322143555
+        },
+        "morphemes": [
+          {
+            "geometry": {
+              "coordinates": [
+                139.753634,
+                35.694003
+              ],
+              "type": "Point"
+            },
+            "properties": {
+              "geoword_properties": {
+                "address": "東京都千代田区",
+                "body": "千代田",
+                "body_variants": "千代田",
+                "code": {},
+                "countyname": "",
+                "countyname_variants": "",
+                "dictionary_id": 1,
+                "dictionary_identifier": "geonlp:geoshape-city",
+                "entry_id": "13101A1968",
+                "geolod_id": "WWIY7G",
+                "hypernym": [
+                  "東京都"
+                ],
+                "latitude": "35.69400300",
+                "longitude": "139.75363400",
+                "ne_class": "市区町村",
+                "prefname": "東京都",
+                "prefname_variants": "東京都",
+                "source": "1/千代田区役所/千代田区九段南1-2-1/P34-14_13.xml",
+                "suffix": [
+                  "区"
+                ],
+                "valid_from": "",
+                "valid_to": ""
+              },
+              "morphemes": {
+                "conjugated_form": "*",
+                "conjugation_type": "*",
+                "original_form": "千代田区",
+                "pos": "名詞",
+                "prononciation": "",
+                "subclass1": "固有名詞",
+                "subclass2": "地名語",
+                "subclass3": "WWIY7G:千代田区",
+                "surface": "千代田区",
+                "yomi": ""
+              },
+              "node_type": "GEOWORD",
+              "surface": "千代田区"
+            },
+            "type": "Feature"
+          },
+          {
+            "geometry": null,
+            "properties": {
+              "morphemes": {
+                "conjugated_form": "*",
+                "conjugation_type": "*",
+                "original_form": "一ツ橋",
+                "pos": "名詞",
+                "prononciation": "ヒトツバシ",
+                "subclass1": "固有名詞",
+                "subclass2": "地域",
+                "subclass3": "一般",
+                "surface": "一ツ橋",
+                "yomi": "ヒトツバシ"
+              },
+              "node_type": "NORMAL",
+              "surface": "一ツ橋"
+            },
+            "type": "Feature"
+          },
+          {
+            "geometry": null,
+            "properties": {
+              "morphemes": {
+                "conjugated_form": "*",
+                "conjugation_type": "*",
+                "original_form": "*",
+                "pos": "名詞",
+                "prononciation": "",
+                "subclass1": "数",
+                "subclass2": "*",
+                "subclass3": "*",
+                "surface": "2",
+                "yomi": ""
+              },
+              "node_type": "NORMAL",
+              "surface": "2"
+            },
+            "type": "Feature"
+          },
+          {
+            "geometry": null,
+            "properties": {
+              "morphemes": {
+                "conjugated_form": "*",
+                "conjugation_type": "*",
+                "original_form": "*",
+                "pos": "記号",
+                "prononciation": "",
+                "subclass1": "一般",
+                "subclass2": "*",
+                "subclass3": "*",
+                "surface": "-",
+                "yomi": ""
+              },
+              "node_type": "NORMAL",
+              "surface": "-"
+            },
+            "type": "Feature"
+          },
+          {
+            "geometry": null,
+            "properties": {
+              "morphemes": {
+                "conjugated_form": "*",
+                "conjugation_type": "*",
+                "original_form": "*",
+                "pos": "名詞",
+                "prononciation": "",
+                "subclass1": "数",
+                "subclass2": "*",
+                "subclass3": "*",
+                "surface": "1",
+                "yomi": ""
+              },
+              "node_type": "NORMAL",
+              "surface": "1"
+            },
+            "type": "Feature"
+          },
+          {
+            "geometry": null,
+            "properties": {
+              "morphemes": {
+                "conjugated_form": "*",
+                "conjugation_type": "*",
+                "original_form": "*",
+                "pos": "記号",
+                "prononciation": "",
+                "subclass1": "一般",
+                "subclass2": "*",
+                "subclass3": "*",
+                "surface": "-",
+                "yomi": ""
+              },
+              "node_type": "NORMAL",
+              "surface": "-"
+            },
+            "type": "Feature"
+          }
+        ],
+        "node_type": "ADDRESS",
+        "surface": "千代田区一ツ橋2-1-"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "*",
+          "pos": "名詞",
+          "prononciation": "",
+          "subclass1": "数",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "2",
+          "yomi": ""
+        },
+        "node_type": "NORMAL",
+        "surface": "2"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "に",
+          "pos": "助詞",
+          "prononciation": "ニ",
+          "subclass1": "格助詞",
+          "subclass2": "一般",
+          "subclass3": "*",
+          "surface": "に",
+          "yomi": "ニ"
+        },
+        "node_type": "NORMAL",
+        "surface": "に"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "五段・ラ行",
+          "conjugation_type": "連用形",
+          "original_form": "ある",
+          "pos": "動詞",
+          "prononciation": "アリ",
+          "subclass1": "自立",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "あり",
+          "yomi": "アリ"
+        },
+        "node_type": "NORMAL",
+        "surface": "あり"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "特殊・マス",
+          "conjugation_type": "基本形",
+          "original_form": "ます",
+          "pos": "助動詞",
+          "prononciation": "マス",
+          "subclass1": "*",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "ます",
+          "yomi": "マス"
+        },
+        "node_type": "NORMAL",
+        "surface": "ます"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": null,
+      "properties": {
+        "morphemes": {
+          "conjugated_form": "*",
+          "conjugation_type": "*",
+          "original_form": "。",
+          "pos": "記号",
+          "prononciation": "。",
+          "subclass1": "句点",
+          "subclass2": "*",
+          "subclass3": "*",
+          "surface": "。",
+          "yomi": "。"
+        },
+        "node_type": "NORMAL",
+        "surface": "。"
+      },
+      "type": "Feature"
+    }
+  ],
+  "type": "FeatureCollection"
+}

@@ -1,0 +1,42 @@
+{
+  "Bn4q6d": {
+    "body": "国会議事堂前",
+    "dictionary_id": 3,
+    "dictionary_identifier": "geonlp:ksj-station-N02",
+    "entry_id": "LrGGxY",
+    "geolod_id": "Bn4q6d",
+    "hypernym": [
+      "東京地下鉄",
+      "4号線丸ノ内線"
+    ],
+    "institution_type": "民営鉄道",
+    "latitude": "35.674845",
+    "longitude": "139.74534166666666",
+    "ne_class": "鉄道施設/鉄道駅",
+    "railway_class": "普通鉄道",
+    "suffix": [
+      "駅",
+      ""
+    ]
+  },
+  "cE8W4w": {
+    "body": "国会議事堂前",
+    "dictionary_id": 3,
+    "dictionary_identifier": "geonlp:ksj-station-N02",
+    "entry_id": "4NFELa",
+    "geolod_id": "cE8W4w",
+    "hypernym": [
+      "東京地下鉄",
+      "9号線千代田線"
+    ],
+    "institution_type": "民営鉄道",
+    "latitude": "35.673543333333335",
+    "longitude": "139.74305333333334",
+    "ne_class": "鉄道施設/鉄道駅",
+    "railway_class": "普通鉄道",
+    "suffix": [
+      "駅",
+      ""
+    ]
+  }
+}

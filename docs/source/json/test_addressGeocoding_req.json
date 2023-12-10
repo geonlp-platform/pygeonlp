@@ -1,0 +1,7 @@
+{
+  "method": "geonlp.addressGeocoding",
+  "params": {
+    "address": "千代田区一ツ橋2-1-2"
+  },
+  "id": "test_addressGeocoding"
+}

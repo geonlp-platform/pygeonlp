@@ -27,6 +27,7 @@ geotagger や geoparser と呼ばれるツールです。
 ----
 
 .. toctree::
+    :caption: 目次
     :numbered:
     :maxdepth: 2
 
@@ -36,9 +37,22 @@ geotagger や geoparser と呼ばれるツールです。
     quick_start.rst
     link_neologd.rst
     link_jageocoder.rst
+    webapi/index.rst
     tuning.rst
+    create_dictionary.rst
     advanced.rst
     terms.rst
     json/index.rst
     envvars.rst
+
+モジュール目次
+--------------
+
+.. toctree::
+    :caption: モジュール一覧
+    :maxdepth: 2
+
     api/pygeonlp.api.rst
+    api/pygeonlp.webapi.rst
+
+

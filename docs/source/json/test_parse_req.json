@@ -1,0 +1,7 @@
+{
+  "method": "geonlp.parse",
+  "params": {
+    "sentence": "NIIは神保町駅から徒歩7分です。"
+  },
+  "id": "test_parse"
+}
