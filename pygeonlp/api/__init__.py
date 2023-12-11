@@ -12,7 +12,7 @@ logger = getLogger(__name__)
 _default_workflow = None
 _default_manager = None
 
-__version__ = '1.2.2rc2'
+__version__ = '1.2.2'
 
 
 def get_db_dir():
