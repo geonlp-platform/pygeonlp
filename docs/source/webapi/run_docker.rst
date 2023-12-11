@@ -21,7 +21,7 @@ Docker ファイルを作成したディレクトリで、
 `docker build <https://docs.docker.jp/engine/reference/commandline/build.html>`_
 を実行してイメージを作成します。 ::
 
-  $ docker build docker build -t pygeonlp_webapi_image .
+  $ docker build -t pygeonlp_webapi_image .
 
 これで *pygeonlp_webapi_image* というタグ名を持つイメージが作成されます。
 
@@ -65,12 +65,12 @@ http://localhost:5000/api/browse にアクセスして WebAPI ブラウザが
 
 不要になったコンテナは
 `docker rm <https://docs.docker.jp/engine/reference/commandline/rm.html>`_
-で削除できます。パラメータはイメージのタグ名です。 ::
+で削除できます。パラメータはコンテナ名です。 ::
 
   $ docker rm pygeonlp_webapi
 
 イメージも不要になった場合は、
 `docker rmi <https://docs.docker.jp/engine/reference/commandline/rmi.html>`_
-で削除します。 ::
+で削除します。パラメータはイメージのタグ名です。 ::
 
   $ docker rmi pygeonlp_webapi_image

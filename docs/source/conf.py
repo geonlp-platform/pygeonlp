@@ -8,21 +8,13 @@
 
 import sys
 import os
+
 project = 'pygeonlp'
 copyright = '2021-2023, GeoNLP Project'
 author = 'sagara@info-proto.com <Takeshi Sagara>'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
-
-extensions = [
-    'sphinx.ext.duration',
-    'sphinx.ext.doctest',
-    'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.napoleon',  # Numpy style pydoc
-]
 
 templates_path = ['_templates']
 exclude_patterns = []
@@ -36,9 +28,15 @@ html_theme = 'sphinx_rtd_theme'  # 'alabaster'
 html_static_path = ['_static']
 
 
-# Import python module
+# Import python module in the source tree
 sys.path.insert(0, os.path.abspath(
     os.path.join(os.path.dirname(__file__), '../../')))
+
+if True:
+    import pygeonlp.api
+    version = pygeonlp.api.__version__
+    release = version
+
 
 # Import extensions
 extensions = [

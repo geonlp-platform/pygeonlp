@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y \
 RUN python3 -m pip install pygeonlp && pygeonlp setup
 
 # ここから WebAPI サーバ固有の処理（Flaskのインストールとサーバ起動）
-RUN python3 -m pip flask-jsonrpc
+RUN python3 -m pip install flask-jsonrpc
 ENV GEONLP_MECAB_DIC_DIR=/var/lib/mecab/dic/ipadic-utf8
 ENV FLASK_APP=pygeonlp.webapi.app
 

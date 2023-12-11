@@ -3,6 +3,8 @@
 PyGeoNLP リファレンス
 =====================
 
+Ver. |version| 
+
 PyGeoNLP は、普通の日本語テキスト(自然文)を解析し、地名部分を抽出する
 geotagger や geoparser と呼ばれるツールです。
 
@@ -22,10 +24,6 @@ geotagger や geoparser と呼ばれるツールです。
     。      記号,句点,*,*,*,*,。,。,。
     EOS
 
-
-目次
-----
-
 .. toctree::
     :caption: 目次
     :numbered:
@@ -44,9 +42,6 @@ geotagger や geoparser と呼ばれるツールです。
     terms.rst
     json/index.rst
     envvars.rst
-
-モジュール目次
---------------
 
 .. toctree::
     :caption: モジュール一覧
