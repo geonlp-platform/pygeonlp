@@ -4,9 +4,9 @@
 Japanese natural language text to extract place names.
 
 More detailed Japanese documentation and API references are available
-in the [/doc](./doc/) directory.
+in the [/docs/source](./docs/source) directory.
 You can also find the latest online documentation at
-[GeoNLP Documentation](https://geonlp.ex.nii.ac.jp/doc/pygeonlp/).
+[PyGeoNLP Reference](https://pygeonlp.readthedocs.io/latest/).
 
 ## How To Use
 
