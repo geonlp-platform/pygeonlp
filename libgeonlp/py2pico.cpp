@@ -171,6 +171,8 @@ PyObject * picojson_to_pyobject(const picojson::value& pico_v) {
       PyObject *val = picojson_to_pyobject(it->second);
 
       PyDict_SetItem(pydict, key, val);
+      Py_XDECREF(key);
+      Py_XDECREF(val);
     }
 
     return pydict;
