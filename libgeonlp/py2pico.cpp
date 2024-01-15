@@ -47,7 +47,9 @@ picojson::value pyobject_to_picojson(PyObject *pyobj) {
   if (PyUnicode_Check(pyobj)) {
     // is_a unicode object
     if (debug_py2pico) std::cerr << "is unicode." << std::endl;
-    const std::string cstr = PyBytes_AsString(PyUnicode_AsUTF8String(pyobj));
+    PyObject *utf8obj = PyUnicode_AsUTF8String(pyobj);
+    const std::string cstr = PyBytes_AsString(utf8obj);
+    Py_XDECREF(utf8obj);
     return picojson::value(cstr);
   }
 
@@ -91,7 +93,9 @@ picojson::value pyobject_to_picojson(PyObject *pyobj) {
       if (PyBytes_Check(key)) {
 	key_str = std::string(PyBytes_AsString(key));
       } else if (PyUnicode_Check(key)) {
-	key_str = std::string(PyBytes_AsString(PyUnicode_AsUTF8String(key)));
+	PyObject *utf8obj = PyUnicode_AsUTF8String(key);
+	key_str = std::string(PyBytes_AsString(utf8obj));
+	Py_XDECREF(utf8obj);
       } else {
 	PyErr_SetString(PyExc_RuntimeError, "The key-object of the dictionary object is neither bytes- nor unicode- object.");
 	return picojson::value();
