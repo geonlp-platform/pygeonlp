@@ -140,7 +140,7 @@ def get_libgeonlp():
 # Setup tools
 setup(
     name='pygeonlp',
-    version='1.2.2',
+    version='1.2.2.post1',
     description='A Python module for geotagging Japanese texts.',
     author='GeoNLP Project Team',
     author_email='geonlp@nii.ac.jp',
