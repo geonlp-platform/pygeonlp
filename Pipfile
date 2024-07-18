@@ -15,7 +15,7 @@ sphinx-toolbox = "*"
 pygeonlp = {file = ".", editable = true}
 
 [packages]
-certifi = ">=2023.7.22"
+certifi = ">=2024.7.04"
 chardet = "*"
 cryptography = ">=42.0.4"
 deprecated = "*"
@@ -25,10 +25,10 @@ jageocoder = ">=2.0.0"
 lxml = ">=4.9.1"
 pipenv = ">=2022.1.8"
 python-dateutil = "~=2.8.1"
-requests = ">=2.31.0"
-setuptools = ">=65.5.1"
-urllib3 = ">=2.0.7"
-werkzeug = ">=3.0.1"
+requests = ">=2.32.0"
+setuptools = ">=70.0.0"
+urllib3 = ">=2.2.2"
+werkzeug = ">=3.0.3"
 
 [requires]
 python_version = "3"

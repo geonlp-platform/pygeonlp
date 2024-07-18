@@ -577,7 +577,11 @@ class Parser(object):
                     # 固有名クラスが住所表記のものではない
                     score = 0
                 else:
-                    score = self._calc_node_score_by_distance(parent, node)
+                    if parent.surface in node.prop.get('hypernym', ''):
+                        score = 5
+                    else:
+                        score = self._calc_node_score_by_distance(parent, node)
+
                     if score > max_score:
                         cand = node
                         max_score = score
