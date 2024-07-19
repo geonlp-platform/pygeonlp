@@ -416,6 +416,7 @@ class Parser(object):
                    self.address_regex.match(node.prop.get('ne_class', '')):
                     can_be_address = True
                     break
+
                 # 地域・一般の場合でも、都道府県または市区町村名から始まる場合は
                 # 住所ジオコーディングの対象とする（NEologdで結合しているケース）
                 elif node.node_type == Node.NORMAL and \
@@ -424,29 +425,48 @@ class Parser(object):
                         'subclass1': '固有名詞',
                         'subclass2': '地域',
                         'subclass3': '一般'}):
-                    # jageocoder の trie を利用して語の候補を得る
-                    prefixes = self.jageocoder_tree.trie.common_prefixes(
-                        itaiji_converter.standardize(node.surface))
-                    if node.morphemes['original_form'] != '':
-                        prefixes.update(
-                            self.jageocoder_tree.trie.common_prefixes(
-                                itaiji_converter.standardize(
-                                    node.morphemes['original_form'])))
 
-                    for prefix in prefixes.keys():
-                        if can_be_address is True:
-                            break
+                    if not isinstance(
+                            self.jageocoder_tree,
+                            _jageocoder.remote.RemoteTree):
+                        # jageocoder の trie を利用して語の候補を得る
+                        prefixes = self.jageocoder_tree.trie.common_prefixes(
+                            itaiji_converter.standardize(node.surface))
+                        if node.morphemes['original_form'] != '':
+                            prefixes.update(
+                                self.jageocoder_tree.trie.common_prefixes(
+                                    itaiji_converter.standardize(
+                                        node.morphemes['original_form'])))
 
-                        # prefix と一致する正規化前の部分文字列を得る
-                        surface = ''
-                        for c in node.surface:
-                            surface += c
-                            if itaiji_converter.standardize(surface) == prefix:
+                        for prefix in prefixes.keys():
+                            if can_be_address is True:
                                 break
 
-                        words = self.service.searchWord(surface)
-                        for word in words.values():
-                            if self.address_regex.match(word['ne_class']):
+                            # prefix と一致する正規化前の部分文字列を得る
+                            surface = ''
+                            for c in node.surface:
+                                surface += c
+                                if itaiji_converter.standardize(surface) == prefix:
+                                    break
+
+                            words = self.service.searchWord(surface)
+                            for word in words.values():
+                                if self.address_regex.match(word['ne_class']):
+                                    can_be_address = True
+                                    break
+
+                    else:
+                        # リモートサーバで住所として解析する
+                        results = self.jageocoder_tree.searchNode(node.surface)
+                        if len(results) > 0 and results[0].matched == node.surface:
+                            can_be_address = True
+                            break
+
+                        if node.morphemes['original_form'] != '':
+                            alternative = node.morphemes['original_form']
+                            results = self.jageocoder_tree.searchNode(
+                                alternative)
+                            if len(results) > 0 and results[0].matched == alternative:
                                 can_be_address = True
                                 break
 

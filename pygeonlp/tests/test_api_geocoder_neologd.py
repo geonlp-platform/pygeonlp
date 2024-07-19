@@ -21,6 +21,10 @@ jageocoder と NEologd を同時に利用する場合のテスト。
 python -m unittest -v pygeonlp.tests.test_api_geocoder_neologd
 """
 
+# os.environ["JAGEOCODER_SERVER_URL"] = "https://jageocoder.info-proto.com/jsonrpc"
+# os.environ["JAGEOCODER_DB2_DIR"] = "/home/user/jageocoder/db2"
+# os.environ["NEOLOGD_DIC_DIR"] = "/home/user/neologd/"
+
 
 class TestModuleMethods(unittest.TestCase):
 
@@ -40,15 +44,15 @@ class TestModuleMethods(unittest.TestCase):
         api.init()
 
         # Initialize jageocoder
-        jageocoder_db_dir = jageocoder.get_db_dir(mode='r')
-        if jageocoder_db_dir:
+        try:
+            jageocoder.init()
             cls.workflow = Workflow(
                 db_dir=testdir,
                 system_dic_dir=cls.neologd_dic_dir,
                 jageocoder=jageocoder.get_module_tree(),
             )
             cls.parser = cls.workflow.parser
-        else:
+        except jageocoder.exceptions.JageocoderError:
             cls.workflow = None
 
     def setUp(self):
@@ -155,7 +159,9 @@ class TestModuleMethods(unittest.TestCase):
         地名語として抽出できない場合も住所として解析できることを確認する。
         """
         result = self.workflow.geoparse('多摩市落合1-15-2')
-        self.assertEqual(result[0]['properties']['surface'], '多摩市落合1-15')
+        self.assertTrue(
+            result[0]['properties']['surface'] in (
+                '多摩市落合1-15', '多摩市落合1-15-2'))
         self.assertEqual(result[0]['properties']['node_type'], 'ADDRESS')
 
     def test_geoparse_combined_address_oneword(self):

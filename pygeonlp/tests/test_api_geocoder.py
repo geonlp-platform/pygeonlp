@@ -19,8 +19,13 @@ jageocoder を利用するテスト。
 python -m unittest -v pygeonlp.tests.test_api_geocoder
 """
 
+# os.environ["JAGEOCODER_SERVER_URL"] = "https://jageocoder.info-proto.com/jsonrpc"
+# os.environ["JAGEOCODER_DB2_DIR"] = "/home/user/jageocoder/db2"
+
 
 class TestModuleMethods(unittest.TestCase):
+
+    workflow = None
 
     @classmethod
     def setUpClass(cls):
@@ -32,11 +37,14 @@ class TestModuleMethods(unittest.TestCase):
         dict_manager.setupBasicDatabase()
 
         # Initialize jageocoder
-        jageocoder_db_dir = jageocoder.get_db_dir(mode='r')
-        if jageocoder_db_dir:
-            cls.workflow = Workflow(db_dir=testdir, jageocoder=True)
+        try:
+            jageocoder.init()
+            cls.workflow = Workflow(
+                db_dir=testdir,
+                jageocoder=jageocoder.get_module_tree(),
+            )
             cls.parser = cls.workflow.parser
-        else:
+        except jageocoder.exceptions.JageocoderError:
             cls.workflow = None
 
     def setUp(self):
