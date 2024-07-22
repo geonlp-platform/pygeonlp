@@ -1,7 +1,8 @@
 FROM osgeo/gdal:ubuntu-full-3.6.3
 # このイメージは "Ubuntu 22.04.2 LTS" を拡張しています。
 
-ENV JAGEOCODER_DB2_DIR /opt/db2
+# アクセスできなくなっているリポジトリを削除します。
+RUN rm /etc/apt/sources.list.d/apache-arrow.sources
 
 # 必要なライブラリ・パッケージをインストールします。
 RUN apt-get update && apt-get install -y \
@@ -23,10 +24,14 @@ RUN python3 -m pip install pygeonlp && pygeonlp setup
 # RUN pygeonlp add-dictionary https://geonlp.ex.nii.ac.jp/dictionary/ksj-post-office/
 
 # 住所ジオコーダをインストールしたイメージを作りたい場合は以下のコメントを外してください。
+# ENV JAGEOCODER_DB2_DIR /opt/db2
 # RUN curl https://www.info-proto.com/static/jageocoder/latest/gaiku_all_v21.zip \
 #     -o /opt/gaiku_all_v21.zip && \
 #     jageocoder install-dictionary /opt/gaiku_all_v21.zip && \
 #     rm /opt/gaiku_all_v21.zip
+
+# オンラインの住所ジオコーダを利用したい場合は以下のコメントを外してください。
+# ENV JAGEOCODER_SERVER_URL https://jageocoder.info-proto.com/jsonrpc
 
 # NEologd を辞書として利用したい場合は以下のコメントを外してください。
 # ENV GEONLP_MECAB_DIC_DIR=/neologd

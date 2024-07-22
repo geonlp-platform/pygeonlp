@@ -19,8 +19,13 @@ jageocoder を利用するテスト。
 python -m unittest -v pygeonlp.tests.test_api_geocoder
 """
 
+# os.environ["JAGEOCODER_SERVER_URL"] = "https://jageocoder.info-proto.com/jsonrpc"
+# os.environ["JAGEOCODER_DB2_DIR"] = "/home/user/jageocoder/db2"
+
 
 class TestModuleMethods(unittest.TestCase):
+
+    workflow = None
 
     @classmethod
     def setUpClass(cls):
@@ -32,15 +37,18 @@ class TestModuleMethods(unittest.TestCase):
         dict_manager.setupBasicDatabase()
 
         # Initialize jageocoder
-        jageocoder_db_dir = jageocoder.get_db_dir(mode='r')
-        if jageocoder_db_dir:
-            cls.workflow = Workflow(db_dir=testdir, jageocoder=True)
+        try:
+            jageocoder.init()
+            cls.workflow = Workflow(
+                db_dir=testdir,
+                jageocoder=jageocoder.get_module_tree(),
+            )
             cls.parser = cls.workflow.parser
-        else:
+        except jageocoder.exceptions.JageocoderError:
             cls.workflow = None
 
     def setUp(self):
-        if self.parser is None:
+        if self.workflow is None:
             self.skipTest('住所辞書がインストールされていません。')
 
     def test_geoparse_with_address(self):
@@ -137,3 +145,21 @@ class TestModuleMethods(unittest.TestCase):
             prop = feature['properties']
             self.assertEqual(prop['surface'], answer[i]['surface'])
             self.assertEqual(prop['node_type'], answer[i]['node_type'])
+
+    def test_geoparse_with_address(self):
+        """
+        住所要素の親子関係を利用して要素を選択できることを確認する。
+        """
+        lattice = self.parser.analyze_sentence('静岡県浜松市天竜区水窪町山住')
+        lattice_address = self.parser.add_address_candidates(lattice)
+
+        # 内部の形態素を確認
+        answer = ['静岡県', '浜松市', '天竜区', '水窪町', '山住']
+        inner_morphemes = lattice_address[0][0].morphemes
+        self.assertEqual(len(inner_morphemes), len(answer))
+        self.assertEqual(inner_morphemes[0].node_type, Node.GEOWORD)
+        self.assertEqual(inner_morphemes[1].node_type, Node.GEOWORD)
+        self.assertEqual(inner_morphemes[2].node_type, Node.GEOWORD)
+        for i, node in enumerate(inner_morphemes):
+            self.assertIsInstance(node, Node)
+            self.assertEqual(node.surface, answer[i])

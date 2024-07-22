@@ -3,7 +3,8 @@
 FROM osgeo/gdal:ubuntu-full-3.6.3
 # This image is built on "Ubuntu 22.04.2 LTS"
 
-ENV JAGEOCODER_DB2_DIR /opt/db2
+# remove reference to missing repo
+RUN rm /etc/apt/sources.list.d/apache-arrow.sources
 
 # Install the required Python packages.
 RUN apt-get update && apt-get install -y \
@@ -16,6 +17,7 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     python3-pip
 
+# Setup application
 RUN mkdir /develop
 COPY setup.py README.md /develop/
 COPY base_data/ /develop/base_data/
@@ -26,13 +28,17 @@ WORKDIR /develop
 RUN --mount=type=cache,target=/root/.cache/pip \
     python3 -m pip install -e . && pygeonlp setup
 
-# Install Jageocoder gaiku_all_v20.zip
+# Option 1a. Install Jageocoder gaiku_all_v21.zip
+# ENV JAGEOCODER_DB2_DIR /opt/db2
 # RUN curl https://www.info-proto.com/static/jageocoder/latest/gaiku_all_v21.zip \
 #     -o /opt/gaiku_all_v21.zip && \
 #     jageocoder install-dictionary /opt/gaiku_all_v21.zip && \
 #     rm /opt/gaiku_all_v21.zip
 
-# Install neologd
+# Option 1b. Use Jageocoder server
+# ENV JAGEOCODER_SERVER_URL https://jageocoder.info-proto.com/jsonrpc
+
+# Option 2. Install neologd
 # ENV GEONLP_MECAB_DIC_DIR=/neologd
 # RUN apt-get install -y git mecab
 # RUN cd /tmp \

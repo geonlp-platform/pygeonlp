@@ -68,7 +68,7 @@ class TestModuleMethods(unittest.TestCase):
         from pygeonlp.api.spatial_filter import SpatialFilter, GeoContainsFilter
         geojson = SpatialFilter.get_geometry((
             'https://geoshape.ex.nii.ac.jp/city/geojson/'
-            '20200101/13/13208A1968.geojson')).ExportToJson()
+            '20230101/13/13206A1968.geojson')).ExportToJson()
         gcfilter = GeoContainsFilter(geojson)
         api.default_workflow().filters = [gcfilter]
         result = api.geoparse('府中に行きます')

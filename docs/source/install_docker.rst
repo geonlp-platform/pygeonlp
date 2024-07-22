@@ -29,11 +29,12 @@ Dockerfile を作成
 .. code-block:: docker
 
     FROM osgeo/gdal:ubuntu-full-3.6.3
-    # This image is built on "Ubuntu 22.04.2 LTS"
+    # このイメージは "Ubuntu 22.04.2 LTS" を拡張しています。
 
-    ENV JAGEOCODER_DB2_DIR /opt/db2
+    # アクセスできなくなっているリポジトリを削除します。
+    RUN rm /etc/apt/sources.list.d/apache-arrow.sources
 
-    # Install the required Python packages.
+    # 必要なライブラリ・パッケージをインストールします。
     RUN apt-get update && apt-get install -y \
         libmecab-dev \
         mecab-ipadic-utf8 \
@@ -43,7 +44,9 @@ Dockerfile を作成
         python3 \
         python3-dev \
         python3-pip
-    RUN python3 -m pip install pygeonlp && python3 -m pygeonlp.api setup
+
+    # pygeonlp と基本辞書セットをインストールします。
+    RUN python3 -m pip install pygeonlp && pygeonlp setup
 
 
 Docker イメージを作成
@@ -132,6 +135,11 @@ pygeonlp コンテナをパイプとして利用したい場合は、次のよ�
     ます    助動詞,*,*,*,基本形,特殊・マス,ます,マス,マス
     。      記号,句点,*,*,*,*,。,。,。
     EOS
+
+.. note::
+
+    Windows 環境で Docker を利用している場合、文字コードとして
+    UTF-8 を指定しないと文字化けすることがあります。
 
 
 拡張機能対応

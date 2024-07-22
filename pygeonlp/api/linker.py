@@ -300,7 +300,7 @@ class Evaluator(object):
                 continue
 
             while n > 0:
-                if results[n - 1]['score'] > score:
+                if results[n - 1]['score'] >= score:
                     results.insert(n, new_record)
                     break
 
