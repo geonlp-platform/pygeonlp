@@ -43,8 +43,8 @@
     {
       "geometry": {
         "coordinates": [
-          139.757845,
-          35.6960275
+          139.757665,
+          35.695975000000004
         ],
         "type": "Point"
       },
@@ -53,15 +53,15 @@
           "body": "神保町",
           "dictionary_id": 3,
           "dictionary_identifier": "geonlp:ksj-station-N02",
-          "entry_id": "5WS6qh",
-          "geolod_id": "uN6ecI",
+          "entry_id": "Iy2jnd",
+          "geolod_id": "AGGwyc",
           "hypernym": [
-            "東京都",
-            "10号線新宿線"
+            "東京地下鉄",
+            "11号線半蔵門線"
           ],
-          "institution_type": "公営鉄道",
-          "latitude": "35.6960275",
-          "longitude": "139.757845",
+          "institution_type": "民営鉄道",
+          "latitude": "35.695975000000004",
+          "longitude": "139.757665",
           "ne_class": "鉄道施設/鉄道駅",
           "railway_class": "普通鉄道",
           "suffix": [
@@ -77,7 +77,7 @@
           "prononciation": "",
           "subclass1": "固有名詞",
           "subclass2": "地名語",
-          "subclass3": "uN6ecI:神保町駅",
+          "subclass3": "AGGwyc:神保町駅",
           "surface": "神保町駅",
           "yomi": ""
         },

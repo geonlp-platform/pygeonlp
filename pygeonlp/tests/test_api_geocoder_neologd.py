@@ -23,7 +23,8 @@ python -m unittest -v pygeonlp.tests.test_api_geocoder_neologd
 
 # os.environ["JAGEOCODER_SERVER_URL"] = "https://jageocoder.info-proto.com/jsonrpc"
 # os.environ["JAGEOCODER_DB2_DIR"] = "/home/user/jageocoder/db2"
-# os.environ["NEOLOGD_DIC_DIR"] = "/home/user/neologd/"
+os.environ["NEOLOGD_DIC_DIR"] = os.path.join(
+    os.environ.get("HOME"), "neologd/")
 
 
 class TestModuleMethods(unittest.TestCase):

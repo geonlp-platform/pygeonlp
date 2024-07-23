@@ -211,7 +211,7 @@ def _mecabline(geojson):
     >>> import pygeonlp.api as api
     >>> from pygeonlp.api.devtool import _mecabline as mecabline
     >>> mecabline(api.geoparse('目黒駅')[0])
-    ('目黒駅', ('名詞', '固有名詞', '地名語', 'Y2uuN3:目黒駅', '*', '*', '目黒駅', '', ''), ('鉄道施設/鉄道駅', 'Y2uuN3', '目黒駅', '139.71566', '35.632485'))
+    ('目黒駅', ('名詞', '固有名詞', '地名語', '...:目黒駅', '*', '*', '目黒駅', '', ''), ('鉄道施設/鉄道駅', '...', '目黒駅', '139.71566', '35.632485'))
     """
     # Common properties
     properties = geojson["properties"]
@@ -236,9 +236,9 @@ def _mecabline(geojson):
     elif node_type == "GEOWORD":
         geoword_properties = geojson["properties"]["geoword_properties"]
         prefix = geoword_properties["prefix"][0] \
-          if "prefix" in geoword_properties else ""
+            if "prefix" in geoword_properties else ""
         suffix = geoword_properties["suffix"][0] \
-          if "suffix" in geoword_properties else ""
+            if "suffix" in geoword_properties else ""
 
         geo = (
             geoword_properties["ne_class"],
@@ -264,9 +264,9 @@ def _mecabline(geojson):
         level = levels[address_properties["level"]]
         original_form = "".join(address_properties["fullname"])
         yomi = "".join(m["properties"]["morphemes"]["yomi"]
-                        for m in morphemes)
+                       for m in morphemes)
         prononciation = "".join(m["properties"]["morphemes"]
-                        ["prononciation"] for m in morphemes)
+                                ["prononciation"] for m in morphemes)
         common = (
             "名詞",
             "固有名詞",
@@ -320,10 +320,10 @@ def pp_mecab(geojson_list, file=None):
         if geojson is not None:
             line = _mecabline(geojson)
             print("\t".join((
-                    line[0],
-                    ",".join(line[1]),
-                    ",".join(line[2]),
-                )), end="\n", file=file
+                line[0],
+                ",".join(line[1]),
+                ",".join(line[2]),
+            )), end="\n", file=file
             )
 
     print("EOS", file=file)

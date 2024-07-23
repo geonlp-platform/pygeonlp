@@ -184,11 +184,11 @@ class Evaluator(object):
     >>> for x in rr.get(api.analyze('福島は大阪から2分です。')):
     ...   (x['score'], [n.simple() for n in x['result']])
     ...
-    (46, ["福島(GEOWORD:['西日本旅客鉄道', '大阪環状線'])", 'は(NORMAL)', "大阪(GEOWORD:['西日本旅客鉄道', '東海道線'])", 'から(NORMAL)', '2(NORMAL)', '分(NORMAL)', 'です(NORMAL)', '。(NORMAL)'])
     (46, ["福島(GEOWORD:['西日本旅客鉄道', '大阪環状線'])", 'は(NORMAL)', "大阪(GEOWORD:['西日本旅客鉄道', '大阪環状線'])", 'から(NORMAL)', '2(NORMAL)', '分(NORMAL)', 'です(NORMAL)', '。(NORMAL)'])
-    (41, ["福島(GEOWORD:['阪神電気鉄道', '本線'])", 'は(NORMAL)', "大阪(GEOWORD:['西日本旅客鉄道', '東海道線'])", 'から(NORMAL)', '2(NORMAL)', '分(NORMAL)', 'です(NORMAL)', '。(NORMAL)'])
+    (46, ["福島(GEOWORD:['西日本旅客鉄道', '大阪環状線'])", 'は(NORMAL)', "大阪(GEOWORD:['西日本旅客鉄道', '東海道線'])", 'から(NORMAL)', '2(NORMAL)', '分(NORMAL)', 'です(NORMAL)', '。(NORMAL)'])
     (41, ["福島(GEOWORD:['阪神電気鉄道', '本線'])", 'は(NORMAL)', "大阪(GEOWORD:['西日本旅客鉄道', '大阪環状線'])", 'から(NORMAL)', '2(NORMAL)', '分(NORMAL)', 'です(NORMAL)', '。(NORMAL)'])
-    (36, ["福島(GEOWORD:['福島交通', '飯坂線'])", 'は(NORMAL)', "大阪(GEOWORD:['西日本旅客鉄道', '東海道線'])", 'から(NORMAL)', '2(NORMAL)', '分(NORMAL)', 'です(NORMAL)', '。(NORMAL)'])
+    (41, ["福島(GEOWORD:['阪神電気鉄道', '本線'])", 'は(NORMAL)', "大阪(GEOWORD:['西日本旅客鉄道', '東海道線'])", 'から(NORMAL)', '2(NORMAL)', '分(NORMAL)', 'です(NORMAL)', '。(NORMAL)'])
+    (36, ['福島(GEOWORD,福島県)', 'は(NORMAL)', '大阪(GEOWORD,大阪府)', 'から(NORMAL)', '2(NORMAL)', '分(NORMAL)', 'です(NORMAL)', '。(NORMAL)'])
 
     Attributes
     ----------
