@@ -10,12 +10,17 @@ class BaseConfig(object):
     TESTING = False
 
     GEONLP_DIR = geonlp_api.get_db_dir()
-    JAGEOCODER_DIR = jageocoder.get_db_dir()
     MECAB_DIC_DIR = os.environ.get('GEONLP_MECAB_DIC_DIR')
     GEONLP_API_OPTIONS = {}
 
     if MECAB_DIC_DIR is not None:
         GEONLP_API_OPTIONS['system_dic_dir'] = MECAB_DIC_DIR
+
+    try:
+        jageocoder.init()
+        JAGEOCODER_TREE = jageocoder.get_module_tree()
+    except jageocoder.exceptions.JageocoderError:
+        JAGEOCODER_TREE = None
 
     LOGGING = {
         'version': 1,

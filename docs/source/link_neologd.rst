@@ -60,6 +60,7 @@ pygeonlp で mecab-ipadic-NEologd を MeCab システム辞書として利用す
     。      記号,句点,*,*,*,*,。,。,。
     EOS
 
+
 環境変数を使わずに Python API で実行時に MeCab システム辞書を指定するには、
 :py:meth:`pygeonlp.api.init` の解析オプション **system_dic_dir** で
 NEologd のカスタムシステム辞書のパスを指定してください。 ::

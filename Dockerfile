@@ -30,7 +30,7 @@ RUN python3 -m pip install pygeonlp && pygeonlp setup
 #     jageocoder install-dictionary /opt/gaiku_all_v21.zip && \
 #     rm /opt/gaiku_all_v21.zip
 
-# オンラインの住所ジオコーダを利用したい場合は以下のコメントを外してください。
+# 住所ジオコーダサーバを利用したい場合は以下のコメントを外してください。
 # ENV JAGEOCODER_SERVER_URL https://jageocoder.info-proto.com/jsonrpc
 
 # NEologd を辞書として利用したい場合は以下のコメントを外してください。

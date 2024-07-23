@@ -16,9 +16,6 @@ app = Flask('pygeonlp_webapi')
 app.config.from_object(config)
 jsonrpc = JSONRPC(app, '/api', enable_web_browsable_api=True)
 
-if config.JAGEOCODER_DIR:
-    jageocoder.init(db_dir=config.JAGEOCODER_DIR, mode='r')
-
 
 def apply_geonlp_api_parse_options(options: Optional[dict] = None):
     """
@@ -273,7 +270,7 @@ def check_jageocoder_enabled():
     Jageocoder が利用できるかどうか確認します。
     利用できない場合は InvalidParamsError (-32602) を送ります。
     """
-    if not config.JAGEOCODER_DIR:
+    if not config.JAGEOCODER_TREE:
         raise InvalidParamsError(
             message="'geocoding' option is not available on this server.")
 
@@ -500,7 +497,7 @@ def address_geocoding(address: str) -> dict:
     dict
         住所ジオコーディングの結果
     """
-    if not config.JAGEOCODER_DIR:
+    if not config.JAGEOCODER_TREE:
         raise MethodNotFoundError(
             message="'addressGeocoding' is not available on this server.")
 

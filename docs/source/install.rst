@@ -9,8 +9,8 @@
 pygeonlp は以下の環境で動作確認済みです。
 
 - x86_64 アーキテクチャ / Ubuntu 22.04.3 LTS
-- aarm64 アーキテクチャ / MacOS X Sonoma 14.1.1
-- Windows Subsystem for Linux / Ubuntu 20.04.6 LTS
+- aarm64 アーキテクチャ / MacOS X Sonoma 14.5
+- Windows Subsystem for Linux / Ubuntu 20.04.6 LTS, 22.04.3 LTS
 - x86_64, aarm64 アーキテクチャ / Docker desktop, Docker engine
 
 環境ごとのインストール手順は、リンク先を参照してください。

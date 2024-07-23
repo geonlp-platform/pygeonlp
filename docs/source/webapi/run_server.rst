@@ -80,11 +80,9 @@ Pygeonlp の環境変数を利用して WebAPI サーバの設定を変更でき
 
 .. collapse:: Jageocoderを利用したい場合
 
-  住所辞書をインストールしたいディレクトリを
-  環境変数 **JAGEOCODER_DB2_DIR** に設定して、
-  Jageocoder の住所辞書をインストールしてからサーバを起動してください。 ::
-
-    $ export JAGEOCODER_DB2_DIR=$HOME/jageocoder/db/
+  環境変数 **JAGEOCODER_SERVER_URL** に Jageocoder サーバの
+  URL を設定するか、Jageocoder の住所辞書をインストールしてから
+  サーバを起動してください。 ::
 
   詳細は :ref:`link_jageocoder` を参照してください。
 
