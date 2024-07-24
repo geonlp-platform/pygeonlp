@@ -10,7 +10,7 @@ import sys
 import os
 
 project = 'pygeonlp'
-copyright = '2021-2023, GeoNLP Project'
+copyright = '2021-2024, GeoNLP Project'
 author = 'sagara@info-proto.com <Takeshi Sagara>'
 
 # -- General configuration ---------------------------------------------------
@@ -20,6 +20,7 @@ templates_path = ['_templates']
 exclude_patterns = []
 
 language = 'ja'
+latex_engine = "platex"
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
