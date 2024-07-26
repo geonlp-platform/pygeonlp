@@ -71,8 +71,8 @@ class TestModuleMethods(unittest.TestCase):
             '20230101/13/13206A1968.geojson')).ExportToJson()
         gcfilter = GeoContainsFilter(geojson)
         api.default_workflow().filters = [gcfilter]
-        result = api.geoparse('府中に行きます')
-        self.assertEqual(result[0]['properties']['node_type'], 'GEOWORD')
+        results = api.geoparse('府中に行きます')
+        self.assertEqual(results[0]['properties']['node_type'], 'GEOWORD')
         api.default_workflow().filters = []
 
     def test_geo_disjoint_filter(self):
@@ -82,9 +82,26 @@ class TestModuleMethods(unittest.TestCase):
             '20200101/13/13208A1968.geojson')).ExportToJson()
         gcfilter = GeoDisjointFilter(geojson)
         api.default_workflow().filters = [gcfilter]
-        result = api.geoparse('府中に行きます')
-        self.assertEqual(result[0]['properties']['node_type'], 'GEOWORD')
+        results = api.geoparse('府中に行きます')
+        self.assertEqual(results[0]['properties']['node_type'], 'GEOWORD')
         api.default_workflow().filters = []
+
+    def test_issue1(self):
+        """
+        RecursionError: maximum recursion depth exceeded
+        """
+        results = api.geoparse("第二希望：東京、静岡、三重、滋賀、大阪")
+        self.assertEqual(len(results), 13)
+        self.assertEqual(results[4]['properties']['node_type'], 'GEOWORD')
+
+    def test_issue15(self):
+        """
+        「〇〇線××駅」を正しく解析できない
+        """
+        results = api.geoparse("高崎線上尾駅は埼玉県にあります。")
+        self.assertEqual(results[0]['properties']['surface'], "高崎")
+        self.assertEqual(results[1]['properties']['surface'], "線")
+        self.assertEqual(results[2]['properties']['surface'], "上尾駅")
 
 
 if __name__ == '__main__':

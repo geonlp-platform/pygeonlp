@@ -703,7 +703,7 @@ namespace geonlp
             if (next->canBeStop() ) {
               // 地名語に続かない語が続く場合は地名修飾語として扱う
               //  std::cerr << "stop = true: " << next->get_surface() << std::endl;
-              // alternative = "名詞-固有名詞-地名修飾語";
+              alternative = "名詞-固有名詞-地名修飾語";
               ;
             } else {
               // 地名語として扱う場合は次行のコメントを解除する

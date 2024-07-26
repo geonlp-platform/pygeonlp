@@ -127,7 +127,7 @@ def get_libgeonlp():
         define_macros=[
             ('MAJOR_VERSION', '1'),
             ('MINOR_VERSION', '2'),
-            ('REVISION', '3')
+            ('REVISION', '3'),
         ],
         include_dirs=[LIBGEONLP_INCLUDE_DIR] + boost_inc_dirs,
         library_dirs=[LIBGEONLP_SOURCE_DIR] + boost_lib_dirs,

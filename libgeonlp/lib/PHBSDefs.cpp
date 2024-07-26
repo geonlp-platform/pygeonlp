@@ -65,7 +65,7 @@ namespace geonlp
 		// antileaders.push_back("名詞,一般");
 		antileaders.push_back("名詞,形容動詞語幹");
 		// antileaders.push_back("名詞,接尾,地域"); // 接尾付きで地名語登録 -> 直前の地名が未登録の可能性もある
-		antileaders.push_back("名詞,接尾,一般");
+		// antileaders.push_back("名詞,接尾,一般"); // 「〇〇線」「▽▽駅」の「線」が該当
 	};
 	
 	/// @brief 地名接頭辞集合および地名接尾辞集合をプロファイルから読み込む。
