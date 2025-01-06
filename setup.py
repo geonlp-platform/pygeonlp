@@ -35,6 +35,7 @@ def get_libgeonlp():
     from distutils.errors import LinkError
 
     boost_libs = ['boost_regex', 'boost_system', 'boost_filesystem']
+    option_cflags = []
 
     # Search boost dirs
     boost_inc_dirs = None
@@ -45,7 +46,7 @@ def get_libgeonlp():
             boost_inc_dirs = [os.path.join(prefix, 'include')]
             boost_lib_dirs = [os.path.join(prefix, 'lib')]
             if 'brew' in prefix:  # MacOSX + Homebrew
-                os.environ["CFLAGS"] = '-std=c++14'
+                option_cflags.append('-std=c++14')
 
             break
 
@@ -84,7 +85,8 @@ def get_libgeonlp():
     compiled = compiler.compile(
         sources=[file_name],
         include_dirs=boost_inc_dirs,
-        output_dir='test_boost'
+        output_dir='test_boost',
+        extra_postargs=option_cflags,
     )
 
     libraries = None
@@ -133,6 +135,7 @@ def get_libgeonlp():
         library_dirs=[LIBGEONLP_SOURCE_DIR] + boost_lib_dirs,
         sources=LIBGEONLP_FILES + CPYGEONLP_FILES,
         libraries=['sqlite3', 'mecab'] + libraries,
+        extra_compile_args=option_cflags,
     )
     return libgeonlp
 

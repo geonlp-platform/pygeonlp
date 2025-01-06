@@ -12,7 +12,7 @@ flask-jsonrpc = "*"
 sphinx = ">=5.3.0, <6.0.0"
 sphinx-rtd-theme = ">=1.1.1"
 sphinx-toolbox = "*"
-pygeonlp = {file = ".", editable = true}
+# pygeonlp = {file = ".", editable = true}
 
 [packages]
 certifi = ">=2023.7.22"
