@@ -164,8 +164,8 @@ class Workflow(object):
         while pos_from < len(lattice):
             lattice_part = lattice[pos_from:pos_to]
             if pos_to - pos_from == 1 or \
-                    self.evaluator.count_combinations(
-                        lattice_part) < MAX_COMBINATIONS:
+                    self.evaluator.count_combinations(lattice_part) \
+                        < self.evaluator.max_combinations:
                 logger.debug("--- pos {} - {}".format(pos_from, pos_to))
                 for i in range(pos_from, pos_to):
                     nodes = lattice[i]

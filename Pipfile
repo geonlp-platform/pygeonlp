@@ -14,9 +14,9 @@ sphinx-rtd-theme = ">=1.1.1"
 sphinx-toolbox = "*"
 
 [packages]
-certifi = ">=2023.7.22"
+certifi = ">=2024.12.14"
 chardet = "*"
-cryptography = ">=42.0.4"
+cryptography = ">=43.0.1"
 deprecated = "*"
 flask = ">=2.2.5"
 geographiclib = "*"
@@ -26,10 +26,10 @@ python-dateutil = "~=2.8.1"
 requests = ">=2.32.0"
 setuptools = ">=70.0.0"
 urllib3 = ">=2.2.2"
-werkzeug = ">=3.0.3"
+werkzeug = ">=3.0.6"
+jageocoder = ">=2.1.9.dev2"
 
 [requires]
-python_version = "3"
 
 [scripts]
 format = "autopep8 -ivr --ignore E226,E24,W50,W690,E501 ."
