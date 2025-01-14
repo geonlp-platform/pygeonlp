@@ -190,7 +190,7 @@ pygeonlp は [jageocoder](https://pypi.org/project/jageocoder/) 用の住所辞�
 
 ### テストの実行（オプション）
 
-`python setup.py test` コマンドでユニットテストを実行します。
+`pytest` コマンドでユニットテストを実行します。
 
 
 ## pygeonlp のアンインストール

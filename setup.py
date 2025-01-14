@@ -157,7 +157,6 @@ setup(
             'pygeonlp = pygeonlp.api.__main__:main'
         ]
     },
-    test_suite='pygeonlp.tests',
     python_requires='>=3.9',
     install_requires=[
         'requests',

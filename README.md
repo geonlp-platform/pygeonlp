@@ -192,7 +192,7 @@ See the jageocoder documentation for installation instructions.
 
 ### Run tests (Optional)
 
-Run the unit tests with `python setup.py test` command.
+Run the unit tests with `pytest` command.
 
 
 ## Uninstall
