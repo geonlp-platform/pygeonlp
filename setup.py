@@ -158,7 +158,7 @@ setup(
         ]
     },
     test_suite='pygeonlp.tests',
-    python_requires='>=3.6.8',
+    python_requires='>=3.9',
     install_requires=[
         'requests',
         'chardet',

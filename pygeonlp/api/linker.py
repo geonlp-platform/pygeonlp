@@ -218,7 +218,8 @@ class Evaluator(object):
             保持する結果の最大数を指定します（デフォルト = 5）。
         max_combinations : int, optional
             ノード候補の組み合わせ数の上限値。これを超える組み合わせが
-            可能な入力が与えられた場合は例外 LinkerError を発生します。
+            可能な入力が与えられた場合は例外 LinkerError を発生しますので
+            必要に応じて大きくしてください。
             デフォルト値は linker.MAX_COMBINATIONS です。
         """
         from .scoring import ScoringClass

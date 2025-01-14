@@ -12,7 +12,6 @@ flask-jsonrpc = "*"
 sphinx = ">=5.3.0, <6.0.0"
 sphinx-rtd-theme = ">=1.1.1"
 sphinx-toolbox = "*"
-# pygeonlp = {file = ".", editable = true}
 
 [packages]
 certifi = ">=2023.7.22"
@@ -21,7 +20,6 @@ cryptography = ">=42.0.4"
 deprecated = "*"
 flask = ">=2.2.5"
 geographiclib = "*"
-jageocoder = ">=2.0.0"
 lxml = ">=4.9.1"
 pipenv = ">=2022.1.8"
 python-dateutil = "~=2.8.1"

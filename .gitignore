@@ -9,6 +9,7 @@ nohup.out
 *.egg-info/
 *.eggs
 *.so
+.DS_Store
 __pycache__/
 
 /dist/

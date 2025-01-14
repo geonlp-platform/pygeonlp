@@ -69,6 +69,11 @@ class Workflow(object):
         filters: list
             適用するフィルタオブジェクトのリスト。
             省略した場合は InputBasedFilter がセットされます。
+        max_combinations: int, optional
+            ノード候補の組み合わせ数の上限値。これを超える組み合わせが
+            可能な入力が与えられた場合は例外 LinkerError を発生しますので
+            必要に応じて大きくしてください。
+            デフォルト値は linker.MAX_COMBINATIONS です。
         """
         self.parser = Parser(
             db_dir=db_dir,
