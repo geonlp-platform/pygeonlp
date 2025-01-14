@@ -3,8 +3,8 @@
     {
       "geometry": {
         "coordinates": [
-          135.195275,
-          35.583365
+          134.48298,
+          34.074285
         ],
         "type": "Point"
       },
@@ -13,17 +13,17 @@
           "body": "府中",
           "dictionary_id": 3,
           "dictionary_identifier": "geonlp:ksj-station-N02",
-          "entry_id": "MREv4E",
-          "geolod_id": "We02Nd",
+          "entry_id": "7yxN4G",
+          "geolod_id": "Qi4qUj",
           "hypernym": [
-            "丹後海陸交通",
-            "天橋立鋼索鉄道"
+            "四国旅客鉄道",
+            "徳島線"
           ],
-          "institution_type": "民営鉄道",
-          "latitude": "35.583365",
-          "longitude": "135.195275",
+          "institution_type": "JR在来線",
+          "latitude": "34.074285",
+          "longitude": "134.48298",
           "ne_class": "鉄道施設/鉄道駅",
-          "railway_class": "鋼索鉄道",
+          "railway_class": "普通鉄道JR",
           "suffix": [
             "駅",
             ""
@@ -37,7 +37,7 @@
           "prononciation": "",
           "subclass1": "固有名詞",
           "subclass2": "地名語",
-          "subclass3": "We02Nd:府中駅",
+          "subclass3": "Qi4qUj:府中駅",
           "surface": "府中",
           "yomi": ""
         },

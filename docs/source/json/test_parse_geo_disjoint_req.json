@@ -3,7 +3,7 @@
   "params": {
     "sentence": "府中に行きます。",
     "options": {
-      "geo-disjoint": "https://geoshape.ex.nii.ac.jp/city/geojson/20200101/13/13208A1968.geojson"
+      "geo-disjoint": "https://geoshape.ex.nii.ac.jp/city/geojson/20230101/13/13206A1968.geojson"
     }
   },
   "id": "test_parse_geo_disjoint"

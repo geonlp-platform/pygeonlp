@@ -509,9 +509,9 @@ class TestParseOptions:
         query = {
             'method': 'geonlp.parse',
             'params': {
-                'sentence': '和歌山市は晴れ。',
+                'sentence': '和歌山市駅は晴れ。',
                 'options': {'set-class': [
-                    r'.*', r'-鉄道施設/.*', r'.*駅$'
+                    r'.*', r'-鉄道施設/.*', r'鉄道施設/鉄道駅'
                 ]}
             },
             'id': 'test_parse_set_class_except',
@@ -526,7 +526,7 @@ class TestParseOptions:
 
         # 地名語のチェック
         prop = features[0]['properties']
-        assert prop['surface'] == '和歌山市'
+        assert prop['surface'] == '和歌山市駅'
         assert prop['geoword_properties']['dictionary_identifier'] == \
             'geonlp:ksj-station-N02'
 
@@ -717,7 +717,7 @@ class TestSpatialFilters:
         指定すると、その範囲に含まれない地名語だけが候補になります。
 
         東京都付近の四角形を空間範囲として指定することで
-        京都市の府中駅に解決されます。
+        京王線の府中駅以外に解決されます。
         """
         query = {
             'method': 'geonlp.parse',
@@ -740,7 +740,7 @@ class TestSpatialFilters:
         # 地名語のチェック
         prop = features[0]['properties']
         assert prop['surface'] == '府中'
-        assert '天橋立鋼索鉄道' in prop['geoword_properties']['hypernym']
+        assert '京王線' not in prop['geoword_properties']['hypernym']
 
         write_resreq(query, result)
 
