@@ -225,7 +225,7 @@ class Evaluator(object):
         self.scoring_class = scoring_class
         self.scoring_options = scoring_options
         self.max_results = max_results
-        self.max_combinations = max_combinations
+        self.max_combinations = max_combinations 
 
         if self.scoring_class is None:
             self.scorer = ScoringClass(scoring_options)

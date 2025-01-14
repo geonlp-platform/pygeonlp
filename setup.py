@@ -35,6 +35,7 @@ def get_libgeonlp():
     from distutils.errors import LinkError
 
     boost_libs = ['boost_regex', 'boost_system', 'boost_filesystem']
+    option_cflags = []
 
     # Search boost dirs
     boost_inc_dirs = None
@@ -45,7 +46,7 @@ def get_libgeonlp():
             boost_inc_dirs = [os.path.join(prefix, 'include')]
             boost_lib_dirs = [os.path.join(prefix, 'lib')]
             if 'brew' in prefix:  # MacOSX + Homebrew
-                os.environ["CFLAGS"] = '-std=c++14'
+                option_cflags.append('-std=c++14')
 
             break
 
@@ -84,7 +85,8 @@ def get_libgeonlp():
     compiled = compiler.compile(
         sources=[file_name],
         include_dirs=boost_inc_dirs,
-        output_dir='test_boost'
+        output_dir='test_boost',
+        extra_postargs=option_cflags,
     )
 
     libraries = None
@@ -127,12 +129,13 @@ def get_libgeonlp():
         define_macros=[
             ('MAJOR_VERSION', '1'),
             ('MINOR_VERSION', '2'),
-            ('REVISION', '3'),
+            ('REVISION', '4')
         ],
         include_dirs=[LIBGEONLP_INCLUDE_DIR] + boost_inc_dirs,
         library_dirs=[LIBGEONLP_SOURCE_DIR] + boost_lib_dirs,
         sources=LIBGEONLP_FILES + CPYGEONLP_FILES,
         libraries=['sqlite3', 'mecab'] + libraries,
+        extra_compile_args=option_cflags,
     )
     return libgeonlp
 
@@ -140,7 +143,7 @@ def get_libgeonlp():
 # Setup tools
 setup(
     name='pygeonlp',
-    version='1.2.3',
+    version='1.2.4',
     description='A Python module for geotagging Japanese texts.',
     author='GeoNLP Project Team',
     author_email='geonlp@nii.ac.jp',

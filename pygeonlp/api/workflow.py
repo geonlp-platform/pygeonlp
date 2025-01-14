@@ -2,7 +2,7 @@ import logging
 
 from pygeonlp.api.parser import Parser
 from pygeonlp.api.filter import InputBasedFilter
-from pygeonlp.api.linker import Evaluator, MAX_COMBINATIONS
+from pygeonlp.api.linker import Evaluator
 from pygeonlp.api.node import Node
 
 logger = logging.getLogger(__name__)
@@ -32,9 +32,17 @@ class Workflow(object):
         ラティス表現から順位付きパス表現を作成する Evaluator のインスタンス。
     """
 
-    def __init__(self, db_dir=None, address_regex=None, jageocoder=None,
-                 scoring_class=None, scoring_options=None, filters=None,
-                 **options):
+    def __init__(
+            self,
+            db_dir=None,
+            address_regex=None,
+            jageocoder=None,
+            scoring_class=None,
+            scoring_options=None,
+            filters=None,
+            max_combinations=None,
+            **options
+        ):
         """
         パーザを初期化します。
 
@@ -65,12 +73,14 @@ class Workflow(object):
         self.parser = Parser(
             db_dir=db_dir,
             address_regex=address_regex,
-            jageocoder=jageocoder, **options)
+            jageocoder=jageocoder,
+            **options)
         self.filters = filters or [InputBasedFilter()]
         self.evaluator = Evaluator(
             scoring_class=scoring_class,
             scoring_options=scoring_options,
-            max_results=1, max_combinations=MAX_COMBINATIONS)
+            max_results=1,
+            max_combinations=max_combinations)
 
     def geoparse(self, sentence: str):
         """
