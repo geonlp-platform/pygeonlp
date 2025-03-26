@@ -16,7 +16,7 @@ sphinx-toolbox = "*"
 [packages]
 certifi = ">=2024.12.14"
 chardet = "*"
-cryptography = ">=43.0.1"
+cryptography = ">=44.0.1"
 deprecated = "*"
 flask = ">=2.2.5"
 geographiclib = "*"
@@ -27,7 +27,7 @@ requests = ">=2.32.0"
 setuptools = ">=70.0.0"
 urllib3 = ">=2.2.2"
 werkzeug = ">=3.0.6"
-jageocoder = ">=2.1.9.dev2"
+jageocoder = ">=2.1.9.dev3"
 
 [requires]
 
