@@ -1,10 +1,10 @@
 certifi==2024.12.14
 chardet==5.2.0
-cryptography==44.0.0
+cryptography==44.0.1
 Deprecated==1.2.15
-flask==3.1.0
+Flask==3.1.0
 geographiclib==2.0
-jageocoder==2.1.8.dev2
+jageocoder==2.1.9.dev3
 lxml==5.3.0
 python-dateutil==2.8.2
 requests==2.32.3
