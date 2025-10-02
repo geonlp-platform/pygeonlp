@@ -267,11 +267,15 @@ static PyObject * geonlp_ma_set_active_dictionaries(GeonlpMA *self, PyObject *ar
     PyObject *next = PyIter_Next(iter);
     if (!next) break;
     if (!PyLong_Check(next)) {
+      Py_DECREF(next);
+      Py_DECREF(iter);
       PyErr_SetString(PyExc_TypeError, "Param must be a list of int values.");
       return NULL;
     }
     dic_ids.push_back(int(PyLong_AsLong(next)));
+    Py_DECREF(next);
   }
+  Py_DECREF(iter);
   (self->_ptrObj)->setActiveDictionaries(dic_ids);
   Py_INCREF(Py_None);
   return Py_None;
@@ -314,7 +318,9 @@ static PyObject * geonlp_ma_set_active_classes(GeonlpMA *self, PyObject *args)
     } else if (PyUnicode_Check(next)) {
       ne_classes.push_back(std::string(PyUnicode_AsUTF8AndSize(next, NULL)));
     }
+    Py_DECREF(next);
   }
+  Py_DECREF(iter);
   (self->_ptrObj)->setActiveClasses(ne_classes);
   Py_INCREF(Py_None);
   return Py_None;
