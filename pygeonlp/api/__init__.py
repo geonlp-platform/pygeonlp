@@ -12,7 +12,11 @@ logger = getLogger(__name__)
 _default_workflow = None
 _default_manager = None
 
-__version__ = '1.2.4.post1'
+try:
+    from importlib.metadata import version as _pkg_version
+    __version__ = _pkg_version('pygeonlp')
+except Exception:
+    __version__ = 'unknown'
 
 
 def get_db_dir():

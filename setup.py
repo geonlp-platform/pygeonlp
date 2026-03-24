@@ -14,10 +14,28 @@ LIBGEONLP_HEADERS = glob.glob(os.path.join(LIBGEONLP_INCLUDE_DIR, '*.h'))
 CPYGEONLP_FILES = glob.glob(os.path.join(LIBGEONLP_DIR, '*.cpp'))
 
 # Other Variables
+VERSION = '1.2.5rc1'
 DESCRIPTION = __doc__
 LONG_DESCRIPTION = open("README.md", "r", encoding="utf-8").read()
 LICENSE = '2-Clause "Simplified" BSD License'
 DATA_FILES = glob.glob(os.path.join(BASE_DIR, 'base_data', '*.*'))
+
+
+def get_boost_version(boost_inc_dir):
+    """
+    Parse boost/version.hpp and return BOOST_VERSION as an integer.
+    BOOST_VERSION = (major * 100000) + (minor * 100) + patch
+    Returns None if the version cannot be determined.
+    """
+    version_file = os.path.join(boost_inc_dir, 'boost', 'version.hpp')
+    try:
+        with open(version_file, 'r') as f:
+            for line in f:
+                if '#define BOOST_VERSION ' in line:
+                    return int(line.split()[-1])
+    except (IOError, ValueError):
+        pass
+    return None
 
 
 def get_libgeonlp():
@@ -34,7 +52,6 @@ def get_libgeonlp():
     import distutils.ccompiler
     from distutils.errors import LinkError
 
-    boost_libs = ['boost_regex', 'boost_system', 'boost_filesystem']
     option_cflags = []
 
     # Search boost dirs
@@ -49,6 +66,13 @@ def get_libgeonlp():
                 option_cflags.append('-std=c++14')
 
             break
+
+    # Determine required boost libraries based on version.
+    # boost_system became header-only in Boost 1.69 (BOOST_VERSION 106900).
+    boost_version = get_boost_version(boost_inc_dirs[0]) if boost_inc_dirs else None
+    boost_libs = ['boost_regex', 'boost_filesystem']
+    if boost_version is None or boost_version < 106900:
+        boost_libs.append('boost_system')
 
     # Write a temporary .c file to compile
     c_code = dedent("""
@@ -90,18 +114,17 @@ def get_libgeonlp():
     )
 
     libraries = None
-    if not libraries:
-        try:
-            compiler.link_shared_lib(
-                compiled,
-                bin_file_name,
-                library_dirs=boost_lib_dirs,
-                libraries=boost_libs,
-            )
-        except LinkError:
-            pass
-        else:
-            libraries = boost_libs
+    try:
+        compiler.link_shared_lib(
+            compiled,
+            bin_file_name,
+            library_dirs=boost_lib_dirs,
+            libraries=boost_libs,
+        )
+    except LinkError:
+        pass
+    else:
+        libraries = boost_libs
 
     if not libraries:
         boost_mt_libs = [lib + '-mt' for lib in boost_libs]
@@ -126,11 +149,7 @@ def get_libgeonlp():
     libgeonlp = Extension(
         # see: https://setuptools.pypa.io/en/latest/deprecated/distutils/apiref.html#distutils.ccompiler.gen_preprocess_options  # noqa: E501
         'pygeonlp.capi',
-        define_macros=[
-            ('MAJOR_VERSION', '1'),
-            ('MINOR_VERSION', '2'),
-            ('REVISION', '4.post1'),
-        ],
+        define_macros=[],
         include_dirs=[LIBGEONLP_INCLUDE_DIR] + boost_inc_dirs,
         library_dirs=[LIBGEONLP_SOURCE_DIR] + boost_lib_dirs,
         sources=LIBGEONLP_FILES + CPYGEONLP_FILES,
@@ -143,7 +162,7 @@ def get_libgeonlp():
 # Setup tools
 setup(
     name='pygeonlp',
-    version='1.2.4.post1',
+    version=VERSION,
     description='A Python module for geotagging Japanese texts.',
     author='GeoNLP Project Team',
     author_email='geonlp@nii.ac.jp',
@@ -151,7 +170,7 @@ setup(
     long_description=LONG_DESCRIPTION,
     long_description_content_type='text/markdown',
     ext_modules=[get_libgeonlp()],
-    packages=['pygeonlp.api', 'pygeonlp.webapi'],
+    packages=['pygeonlp', 'pygeonlp.api', 'pygeonlp.webapi'],
     entry_points={
         'console_scripts': [
             'pygeonlp = pygeonlp.api.__main__:main'

@@ -64,7 +64,10 @@ class Parser(object):
             if not _jageocoder.is_initialized():
                 try:
                     _jageocoder.init()
-                except _jageocoder.exceptions.JageocoderError:
+                except (
+                    _jageocoder.exceptions.JageocoderError,
+                    _jageocoder.exceptions.AddressTreeException,
+                ):
                     pass
 
             if _jageocoder.is_initialized():

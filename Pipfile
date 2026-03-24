@@ -12,6 +12,7 @@ flask-jsonrpc = "*"
 sphinx = ">=5.3.0, <6.0.0"
 sphinx-rtd-theme = ">=1.1.1"
 sphinx-toolbox = "*"
+build = "*"
 
 [packages]
 certifi = ">=2024.12.14"

@@ -211,6 +211,7 @@ def main():
         exit(0)
 
     if args['list-dictionaries']:
+        print(f"データベースディレクトリ: '{db_dir}'\n")
         for metadata in manager.getDictionaries():
             dic = json.loads(metadata.jsonld)
             print("{} : {}\n- {}\n{}\n".format(
