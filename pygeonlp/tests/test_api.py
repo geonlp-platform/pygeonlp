@@ -6,6 +6,12 @@ import pygeonlp.api as api
 
 logger = logging.getLogger(__name__)
 
+try:
+    import osgeo  # noqa: F401
+    HAS_GDAL = True
+except ImportError:
+    HAS_GDAL = False
+
 """
 doc_string に書くには複雑過ぎる API のテスト。
 
@@ -64,6 +70,7 @@ class TestModuleMethods(unittest.TestCase):
         self.assertIsInstance(words, dict)
         self.assertIn('AGGwyc', words)  # 新宿線神保町駅
 
+    @unittest.skipUnless(HAS_GDAL, 'GDAL not installed')
     def test_geo_contains_filter(self):
         from pygeonlp.api.spatial_filter import SpatialFilter, GeoContainsFilter
         geojson = SpatialFilter.get_geometry((
@@ -75,6 +82,7 @@ class TestModuleMethods(unittest.TestCase):
         self.assertEqual(results[0]['properties']['node_type'], 'GEOWORD')
         api.default_workflow().filters = []
 
+    @unittest.skipUnless(HAS_GDAL, 'GDAL not installed')
     def test_geo_disjoint_filter(self):
         from pygeonlp.api.spatial_filter import SpatialFilter, GeoDisjointFilter
         geojson = SpatialFilter.get_geometry((

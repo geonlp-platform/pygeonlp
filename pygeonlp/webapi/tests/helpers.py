@@ -23,6 +23,8 @@ def call_jsonrpc(client, query):
         The JSON decoded value of the response.
     """
     if isinstance(query, dict):
+        if 'jsonrpc' not in query:
+            query = {'jsonrpc': '2.0', **query}
         query = json.dumps(query)
 
     headers = {"Content-Type": "application/json"}

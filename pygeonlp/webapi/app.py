@@ -1,7 +1,7 @@
 from collections.abc import Iterable
 import datetime
 from logging.config import dictConfig
-from typing import List, Union, Optional
+from typing import Any, Dict, List, Union, Optional
 
 from flask import Flask, redirect
 from flask_jsonrpc import JSONRPC
@@ -17,7 +17,7 @@ app.config.from_object(config)
 jsonrpc = JSONRPC(app, '/api', enable_web_browsable_api=True)
 
 
-def apply_geonlp_api_parse_options(options: Optional[dict] = None):
+def apply_geonlp_api_parse_options(options: Optional[Dict[str, Any]] = None):
     """
     Parse, ParseStructured のオプションに含まれる解析条件を
     geonlp_api に適用します。
@@ -166,7 +166,7 @@ def apply_geonlp_api_parse_options(options: Optional[dict] = None):
     geonlp_api.setActiveClasses(active_classes)
 
 
-def get_filters_from_options(options: Optional[dict] = {}):
+def get_filters_from_options(options: Optional[Dict[str, Any]] = {}):
     """
     Parse, ParseStructured のオプションに含まれる
     フィルタのリストを解析し、フィルタオブジェクトを作成して返す。
@@ -288,7 +288,7 @@ def version() -> str:
 
 
 @jsonrpc.method('geonlp.parse')
-def parse(sentence: str, options: Optional[dict] = {}) -> dict:
+def parse(sentence: str, options: Optional[Dict[str, Any]] = {}) -> dict:
     """
     テキストを geoparse します。
 
@@ -332,7 +332,7 @@ def parse(sentence: str, options: Optional[dict] = {}) -> dict:
 @jsonrpc.method('geonlp.parseStructured')
 def parse_structured(
         sentence_list: List[str],
-        options: Optional[dict] = {}) -> dict:
+        options: Optional[Dict[str, Any]] = {}) -> dict:
     """
     複数のセンテンスを geoparse します。
 
@@ -388,7 +388,7 @@ def parse_structured(
 
 
 @jsonrpc.method('geonlp.search')
-def search(key: str, options: Optional[dict] = None) -> dict:
+def search(key: str, options: Optional[Dict[str, Any]] = None) -> dict:
     """
     任意の地名語の情報をデータベースから検索します。
 
@@ -409,7 +409,7 @@ def search(key: str, options: Optional[dict] = None) -> dict:
 
 
 @jsonrpc.method('geonlp.getGeoInfo')
-def get_geo_info(idlist: List[str], options: Optional[dict] = None) -> dict:
+def get_geo_info(idlist: List[str], options: Optional[Dict[str, Any]] = None) -> dict:
     """
     指定した geolod_id を持つ語の情報を返します。
     id がデータベースに存在しない場合は None を返します。
@@ -431,7 +431,7 @@ def get_geo_info(idlist: List[str], options: Optional[dict] = None) -> dict:
 
 
 @jsonrpc.method('geonlp.getDictionaries')
-def get_dictionaries(options: Optional[dict] = None) -> list:
+def get_dictionaries(options: Optional[Dict[str, Any]] = None) -> list:
     """
     データベースに登録されている地名解析辞書の
     identifier のリストを返します。
@@ -455,7 +455,7 @@ def get_dictionaries(options: Optional[dict] = None) -> list:
 @jsonrpc.method('geonlp.getDictionaryInfo')
 def get_dictionary_info(
         identifier: str,
-        options: Optional[dict] = None) -> Union[str, None]:
+        options: Optional[Dict[str, Any]] = None) -> Union[str, None]:
     """
     指定された identifer を持つ地名解析辞書の JSONLD
     メタデータをデータベースから取得します。

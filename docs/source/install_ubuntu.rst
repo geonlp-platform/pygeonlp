@@ -6,7 +6,7 @@
 =========================
 
 ここでは Ubuntu に pygeonlp をインストールする手順の例を示します。
-動作確認済みのバージョンは 20.04.6 LTS および 22.04.3 LTS です。
+動作確認済みのバージョンは 20.04.6 LTS, 22.04.3 LTS および 24.04.4 LTS です。
 
 事前準備
 --------
@@ -36,10 +36,27 @@ pip3 コマンドで pygeonlp パッケージをインストールします。 :
     $ pip3 install pygeonlp
 
 pip や setuptools が古いとエラーが発生する場合があります。
-その場合は pip と setuptools を最新バージョンにアップグレードしてから
-実行してみてください。 ::
+その場合は pip と setuptools を最新バージョンにアップグレードしてから実行してみてください。 ::
 
     $ pip3 install --upgrade pip setuptools
+
+Ubuntu 24 では Python 3.12 が標準のバージョンになり、システム環境に pip でパッケージをインストールしようとすると
+``error: externally-managed-environment`` になります。
+これはシステム領域の Python がサードパーティのパッケージで汚染されることを防ぐためです (PEP 668)。
+そのため、任意のパッケージをインストールするには venv 等を利用してシステム領域とは隔離された仮想環境を作成する必要があります。 ::
+
+    $ sudo apt install python3.12-venv
+    $ python3 -m venv .venv
+    $ source .venv/bin/activate
+    (.venv) $
+
+プロンプトの先頭に `(.venv)` と表示されていれば仮想環境に入っていますので、 ``pip3 install pygeonlp`` を実行できます。
+仮想環境から抜けるには ``deativate`` を実行します。 ::
+
+    (.venv) $ deativate
+    $
+
+詳細は `venv --- 仮想環境の作成 <https://docs.python.org/ja/3/library/venv.html>`_ を参照してください。
 
 .. collapse:: (オプション)GDAL のインストール
 
