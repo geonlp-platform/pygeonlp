@@ -40,7 +40,7 @@ pip や setuptools が古いとエラーが発生する場合があります。
 
     $ pip3 install --upgrade pip setuptools
 
-Ubuntu 24 では Python 3.12 が標準のバージョンになり、システム環境に pip でパッケージをインストールしようとすると
+(補足) Ubuntu 24 では Python 3.12 が標準のバージョンになり、システム環境に pip でパッケージをインストールしようとすると
 ``error: externally-managed-environment`` になります。
 これはシステム領域の Python がサードパーティのパッケージで汚染されることを防ぐためです (PEP 668)。
 そのため、任意のパッケージをインストールするには venv 等を利用してシステム領域とは隔離された仮想環境を作成する必要があります。 ::

@@ -14,7 +14,7 @@ LIBGEONLP_HEADERS = glob.glob(os.path.join(LIBGEONLP_INCLUDE_DIR, '*.h'))
 CPYGEONLP_FILES = glob.glob(os.path.join(LIBGEONLP_DIR, '*.cpp'))
 
 # Other Variables
-VERSION = '1.2.5rc1'
+VERSION = '1.2.5'
 DESCRIPTION = __doc__
 LONG_DESCRIPTION = open("README.md", "r", encoding="utf-8").read()
 LICENSE = '2-Clause "Simplified" BSD License'
